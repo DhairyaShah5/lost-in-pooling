@@ -59,7 +59,8 @@ def load_backbone(name: str, device: torch.device | None = None) -> Backbone:
     if name == "clip_vitb16":
         from transformers import CLIPVisionModel
         m = CLIPVisionModel.from_pretrained(HF_IDS[name]).eval().requires_grad_(False).to(device)
-        ln = m.vision_model.post_layernorm
+        # transformers 4.x nests the tower under `.vision_model`; 5.x exposes it directly
+        ln = next(mod for name, mod in m.named_modules() if name.endswith("post_layernorm"))
 
         def tok(x):
             out = m(pixel_values=x)
