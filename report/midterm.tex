@@ -89,7 +89,7 @@ per-class AUROC is stratified by the relative size of the largest instance. On M
 with DINOv2 ViT-B/14 the best global read-out falls from 0.99 AUROC on large targets to 0.86
 on sub-patch ones, while an oracle that pools only the ground-truth region stays at 0.97 on
 the same tokens, so the evidence survives the encoder and is lost at pooling; the same holds
-on CLIP and SigLIP ViT-B/16. A gated attention head trained from image-level labels only
+on CLIP and SigLIP ViT-B/16, with the same ordering of read-outs on each. A gated attention head trained from image-level labels only
 recovers a third of the gap (0.90; 0.91 with a multi-scale variant), lifts mAP from 0.73 to
 0.80 (0.82 multi-scale), and places 12 to 24 times chance attention mass on the target; three
 seeds and paired bootstrap tests confirm it. Doubling the input resolution helps the oracle
@@ -561,14 +561,14 @@ Oracle & 0.973 & \textbf{0.994} & 0.989 & \textbf{0.996} & 0.992 & \textbf{0.999
 \paragraph{Which size variable governs the loss?}
 The pre-proposal predicted that the cliff tracks the ratio of target extent to patch area, so
 that curves for different resolutions should coincide when plotted against the number of
-patches an object covers. Figure~\ref{fig:patchunits} tests this with the 224 px and 448 px
-results on the same images. For the oracle the prediction holds: at equal patch coverage the
-448 px curve is level with or above the 224 px curve (an object covering one to two patches
-scores 0.991 at 224 px and 0.995 at 448 px). For the global read-outs it fails in a specific
-direction: at equal patch coverage the 448 px curves lie \emph{below} the 224 px ones (mean
-pooling 0.936 vs.\ 0.910 for one to two patches, 0.969 vs.\ 0.947 for 8 to 16 patches), because
-an object covering the same number of patches is a four times smaller fraction of the 1,024
-tokens being averaged. What governs the region read-out is how many patches see the object;
+patches an object covers. Figure~\ref{fig:patchunits} tests this with 224, 336 and 448 px
+results on the same images (probes trained on the same 5,000 images at every resolution).
+For the oracle the prediction holds: at equal patch coverage the three curves coincide (an
+object covering one to two patches scores 0.991, 0.995 and 0.995). For the global read-outs
+it fails in a specific direction: at equal patch coverage the curves order themselves by
+token count, with 448 px below 336 px below 224 px (mean pooling 0.936, 0.915 and 0.910 for
+one to two patches; 0.969, 0.959 and 0.947 for 8 to 16 patches), because an object covering
+the same number of patches is a smaller fraction of 576 or 1,024 tokens than of 256. What governs the region read-out is how many patches see the object;
 what governs the global read-out is what fraction of all tokens the object occupies, and
 raising the resolution improves the first while leaving the second unchanged. The second
 quantity can be computed from the box statistics of a dataset and the token count of a
@@ -579,10 +579,10 @@ the final report.
 \centering
 \guardedfig{figures/patch_units__dinov2_vitb14_reg.pdf}{\columnwidth}
 \caption{Macro AUROC against the largest instance's size in patches covered, DINOv2 ViT-B/14-reg
-on COCO val2017 at 224 px (solid) and 448 px (dashed), probes trained on the same 5,000
-images. The oracle curves coincide or improve at 448 px; the global read-outs drop, because the
-same patch coverage is a smaller fraction of four times as many tokens. Bands: 95\% bootstrap
-over images (200 draws).}
+on COCO val2017 at 224 px (solid), 336 px (dotted) and 448 px (dashed), probes trained on the
+same 5,000 images at every resolution. The oracle curves coincide; the global read-outs order
+themselves by token count, because the same patch coverage is a smaller fraction of more
+tokens. Bands: 95\% bootstrap over images (200 draws).}
 \label{fig:patchunits}
 \end{figure}
 
@@ -736,7 +736,9 @@ DINOv2 (attention mass 7.1 and 6.5 times chance vs.\ 12). On CLIP the head is th
 read-out in every bin below 3\%, and the three heads land within 0.04 of each other on
 sub-patch targets (0.899, 0.910, 0.872) although their oracles differ by 0.04 in the other
 direction, so the head is limited more by what it can learn from image-level labels than by
-what the tokens contain. Max-MIL is the one read-out whose behaviour changes qualitatively: it
+what the tokens contain. The multi-scale head is the best read-out on all three backbones
+(0.908, 0.913 and 0.878 on sub-patch targets; mAP 0.816, 0.747 and 0.775), so choosing the
+scale helps regardless of how the tokens were pretrained. Max-MIL is the one read-out whose behaviour changes qualitatively: it
 collapses on CLIP (0.770) and SigLIP (0.750), consistent with their patch tokens not being
 linearly class-separable one patch at a time, whereas region means over several patches (the
 oracle) remain informative.
@@ -815,7 +817,9 @@ cross-validated global probes do not move: CLS 0.582 overall (0.584 at 224 px) a
 patch at 224 px covers four at 448 px, and the region read-out sees that; the global vector,
 averaging over four times as many tokens, does not. For a frozen-backbone pipeline on
 radiographs, raising the input resolution without changing the aggregation buys nothing for
-small findings.
+small findings. RAD-DINO behaves the same way at 448 px: its cross-validated oracle rises to
+0.96 to 0.98 in every bin (0.960 for 0.1--0.3\% lesions, from 0.904) while its cross-validated
+CLS probe stays at 0.62 overall.
 
 \begin{figure*}[t]
 \centering
