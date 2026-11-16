@@ -345,12 +345,29 @@ train2017, split 9,000/1,000 into \emph{train} (probe fitting) and \emph{val} (m
 and early stopping only). No test image is seen during training or selection. Labels are
 80-way multi-label presence; category index follows ascending COCO category id.
 
-\subsection{Backbone and feature cache}
-DINOv2 ViT-B/14 with four register tokens, frozen, input squash-resized to $224\times224$,
-ImageNet mean and standard deviation. We keep the final-layer-norm CLS token
-$z_0\in\mathbb{R}^{768}$ and the $P=256$ patch tokens $\{z_i\}_{i=1}^{P}$ in row-major grid
-order; register tokens are discarded. Everything downstream reads this cache.
-
+\paragraph{Chest radiographs (NIH ChestX-ray14).}
+To test the motivating domain we add NIH ChestX-ray14 \citep{wang2017chestxray8}: 14 findings as
+image-level labels, and 984 radiologist boxes for 8 findings on 880 images. We downloaded
+23,839 images (all 880 boxed ones plus a random subset). Test = the 880 boxed images; train/val
+= 20,721/2,238 images, patient-disjoint from test (seeded). Size = box area over the $1024^2$
+frame. A pair that carries a finding label but no box counts as a positive overall and enters
+no size bin. Because the training images have no boxes, the oracle cannot be fitted on them;
+Section~\ref{sec:cxr-protocol} gives the cross-validated protocol.
+\subsection{Backbones and feature cache}
+\label{sec:backbones}
+Primary: DINOv2 ViT-B/14 with four register tokens, frozen, input squash-resized to
+$224\times224$ with ImageNet normalisation; we keep the final-layer-norm CLS token
+$z_0\in\mathbb{R}^{768}$ and the $P=256$ patch tokens in row-major grid order, and discard the
+register tokens. To test whether the pattern depends on the pretraining objective or the
+patch size we add two backbones with a 16-pixel patch ($14\times14=196$ tokens at 224 px, one
+patch $=0.51\%$ of the image): CLIP ViT-B/16 \citep{radford2021clip}, language-supervised,
+whose global vector is the post-layer-norm CLS token and whose patch tokens we take after the
+same layer norm; and SigLIP ViT-B/16 \citep{zhai2023siglip}, which has no CLS token and whose
+global vector is a learned multihead attention-pooling (MAP) head, so its ``CLS'' read-out is
+already a trained attention pool over the patches. For the radiographs we use DINOv2 and
+RAD-DINO \citep{perezgarcia2025raddino}, a DINOv2-B/14 continued-pretrained on chest X-rays
+(no registers). Every backbone is cached once per image as fp16 (global token plus patch
+tokens), and all read-outs of a backbone read the same cache.
 \subsection{Size variable, bins and box-to-patch mapping}
 \label{sec:bins}
 For class $c$ in image $n$ the size variable is $s_{n,c}=\max_{k}\,\mathrm{area}(b_k)/(W H)$
@@ -419,6 +436,19 @@ extraction runs at 38 images/s at 224 px and 10 images/s at 448 px, so the 224 p
 in well under a minute. We also cache 448 px features ($32\times32$ grid, one patch
 $=0.098\%$ of the image) for the test split and a 5,000-image training subset, to test whether
 the sub-patch bins recover once the object spans at least one token.
+
+\subsection{Chest radiograph protocol}
+\label{sec:cxr-protocol}
+The NIH training images carry labels but no boxes, so two protocols are run. (i) Image-level
+training as on COCO: CLS, mean, max, max-MIL and the attention head are trained on the 20,721
+training images and evaluated per size bin on the 880 boxed images. (ii) Cross-validation on
+the boxed images, following the motivating study: CLS, mean, max and the oracle are each
+fitted as per-class logistic regressions with 5-fold patient-disjoint cross-validation over
+the 880 boxed images, so all four see identical training images and the oracle gap is a
+same-data comparison; positives are boxed pairs, negatives are images without the finding
+label, and unboxed positives are excluded from fitting. With 79 to 180 boxed images per
+finding the bins are thin, so for this arm we lower the per-bin threshold to 5 positives per
+class and report the number of contributing findings.
 
 % ======================================================================
 \section{Initial Results}
