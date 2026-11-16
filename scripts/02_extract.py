@@ -21,7 +21,7 @@ if __name__ == "__main__":
     dev = get_device()
     t0 = time.time()
     model = load_backbone(a.backbone, dev)
-    print(f"loaded {a.backbone} on {dev} in {time.time()-t0:.0f}s; embed_dim={model.embed_dim}")
+    print(f"loaded {a.backbone} on {dev} in {time.time()-t0:.0f}s; embed_dim={model.embed_dim} patch={model.patch_size}")
     manifest = pd.read_parquet(a.manifest)
     for split in a.splits.split(","):
         t1 = time.time()
