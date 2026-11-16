@@ -17,7 +17,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--backbone", default="dinov2_vitb14_reg")
     p.add_argument("--exclude",
                    default="oracle_globalneg,cls_train5k,mean_train5k,max_train5k,attn_ent-0.1,attn_ent0.01,attn_ent0.1,"
-                           "attn_s1,attn_s2,maxmil_top8",
+                           "attn_s1,attn_s2,attn_ms_s1,attn_ms_s2,cls_s1,cls_s2,mean_s1,mean_s2,maxmil_top8",
                    help="comma-separated read-outs left out of both figure and table")
     p.add_argument("--tag", default="", help="appended to output stems, e.g. _cxr")
     p.add_argument("--fig-readouts", default="",

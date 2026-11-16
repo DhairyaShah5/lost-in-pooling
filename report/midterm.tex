@@ -632,9 +632,7 @@ most one of 256 patches. The attention is nevertheless far from uniform: its nor
 settles at 0.43 during training (uniform $=1$), so the head is not re-deriving mean pooling.
 
 \paragraph{Robustness and variants.}
-Three seeds of the $\lambda=0$ head give sub-patch AUROC 0.899, 0.891 and 0.889 (mean 0.893,
-s.d.\ 0.005) and mAP 0.800, 0.802 and 0.798, so the gain over mean pooling (0.862) is not a
-seed effect. Max-MIL with top-8 instead of top-1 pooling improves (0.958 on large targets, mAP 0.654) but stays below mean pooling in every bin. The multi-scale head
+Three seeds of the $\lambda=0$ head give sub-patch AUROC 0.899, 0.891 and 0.889 (mean 0.893, s.d.\ 0.005) and mAP 0.800, 0.802 and 0.798; three seeds of the CLS and mean probes give $0.836\pm0.004$ and $0.864\pm0.003$, so the gain over mean pooling is not a seed effect. Max-MIL with top-8 instead of top-1 pooling improves (0.958 on large targets, mAP 0.654) but stays below mean pooling in every bin. The multi-scale head
 (\texttt{attn\_ms}), which attends jointly over the $16\times16$ grid and its $2\times$ and
 $4\times$ average-pooled versions (336 tokens with learned scale embeddings, 478k parameters),
 is the best read-out we trained: $0.904\pm0.004$ on sub-patch targets over three seeds (0.908 for seed 0), 0.948 and 0.963 in the next two bins, 0.990 on large targets (level with mean pooling), overall AUROC 0.973 and mAP $0.815\pm0.002$, with
@@ -880,7 +878,7 @@ tennis-racket panel of Figure~\ref{fig:attention} shows that context routes stil
 the audit is what makes them visible.
 
 \paragraph{Limitations.}
-Every linear probe and the oracle rest on one seed; the heads are seeded (three seeds), with spreads of 0.005 to 0.016 on COCO and 0.015 to 0.084 on radiographs, where the thinnest bin moves most. The
+The oracle and the CLIP, SigLIP and chest probes rest on one seed; the DINOv2 CLS and mean probes and every head are seeded (three seeds), with spreads of 0.003 to 0.016 on COCO and 0.015 to 0.084 on radiographs, where the thinnest bin moves most. The
 chest bins are thin, with one to seven findings per bin and one finding in the 0.1--0.3\% bin,
 so chest-side per-bin numbers carry wide intervals and we lean on the overall and paired
 figures. The resolution ablations train probes on 5,000 images rather than 9,000 (or 20,721
