@@ -3,12 +3,12 @@
 Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 
 ## 0. Setup
-- [ ] 0.1 Python venv + dependencies (torch, torchvision, scikit-learn, ...)
-- [ ] 0.2 Repo scaffold: .gitignore, README, pyproject, docs/CONTRACTS.md, TODO.md
-- [ ] 0.3 Public GitHub repo `DhairyaShah5/lost-in-pooling` created, first push
-- [ ] 0.4 Download COCO 2017 annotations (241 MB)
-- [ ] 0.5 Download val2017 images (5,000 images, ~780 MB) = `test` split
-- [ ] 0.6 Download 10,000-image seeded subset of train2017 (~1.6 GB) = `train`/`val` splits
+- [x] 0.1 Python venv + dependencies (torch, torchvision, scikit-learn, ...)
+- [x] 0.2 Repo scaffold: .gitignore, README, pyproject, docs/CONTRACTS.md, TODO.md
+- [x] 0.3 Public GitHub repo `DhairyaShah5/lost-in-pooling` created, first push
+- [~] 0.4 Download COCO 2017 annotations (241 MB)
+- [~] 0.5 Download val2017 images (5,000 images, ~780 MB) = `test` split
+- [~] 0.6 Download 10,000-image seeded subset of train2017 (~1.6 GB) = `train`/`val` splits
 
 ## 1. Data
 - [ ] 1.1 Manifest builder: images, splits (train 9k / val 1k / test 5k)
