@@ -1,0 +1,526 @@
+{
+  "readout": "max",
+  "backbone": "rad_dino",
+  "res": 448,
+  "split": "test",
+  "n_images": 880,
+  "train_split": "train",
+  "notes": "linear probe on max (d=768), standardised, BCEWithLogits, AdamW, cosine: epochs=40 lr=0.001 wd=0.0001 bs=512 best_epoch=32 val_map=0.1495 seed=0 train_time_s=106",
+  "seed": 0,
+  "min_pos": 5,
+  "n_boot": 500,
+  "bins": {
+    "edges": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      1.0
+    ],
+    "names": [
+      "<0.1%",
+      "0.1-0.3%",
+      "0.3-1%",
+      "1-3%",
+      "3-10%",
+      ">10%"
+    ]
+  },
+  "per_bin": {
+    "<0.1%": {
+      "auroc_macro": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_classes": 0,
+      "n_pos": 0
+    },
+    "0.1-0.3%": {
+      "auroc_macro": 0.5098156254145112,
+      "ci_lo": 0.4083543760269103,
+      "ci_hi": 0.6085651384244005,
+      "n_classes": 1,
+      "n_pos": 21
+    },
+    "0.3-1%": {
+      "auroc_macro": 0.7026151693918031,
+      "ci_lo": 0.6411365904167383,
+      "ci_hi": 0.7541284991052012,
+      "n_classes": 5,
+      "n_pos": 112
+    },
+    "1-3%": {
+      "auroc_macro": 0.679961360761075,
+      "ci_lo": 0.6278446083101187,
+      "ci_hi": 0.7287650891619675,
+      "n_classes": 7,
+      "n_pos": 226
+    },
+    "3-10%": {
+      "auroc_macro": 0.7210132562040097,
+      "ci_lo": 0.6885595712852419,
+      "ci_hi": 0.7496417639351463,
+      "n_classes": 6,
+      "n_pos": 327
+    },
+    ">10%": {
+      "auroc_macro": 0.7756179941392188,
+      "ci_lo": 0.7409180355596487,
+      "ci_hi": 0.8060934581278405,
+      "n_classes": 7,
+      "n_pos": 281
+    }
+  },
+  "overall": {
+    "auroc_macro": 0.6724243553484619,
+    "map": 0.3116795719306623
+  },
+  "per_class_bin": {
+    "Atelectasis": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 2
+      },
+      "0.3-1%": {
+        "auroc": 0.6584375831780677,
+        "n_pos": 26
+      },
+      "1-3%": {
+        "auroc": 0.6456008708837137,
+        "n_pos": 89
+      },
+      "3-10%": {
+        "auroc": 0.6761652757989008,
+        "n_pos": 51
+      },
+      ">10%": {
+        "auroc": 0.8196366782006921,
+        "n_pos": 12
+      }
+    },
+    "Cardiomegaly": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.3-1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "1-3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 1
+      },
+      ">10%": {
+        "auroc": 0.7310047134706028,
+        "n_pos": 145
+      }
+    },
+    "Consolidation": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.3-1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "1-3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      ">10%": {
+        "auroc": null,
+        "n_pos": 0
+      }
+    },
+    "Edema": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.3-1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "1-3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      ">10%": {
+        "auroc": null,
+        "n_pos": 0
+      }
+    },
+    "Effusion": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 4
+      },
+      "0.3-1%": {
+        "auroc": 0.8080985915492956,
+        "n_pos": 7
+      },
+      "1-3%": {
+        "auroc": 0.7403969270166453,
+        "n_pos": 33
+      },
+      "3-10%": {
+        "auroc": 0.8101319182701845,
+        "n_pos": 71
+      },
+      ">10%": {
+        "auroc": 0.827603780578206,
+        "n_pos": 38
+      }
+    },
+    "Emphysema": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.3-1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "1-3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      ">10%": {
+        "auroc": null,
+        "n_pos": 0
+      }
+    },
+    "Fibrosis": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.3-1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "1-3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      ">10%": {
+        "auroc": null,
+        "n_pos": 0
+      }
+    },
+    "Hernia": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.3-1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "1-3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      ">10%": {
+        "auroc": null,
+        "n_pos": 0
+      }
+    },
+    "Infiltration": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.3-1%": {
+        "auroc": null,
+        "n_pos": 2
+      },
+      "1-3%": {
+        "auroc": 0.513974471830986,
+        "n_pos": 16
+      },
+      "3-10%": {
+        "auroc": 0.6210982108869433,
+        "n_pos": 74
+      },
+      ">10%": {
+        "auroc": 0.6957632894139028,
+        "n_pos": 31
+      }
+    },
+    "Mass": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 2
+      },
+      "0.3-1%": {
+        "auroc": 0.6584905660377358,
+        "n_pos": 20
+      },
+      "1-3%": {
+        "auroc": 0.7785386464631748,
+        "n_pos": 37
+      },
+      "3-10%": {
+        "auroc": 0.7912848158131177,
+        "n_pos": 15
+      },
+      ">10%": {
+        "auroc": 0.9142367066895369,
+        "n_pos": 11
+      }
+    },
+    "Nodule": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 2
+      },
+      "0.1-0.3%": {
+        "auroc": 0.5098156254145112,
+        "n_pos": 21
+      },
+      "0.3-1%": {
+        "auroc": 0.7238928997782956,
+        "n_pos": 49
+      },
+      "1-3%": {
+        "auroc": 0.6941902109033028,
+        "n_pos": 7
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      ">10%": {
+        "auroc": null,
+        "n_pos": 0
+      }
+    },
+    "Pleural_Thickening": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.3-1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "1-3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      ">10%": {
+        "auroc": null,
+        "n_pos": 0
+      }
+    },
+    "Pneumonia": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.3-1%": {
+        "auroc": null,
+        "n_pos": 1
+      },
+      "1-3%": {
+        "auroc": 0.5625539935600408,
+        "n_pos": 17
+      },
+      "3-10%": {
+        "auroc": 0.5963202077656053,
+        "n_pos": 73
+      },
+      ">10%": {
+        "auroc": 0.5229961788131302,
+        "n_pos": 29
+      }
+    },
+    "Pneumothorax": {
+      "<0.1%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "0.1-0.3%": {
+        "auroc": null,
+        "n_pos": 3
+      },
+      "0.3-1%": {
+        "auroc": 0.6641562064156206,
+        "n_pos": 10
+      },
+      "1-3%": {
+        "auroc": 0.8244744046696626,
+        "n_pos": 27
+      },
+      "3-10%": {
+        "auroc": 0.8310791086893062,
+        "n_pos": 43
+      },
+      ">10%": {
+        "auroc": 0.9180846118084611,
+        "n_pos": 15
+      }
+    }
+  },
+  "per_class_all": {
+    "Atelectasis": {
+      "auroc": 0.6594674488416324,
+      "n_pos": 302
+    },
+    "Cardiomegaly": {
+      "auroc": 0.7111491347462571,
+      "n_pos": 185
+    },
+    "Consolidation": {
+      "auroc": 0.5678905467569724,
+      "n_pos": 73
+    },
+    "Edema": {
+      "auroc": 0.7763950448914649,
+      "n_pos": 42
+    },
+    "Effusion": {
+      "auroc": 0.7629785120982304,
+      "n_pos": 312
+    },
+    "Emphysema": {
+      "auroc": 0.900709219858156,
+      "n_pos": 34
+    },
+    "Fibrosis": {
+      "auroc": 0.6450116009280741,
+      "n_pos": 18
+    },
+    "Hernia": {
+      "auroc": 0.39977220956719817,
+      "n_pos": 2
+    },
+    "Infiltration": {
+      "auroc": 0.5905674431202601,
+      "n_pos": 312
+    },
+    "Mass": {
+      "auroc": 0.7292277042071956,
+      "n_pos": 138
+    },
+    "Nodule": {
+      "auroc": 0.6698906427318684,
+      "n_pos": 162
+    },
+    "Pleural_Thickening": {
+      "auroc": 0.6239425564696649,
+      "n_pos": 41
+    },
+    "Pneumonia": {
+      "auroc": 0.5803768892874979,
+      "n_pos": 131
+    },
+    "Pneumothorax": {
+      "auroc": 0.7965620213739936,
+      "n_pos": 163
+    }
+  },
+  "coco_sml": {
+    "small": {
+      "auroc_macro": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_classes": 0,
+      "n_pos": 0
+    },
+    "medium": {
+      "auroc_macro": 0.6570149735483746,
+      "ci_lo": 0.5999158139699983,
+      "ci_hi": 0.7111238740673727,
+      "n_classes": 5,
+      "n_pos": 127
+    },
+    "large": {
+      "auroc_macro": 0.7256831668188796,
+      "ci_lo": 0.6908130830764204,
+      "ci_hi": 0.751751995255224,
+      "n_classes": 8,
+      "n_pos": 853
+    }
+  }
+}
