@@ -805,6 +805,18 @@ localises better than on any other backbone, with attention mass on small lesion
 times chance and pointing accuracy 0.19 to 0.27, which suggests the adapted tokens make the
 lesion easy to find and the remaining difficulty is in scoring it from a few hundred positives.
 
+\paragraph{Resolution on radiographs.}
+Repeating the cross-validated comparison at 448 px (DINOv2, $32\times32$ grid, same 880
+images and folds) reproduces the COCO mechanism result where it matters most. The oracle
+improves in every bin, and most for the smallest lesions: 0.981 for 0.1--0.3\% of the frame
+(from 0.902 at 224 px), 0.964 for 0.3--1\% (from 0.911) and 0.951 for 1--3\% (from 0.936). The
+cross-validated global probes do not move: CLS 0.582 overall (0.584 at 224 px) and 0.64 to
+0.77 per bin against 0.64 to 0.73 before. A radiologist's nodule that covers one 14-pixel
+patch at 224 px covers four at 448 px, and the region read-out sees that; the global vector,
+averaging over four times as many tokens, does not. For a frozen-backbone pipeline on
+radiographs, raising the input resolution without changing the aggregation buys nothing for
+small findings.
+
 \begin{figure*}[t]
 \centering
 \guardedfig{figures/attention_examples_cxr.png}{\textwidth}
