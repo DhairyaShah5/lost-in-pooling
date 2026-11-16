@@ -1,0 +1,133 @@
+{
+  "map": "attn",
+  "n_pairs": 984,
+  "bins": {
+    "edges": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      1.0
+    ],
+    "names": [
+      "<0.1%",
+      "0.1-0.3%",
+      "0.3-1%",
+      "1-3%",
+      "3-10%",
+      ">10%"
+    ]
+  },
+  "overall": {
+    "mass_in_box": 0.2125626714006672,
+    "chance_mass": 0.07562801702235772,
+    "mass_ratio": 2.810633939242752,
+    "pointing_acc": 0.4034552845528455,
+    "n": 984
+  },
+  "per_bin": {
+    "<0.1%": {
+      "mass_in_box": 0.000732123851776123,
+      "chance_mass": 0.00390625,
+      "mass_ratio": 0.1874237060546875,
+      "pointing_acc": 0.0,
+      "n": 2
+    },
+    "0.1-0.3%": {
+      "mass_in_box": 0.052230389788746834,
+      "chance_mass": 0.0040283203125,
+      "mass_ratio": 12.965798580285275,
+      "pointing_acc": 0.1875,
+      "n": 32
+    },
+    "0.3-1%": {
+      "mass_in_box": 0.09457941521768985,
+      "chance_mass": 0.006657608695652174,
+      "mass_ratio": 14.206214204126477,
+      "pointing_acc": 0.23478260869565218,
+      "n": 115
+    },
+    "1-3%": {
+      "mass_in_box": 0.12249547902461702,
+      "chance_mass": 0.018805309734513276,
+      "mass_ratio": 6.51387723754434,
+      "pointing_acc": 0.2831858407079646,
+      "n": 226
+    },
+    "3-10%": {
+      "mass_in_box": 0.1760846089299132,
+      "chance_mass": 0.05490186737804878,
+      "mass_ratio": 3.207260833541638,
+      "pointing_acc": 0.35365853658536583,
+      "n": 328
+    },
+    ">10%": {
+      "mass_in_box": 0.3956315629847109,
+      "chance_mass": 0.18241214412811388,
+      "mass_ratio": 2.168888287979589,
+      "pointing_acc": 0.6548042704626335,
+      "n": 281
+    }
+  },
+  "uniform": {
+    "overall": {
+      "mass_in_box": 0.07562801702235772,
+      "chance_mass": 0.07562801702235772,
+      "mass_ratio": 1.0,
+      "pointing_acc": 0.07562801702235772,
+      "n": 984
+    },
+    "per_bin": {
+      "<0.1%": {
+        "mass_in_box": 0.00390625,
+        "chance_mass": 0.00390625,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.00390625,
+        "n": 2
+      },
+      "0.1-0.3%": {
+        "mass_in_box": 0.0040283203125,
+        "chance_mass": 0.0040283203125,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.0040283203125,
+        "n": 32
+      },
+      "0.3-1%": {
+        "mass_in_box": 0.006657608695652174,
+        "chance_mass": 0.006657608695652174,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.006657608695652174,
+        "n": 115
+      },
+      "1-3%": {
+        "mass_in_box": 0.018805309734513276,
+        "chance_mass": 0.018805309734513276,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.018805309734513276,
+        "n": 226
+      },
+      "3-10%": {
+        "mass_in_box": 0.05490186737804878,
+        "chance_mass": 0.05490186737804878,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.05490186737804878,
+        "n": 328
+      },
+      ">10%": {
+        "mass_in_box": 0.18241214412811388,
+        "chance_mass": 0.18241214412811388,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.18241214412811388,
+        "n": 281
+      }
+    }
+  },
+  "readout": "attn",
+  "backbone": "dinov2_vitb14_reg",
+  "res": 224,
+  "split": "test",
+  "seed": 0,
+  "notes": "gated attention MIL head (attn); epochs=20 lr=0.001 wd=0.0001 lam=0 hidden=256 batch=128 dropout=0.1 seed=0 best_epoch=7 val_map=0.1821 params=408078 train_secs=274 device=mps"
+}

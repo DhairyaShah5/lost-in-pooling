@@ -787,7 +787,15 @@ controlled comparison gives the same answer as on COCO: the tokens carry the fin
 pooled vector does not. What differs from COCO is the absence of scene context. Every
 radiograph is a chest, so a global vector has nothing to predict a finding from except the
 finding itself, and without a context prior to fall back on the loss at pooling is close to
-total. \todo{cxr head sentence}
+total. The attention head, trained from the image-level labels of the 20,721 training
+radiographs, is the best read-out that sees no boxes: 0.73 overall AUROC against 0.70 for CLS,
+0.63 against 0.52 for lesions covering 0.1--0.3\% of the frame and 0.82 against 0.76 for the
+largest findings, and its attention mass on small lesions is 13 to 15 times chance. The
+multi-scale variant is level with it. The head therefore recovers part of what pooling loses
+on radiographs, as on COCO, but on radiographs the remaining distance to the oracle (0.15 to
+0.28 AUROC) is much larger: with no scene prior to lean on and only a few hundred positives
+per finding, learning where to look from image-level labels alone is far harder than reading
+a region that is pointed out. Max-MIL fails outright (0.56), as it did on CLIP and SigLIP.
 
 \begin{figure}[t]
 \centering
@@ -821,7 +829,9 @@ Oracle & \textbf{0.902} & \textbf{0.911} & \textbf{0.936} & \textbf{0.927} & \te
 CLS    & 0.517 & 0.709 & 0.683 & 0.687 & 0.759 & 0.699 \\
 Mean   & 0.532 & 0.717 & 0.655 & 0.722 & 0.791 & 0.691 \\
 Max    & 0.554 & 0.682 & 0.682 & 0.701 & 0.734 & 0.668 \\
-\multicolumn{7}{l}{\todo{cxr head rows}} \\
+Max-MIL          & 0.394 & 0.541 & 0.541 & 0.609 & 0.618 & 0.564 \\
+Attention head   & 0.634 & 0.755 & 0.719 & 0.749 & 0.821 & 0.727 \\
+Multi-scale head & 0.632 & 0.753 & 0.728 & 0.750 & 0.821 & 0.724 \\
 \bottomrule
 \end{tabular}
 \end{table}
