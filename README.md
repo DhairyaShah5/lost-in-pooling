@@ -40,7 +40,7 @@ unchanged: global pooling tracks the fraction of tokens an object occupies, not 
 Chest radiographs (NIH ChestX-ray14, 880 boxed images): with DINOv2, global probes score 0.58 (5-fold CV) to
 0.70 (trained on 20k radiographs) overall AUROC while the oracle on the same tokens reaches 0.88 to 0.94 per
 lesion-size bin and the attention head 0.73; RAD-DINO lifts every read-out (oracle 0.95 to 0.97, probes 0.77)
-without closing the gap. At 448 px the chest oracle rises to 0.96 to 0.98 and the global probes do not move, while the attention head trained on the full 448 px cache reaches 0.77 (0.73 at 224 px): the learned read-out gains from resolution where the global probes do not. Full tables, intervals and per-class breakdowns: `report/midterm.pdf`, `results/`,
+without closing the gap. At 448 px the chest oracle rises to 0.96 to 0.98 and the global probes do not move, while the attention head trained on the full 448 px cache reaches 0.77 +- 0.01 over three seeds (0.73 +- 0.02 at 224 px): the learned read-out gains from resolution where the global probes do not. Full tables, intervals and per-class breakdowns: `report/midterm.pdf`, `results/`,
 `results_cxr/`.
 
 ## Reproduce
