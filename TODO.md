@@ -19,9 +19,9 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 ## 2. Features
 - [x] 2.1 DINOv2 ViT-B/14-reg loader on MPS; squash-resize 224; fp16 memmap writer
 - [x] 2.2 Benchmark: ViT-B/14-reg runs at 38 img/s on MPS, kept
-- [~] 2.3 Extract `test` (val2017) features
-- [~] 2.4 Extract `train` + `val` subset features
-- [ ] 2.5 Go/no-go at ~19:00: extract 448-res features (test + 5k train) for the resolution ablation
+- [x] 2.3 Extract `test` (val2017) features (5,000 x 256 x 768 fp16, 1.8 GB)
+- [x] 2.4 Extract `train` + `val` subset features (9,000 + 1,000, 3.7 GB)
+- [~] 2.5 Extract 448-res features (test + val + 5k train) for the resolution ablation (started early, GPU was idle)
 
 ## 3. Evaluation harness
 - [ ] 3.1 Size bins (6 log-spaced) + COCO S/M/L mapping + box-to-patch mask
