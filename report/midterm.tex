@@ -904,6 +904,22 @@ targets, so its gain over mean pooling comes with localisation rather than inste
 tennis-racket panel of Figure~\ref{fig:attention} shows that context routes still exist, and
 the audit is what makes them visible.
 
+\paragraph{Limitations.}
+Several numbers rest on one seed: every linear probe, the oracle, and the chest heads; the
+COCO heads are seeded and their seed spread (0.005 to 0.016) is a guide to the rest. The
+chest bins are thin, with one to seven findings per bin and one finding in the 0.1--0.3\% bin,
+so chest-side per-bin numbers carry wide intervals and we lean on the overall and paired
+figures. The resolution ablations train probes on 5,000 images rather than 9,000 (or 20,721
+on radiographs) so that the resolutions are comparable with each other, which makes their
+absolute numbers lower than the main tables. The oracle's ``all'' column on radiographs
+includes label-positive pairs without a box, which it cannot see. A control that removes
+scene context on COCO is not available, because images with one small object and nothing
+else annotated are too rare (one class qualifies), so the context argument rests on the
+per-class analysis and the radiograph comparison rather than on a within-COCO control.
+Finally, squash-resizing distorts aspect ratios equally for every read-out, and the macro
+average over classes with at least 10 (COCO) or 5 (radiographs) positives per bin drops rare
+classes from the small bins.
+
 \paragraph{What this does and does not establish.}
 Measured with one harness, the loss at pooling is graded on natural images (0.13 to 0.15 AUROC
 between the largest and the sub-patch bin, never near chance) and a cliff on radiographs
