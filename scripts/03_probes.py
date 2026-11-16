@@ -46,6 +46,8 @@ def main() -> None:
     p.add_argument("--backbone", default="dinov2_vitb14_reg")
     p.add_argument("--res", type=int, default=224)
     p.add_argument("--readout-suffix", default="", help="appended to the read-out name, e.g. _top8")
+    p.add_argument("--train-limit", type=int, default=None,
+                   help="use only the first N train rows (manifest order), e.g. to match a smaller cache")
     p.add_argument("--kinds", default="cls,mean,cls_mean,max,maxmil",
                    help="comma-separated subset of cls,mean,cls_mean,max,maxmil")
     p.add_argument("--epochs", type=int, default=40, help="linear-probe epochs")
@@ -111,8 +113,9 @@ def main() -> None:
                         "history": hist, "dim": stores["train"].dim, "topk": a.mil_topk}, ck)
         else:
             X = {s: cache_pooled(stores[s], kind) for s in SPLITS}
+            n_tr = a.train_limit or len(X["train"])
             probe = LinearProbe().fit(
-                X["train"], labels["train"]["y"], X["val"], labels["val"]["y"],
+                X["train"][:n_tr], labels["train"]["y"][:n_tr], X["val"], labels["val"]["y"],
                 epochs=a.epochs, lr=a.lr, weight_decay=a.weight_decay,
                 batch_size=a.batch_size, device=a.probe_device, seed=a.seed, verbose=a.verbose)
             scores = probe.predict(X["test"])
