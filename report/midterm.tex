@@ -320,8 +320,13 @@ writes against, and committed JSON results under \fname{results/}. The steps are
 \item \textbf{Learned head.} Gated attention MIL head over the memmapped tokens with an
   entropy regulariser, plus the localisation metrics.
 \item \textbf{Evaluation and figures.} Per-class per-bin AUROC, macro average, bootstrap
-  confidence intervals, overall AUROC and mAP, results JSON, the blindness-curve figure and the
-  per-bin table.
+  confidence intervals, overall AUROC and mAP, results JSON, the blindness-curve figure and
+  the per-bin table; paired bootstrap, per-class, seed and cross-backbone analyses as further
+  scripts.
+\item \textbf{Chest radiograph arm.} A manifest builder that writes NIH ChestX-ray14 into the
+  same contract (14 findings, box area over the frame as size, patient-disjoint splits) and a
+  cross-validated read-out script for the boxed images, so every script above runs unchanged
+  with different paths.
 \end{enumerate}
 Every script is seeded, takes \texttt{--backbone}, \texttt{--res} and \texttt{--out} flags, and
 writes to the paths in the contract. Unit tests run on synthetic data without the real dataset. The code is public at
@@ -800,7 +805,8 @@ $16\times16$ grid). The head was trained from image-level labels only.}
 \caption{Blindness curve on NIH ChestX-ray14 boxed images (DINOv2 ViT-B/14-reg, 224 px), size
 = box area over the frame, macro AUROC over findings with at least 5 positives in the bin
 (the $<0.1\%$ bin has 2 pairs and is empty). Read-outs fitted by 5-fold patient-disjoint
-cross-validation on the 880 boxed images.}
+cross-validation on the 880 boxed images (suffix \texttt{\_cv5}) or trained on the 20,721
+unboxed training radiographs (no suffix).}
 \label{fig:cxr}
 \end{figure}
 
@@ -855,22 +861,25 @@ tennis-racket panel of Figure~\ref{fig:attention} shows that context routes stil
 the audit is what makes them visible.
 
 \paragraph{What this does and does not establish.}
-On natural images the cliff may be shallower than in chest radiography, where a lesion has no
-predictive context and the rest of the image looks the same with or without it. We expect and
-say specifically that the drop we observe for global read-outs on COCO, 0.13 to 0.15 AUROC
-between the largest and the sub-patch bin, is a graded loss and is not comparable to the
-chance-level result in chest radiography \citep{smalllesion2026}; it is a statement about
-DINOv2 ViT-B/14 at 224 px on COCO, not about foundation models in general.
-What the controlled comparison does establish, if the oracle stays high where the global
-read-outs fall, is that for \emph{this} encoder and \emph{these} tokens the loss occurs at
-aggregation and is recoverable by a read-out that can select patches.
+Measured with one harness, the loss at pooling is graded on natural images (0.13 to 0.15 AUROC
+between the largest and the sub-patch bin, never near chance) and a cliff on radiographs
+(0.27 to 0.31 per bin, with cross-validated global probes at 0.58 overall). The two are the
+same mechanism seen with and without a context prior: on COCO the global vector can fall back
+on the scene, on a chest radiograph it cannot. What the controlled comparisons establish is
+that for these encoders and these tokens the loss occurs at aggregation and is recoverable
+by a read-out that can select patches; what they do not establish is how much of it a head
+trained without boxes can recover in general. On COCO the answer is a third to three
+quarters of the gap depending on the backbone, on radiographs much less, and the per-class
+analysis says the recoverable share is largest exactly where context helps least. All
+statements are about the named backbones at 224 or 448 px on COCO val2017 and the NIH boxed
+images, with one seed except where seeds are reported.
 
 % ======================================================================
 \section{Updated Plan}
 \label{sec:plan}
 % ======================================================================
-Three weeks remain. The plan below keeps the midterm study as the core deliverable and adds the
-radiograph replication only after it is complete.
+Three weeks remain. The core comparison, the backbone and resolution extensions and the
+radiograph replication are in; the plan below deepens each rather than opening new fronts.
 
 \begin{table}[h]
 \centering\small
