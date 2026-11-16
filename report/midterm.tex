@@ -575,6 +575,34 @@ Oracle & 0.973 & \textbf{0.994} & 0.989 & \textbf{0.996} & 0.992 & \textbf{0.999
 \end{tabular}
 \end{table}
 
+\paragraph{Which size variable governs the loss?}
+The pre-proposal predicted that the cliff tracks the ratio of target extent to patch area, so
+that curves for different resolutions should coincide when plotted against the number of
+patches an object covers. Figure~\ref{fig:patchunits} tests this with the 224 px and 448 px
+results on the same images. For the oracle the prediction holds: at equal patch coverage the
+448 px curve is level with or above the 224 px curve (an object covering one to two patches
+scores 0.991 at 224 px and 0.995 at 448 px). For the global read-outs it fails in a specific
+direction: at equal patch coverage the 448 px curves lie \emph{below} the 224 px ones (mean
+pooling 0.936 vs.\ 0.910 for one to two patches, 0.969 vs.\ 0.947 for 8 to 16 patches), because
+an object covering the same number of patches is a four times smaller fraction of the 1,024
+tokens being averaged. What governs the region read-out is how many patches see the object;
+what governs the global read-out is what fraction of all tokens the object occupies, and
+raising the resolution improves the first while leaving the second unchanged. The second
+quantity can be computed from the box statistics of a dataset and the token count of a
+backbone without running the model, which is the pre-deployment check we will formalise in
+the final report.
+
+\begin{figure}[t]
+\centering
+\guardedfig{figures/patch_units__dinov2_vitb14_reg.pdf}{\columnwidth}
+\caption{Macro AUROC against the largest instance's size in patches covered, DINOv2 ViT-B/14-reg
+on COCO val2017 at 224 px (solid) and 448 px (dashed), probes trained on the same 5,000
+images. The oracle curves coincide or improve at 448 px; the global read-outs drop, because the
+same patch coverage is a smaller fraction of four times as many tokens. Bands: 95\% bootstrap
+over images (200 draws).}
+\label{fig:patchunits}
+\end{figure}
+
 \subsection{Learned head and localisation}
 \begin{figure*}[t]
 \centering
@@ -796,6 +824,20 @@ on radiographs, as on COCO, but on radiographs the remaining distance to the ora
 0.28 AUROC) is much larger: with no scene prior to lean on and only a few hundred positives
 per finding, learning where to look from image-level labels alone is far harder than reading
 a region that is pointed out. Max-MIL fails outright (0.56), as it did on CLIP and SigLIP.
+The one finding with enough small lesions for a per-finding estimate, nodules under 0.3\% of
+the frame ($n=23$), shows the pattern in miniature: mean pooling 0.54, head 0.64, oracle 0.89.
+Figure~\ref{fig:cxr-attn} shows the head's attention on six small findings: it lands on the
+nodules and the mass, is close on the effusion, and misses the pneumothorax and the
+atelectasis.
+
+\begin{figure*}[t]
+\centering
+\guardedfig{figures/attention_examples_cxr.png}{\textwidth}
+\caption{Attention of the gated head on NIH radiographs for findings covering 0.4--1\% of the
+frame (top: radiograph with the radiologist's box; bottom: the finding's attention map on the
+$16\times16$ grid). The head was trained from image-level labels only.}
+\label{fig:cxr-attn}
+\end{figure*}
 
 \begin{figure}[t]
 \centering
