@@ -216,9 +216,7 @@ encoder, learned pooling, image-level labels only.
 \subsection{Size-stratified evaluation and the motivating paper}
 COCO reports average precision separately for small (area below $32^2$ pixels), medium and
 large objects \citep{lin2014coco}, and most detection papers follow;
-\citet{cheng2023smallobject} argue for finer stratification. Classification benchmarks almost
-never stratify by target size. In medical imaging this matters because the clinically important
-finding is often small. ChestX-ray8 \citep{wang2017chestxray8} introduced weakly supervised
+\citet{cheng2023smallobject} argue for finer stratification. Classification benchmarks almost never stratify by target size, although in medical imaging the clinically important finding is often small. ChestX-ray8 \citep{wang2017chestxray8} introduced weakly supervised
 classification and localisation of thorax diseases from image-level labels, and foundation
 models for the domain now include BiomedCLIP \citep{zhang2023biomedclip} and RAD-DINO
 \citep{perezgarcia2025raddino}. The paper that motivates us evaluated frozen global embeddings
@@ -325,13 +323,7 @@ writes against, and committed JSON results under \fname{results/}. The steps are
 Every script is seeded, takes \texttt{--backbone}, \texttt{--res} and \texttt{--out} flags, and
 writes to the paths in the contract. Unit tests run on synthetic data without the real dataset. The code is public at
 \url{https://github.com/DhairyaShah5/lost-in-pooling}.
-Status at submission: the COCO study is complete on three backbones at 224 px and on DINOv2
-at 448 px (six fixed read-outs, the oracle and its negative-sampling ablation, the attention
-head with a $\lambda$ sweep, three seeds and a multi-scale variant, the localisation audit,
-paired bootstrap tests and the per-class analysis); the chest radiograph arm is complete on
-DINOv2 and RAD-DINO at 224 px, with 448 px runs in progress. Every figure and table is
-regenerated from the committed
-\texttt{results*/} JSON files by the numbered scripts.
+Status at submission: every experiment in Section~\ref{sec:results} is complete and committed, and every figure and table is regenerated from the \texttt{results*/} JSON files by the numbered scripts.
 
 % ======================================================================
 \section{Experimental Setup}
@@ -642,9 +634,7 @@ settles at 0.43 during training (uniform $=1$), so the head is not re-deriving m
 \paragraph{Robustness and variants.}
 Three seeds of the $\lambda=0$ head give sub-patch AUROC 0.899, 0.891 and 0.889 (mean 0.893,
 s.d.\ 0.005) and mAP 0.800, 0.802 and 0.798, so the gain over mean pooling (0.862) is not a
-seed effect. Max-MIL with top-8 instead of top-1 pooling recovers on large targets (0.958 vs.\
-0.945) and in mAP (0.654 vs.\ 0.631) but stays below mean pooling in every bin: the linear
-per-patch scorer is the limitation, not the pooling rule. The multi-scale head
+seed effect. Max-MIL with top-8 instead of top-1 pooling improves (0.958 on large targets, mAP 0.654) but stays below mean pooling in every bin. The multi-scale head
 (\texttt{attn\_ms}), which attends jointly over the $16\times16$ grid and its $2\times$ and
 $4\times$ average-pooled versions (336 tokens with learned scale embeddings, 478k parameters),
 is the best read-out we trained: 0.908 on sub-patch targets, 0.948 and 0.963 in the next two
