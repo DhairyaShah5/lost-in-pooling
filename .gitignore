@@ -1,7 +1,7 @@
 # data and cached features are never committed
-data/
-features/
-checkpoints/
+/data/
+/features/
+/checkpoints/
 *.npy
 *.npz
 *.parquet
