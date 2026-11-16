@@ -30,3 +30,6 @@ report/*.synctex.gz
 .DS_Store
 .idea/
 .vscode/
+
+# committed results: JSON + per-image test scores (small); attention maps stay local
+!results/scores/*.npy

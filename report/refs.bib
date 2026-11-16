@@ -1,0 +1,268 @@
+% Bibliography for the Lost in Pooling midterm report.
+% Numeric, citation-order (unsrtnat). Only entries we are confident exist.
+
+@misc{smalllesion2026,
+  title        = {{Frozen Foundation-Model Embeddings Discard Small-Lesion Signal in Chest Radiography: Implications for Pre-Deployment Evaluation}},
+  howpublished = {arXiv:2606.11606},
+  year         = {2026}
+}
+
+% ---- (a) frozen features and linear probing ----
+
+@inproceedings{kornblith2019transfer,
+  author    = {Kornblith, Simon and Shlens, Jonathon and Le, Quoc V.},
+  title     = {Do Better {ImageNet} Models Transfer Better?},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2019}
+}
+
+@inproceedings{radford2021clip,
+  author    = {Radford, Alec and Kim, Jong Wook and Hallacy, Chris and Ramesh, Aditya and Goh, Gabriel and Agarwal, Sandhini and Sastry, Girish and Askell, Amanda and Mishkin, Pamela and Clark, Jack and Krueger, Gretchen and Sutskever, Ilya},
+  title     = {Learning Transferable Visual Models From Natural Language Supervision},
+  booktitle = {Proceedings of the 38th International Conference on Machine Learning (ICML)},
+  year      = {2021}
+}
+
+@article{oquab2024dinov2,
+  author  = {Oquab, Maxime and Darcet, Timoth{\'e}e and Moutakanni, Th{\'e}o and Vo, Huy and Szafraniec, Marc and Khalidov, Vasil and Fernandez, Pierre and Haziza, Daniel and Massa, Francisco and El-Nouby, Alaaeldin and Assran, Mahmoud and Ballas, Nicolas and Galuba, Wojciech and Howes, Russell and Huang, Po-Yao and Li, Shang-Wen and Misra, Ishan and Rabbat, Michael and Sharma, Vasu and Synnaeve, Gabriel and Xu, Hu and J{\'e}gou, Herv{\'e} and Mairal, Julien and Labatut, Patrick and Joulin, Armand and Bojanowski, Piotr},
+  title   = {{DINOv2}: Learning Robust Visual Features without Supervision},
+  journal = {Transactions on Machine Learning Research (TMLR)},
+  year    = {2024},
+  note    = {arXiv:2304.07193}
+}
+
+@inproceedings{caron2021dino,
+  author    = {Caron, Mathilde and Touvron, Hugo and Misra, Ishan and J{\'e}gou, Herv{\'e} and Mairal, Julien and Bojanowski, Piotr and Joulin, Armand},
+  title     = {Emerging Properties in Self-Supervised Vision Transformers},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+  year      = {2021}
+}
+
+% ---- (b) how a ViT produces a global vector ----
+
+@inproceedings{dosovitskiy2021vit,
+  author    = {Dosovitskiy, Alexey and Beyer, Lucas and Kolesnikov, Alexander and Weissenborn, Dirk and Zhai, Xiaohua and Unterthiner, Thomas and Dehghani, Mostafa and Minderer, Matthias and Heigold, Georg and Gelly, Sylvain and Uszkoreit, Jakob and Houlsby, Neil},
+  title     = {An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2021}
+}
+
+@misc{beyer2022betterplain,
+  author       = {Beyer, Lucas and Zhai, Xiaohua and Kolesnikov, Alexander},
+  title        = {Better plain {ViT} baselines for {ImageNet-1k}},
+  howpublished = {arXiv:2205.01580},
+  year         = {2022}
+}
+
+@inproceedings{raghu2021vitcnn,
+  author    = {Raghu, Maithra and Unterthiner, Thomas and Kornblith, Simon and Zhang, Chiyuan and Dosovitskiy, Alexey},
+  title     = {Do Vision Transformers See Like Convolutional Neural Networks?},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2021}
+}
+
+@inproceedings{zhai2022scaling,
+  author    = {Zhai, Xiaohua and Kolesnikov, Alexander and Houlsby, Neil and Beyer, Lucas},
+  title     = {Scaling Vision Transformers},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2022}
+}
+
+@inproceedings{zhai2023siglip,
+  author    = {Zhai, Xiaohua and Mustafa, Basil and Kolesnikov, Alexander and Beyer, Lucas},
+  title     = {Sigmoid Loss for Language Image Pre-Training},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)},
+  year      = {2023}
+}
+
+@inproceedings{darcet2024registers,
+  author    = {Darcet, Timoth{\'e}e and Oquab, Maxime and Mairal, Julien and Bojanowski, Piotr},
+  title     = {Vision Transformers Need Registers},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2024}
+}
+
+% ---- (c) patch tokens localise objects without supervision ----
+
+@inproceedings{simeoni2021lost,
+  author    = {Sim{\'e}oni, Oriane and Puy, Gilles and Vo, Huy V. and Roburin, Simon and Gidaris, Spyros and Bursuc, Andrei and P{\'e}rez, Patrick and Marlet, Renaud and Ponce, Jean},
+  title     = {Localizing Objects with Self-Supervised Transformers and no Labels},
+  booktitle = {British Machine Vision Conference (BMVC)},
+  year      = {2021}
+}
+
+@inproceedings{wang2022tokencut,
+  author    = {Wang, Yangtao and Shen, Xi and Hu, Shell Xu and Yuan, Yuan and Crowley, James L. and Vaufreydaz, Dominique},
+  title     = {Self-Supervised Transformers for Unsupervised Object Discovery using Normalized Cut},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2022}
+}
+
+@inproceedings{amir2022deepvit,
+  author    = {Amir, Shir and Gandelsman, Yossi and Bagon, Shai and Dekel, Tali},
+  title     = {Deep {ViT} Features as Dense Visual Descriptors},
+  booktitle = {ECCV Workshops},
+  year      = {2022},
+  note      = {arXiv:2112.05814}
+}
+
+% ---- (d) small objects, scale and resolution ----
+
+@inproceedings{singh2018snip,
+  author    = {Singh, Bharat and Davis, Larry S.},
+  title     = {An Analysis of Scale Invariance in Object Detection -- {SNIP}},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2018}
+}
+
+@inproceedings{akyon2022sahi,
+  author    = {Akyon, Fatih Cagatay and Altinuc, Sinan Onur and Temizel, Alptekin},
+  title     = {Slicing Aided Hyper Inference and Fine-tuning for Small Object Detection},
+  booktitle = {IEEE International Conference on Image Processing (ICIP)},
+  year      = {2022}
+}
+
+@inproceedings{beyer2023flexivit,
+  author    = {Beyer, Lucas and Izmailov, Pavel and Kolesnikov, Alexander and Caron, Mathilde and Kornblith, Simon and Zhai, Xiaohua and Minderer, Matthias and Tschannen, Michael and Alabdulmohsin, Ibrahim and Pavetic, Filip},
+  title     = {{FlexiViT}: One Model for All Patch Sizes},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2023}
+}
+
+@article{cheng2023smallobject,
+  author  = {Cheng, Gong and Yuan, Xiang and Yao, Xiwen and Yan, Kebing and Zeng, Qinghua and Xie, Xingxing and Han, Junwei},
+  title   = {Towards Large-Scale Small Object Detection: Survey and Benchmarks},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  year    = {2023}
+}
+
+% ---- (e) multiple-instance learning pooling ----
+
+@article{dietterich1997mil,
+  author  = {Dietterich, Thomas G. and Lathrop, Richard H. and Lozano-P{\'e}rez, Tom{\'a}s},
+  title   = {Solving the multiple instance problem with axis-parallel rectangles},
+  journal = {Artificial Intelligence},
+  volume  = {89},
+  number  = {1--2},
+  pages   = {31--71},
+  year    = {1997}
+}
+
+@article{wang2018revisiting,
+  author  = {Wang, Xinggang and Yan, Yongluan and Tang, Peng and Bai, Xiang and Liu, Wenyu},
+  title   = {Revisiting multiple instance neural networks},
+  journal = {Pattern Recognition},
+  volume  = {74},
+  pages   = {15--24},
+  year    = {2018}
+}
+
+@inproceedings{ilse2018attention,
+  author    = {Ilse, Maximilian and Tomczak, Jakub M. and Welling, Max},
+  title     = {Attention-based Deep Multiple Instance Learning},
+  booktitle = {Proceedings of the 35th International Conference on Machine Learning (ICML)},
+  year      = {2018}
+}
+
+@article{campanella2019clinical,
+  author  = {Campanella, Gabriele and Hanna, Matthew G. and Geneslaw, Luke and Miraflor, Allen and Werneck Krauss Silva, Vitor and Busam, Klaus J. and Brogi, Edi and Reuter, Victor E. and Klimstra, David S. and Fuchs, Thomas J.},
+  title   = {Clinical-grade computational pathology using weakly supervised deep learning on whole slide images},
+  journal = {Nature Medicine},
+  volume  = {25},
+  pages   = {1301--1309},
+  year    = {2019}
+}
+
+@article{lu2021clam,
+  author  = {Lu, Ming Y. and Williamson, Drew F. K. and Chen, Tiffany Y. and Chen, Richard J. and Barbieri, Matteo and Mahmood, Faisal},
+  title   = {Data-efficient and weakly supervised computational pathology on whole-slide images},
+  journal = {Nature Biomedical Engineering},
+  volume  = {5},
+  pages   = {555--570},
+  year    = {2021}
+}
+
+% ---- (f) size-stratified evaluation and the motivating domain ----
+
+@inproceedings{lin2014coco,
+  author    = {Lin, Tsung-Yi and Maire, Michael and Belongie, Serge and Hays, James and Perona, Pietro and Ramanan, Deva and Doll{\'a}r, Piotr and Zitnick, C. Lawrence},
+  title     = {Microsoft {COCO}: Common Objects in Context},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2014}
+}
+
+@inproceedings{wang2017chestxray8,
+  author    = {Wang, Xiaosong and Peng, Yifan and Lu, Le and Lu, Zhiyong and Bagheri, Mohammadhadi and Summers, Ronald M.},
+  title     = {{ChestX-ray8}: Hospital-Scale Chest X-Ray Database and Benchmarks on Weakly-Supervised Classification and Localization of Common Thorax Diseases},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2017}
+}
+
+@misc{zhang2023biomedclip,
+  author       = {Zhang, Sheng and Xu, Yanbo and Usuyama, Naoto and Xu, Hanwen and Bagga, Jaspreet and Tinn, Robert and Preston, Sam and Rao, Rajesh and Wei, Mu and Valluri, Naveen and Wong, Cliff and Tupini, Andrea and Wang, Yu and Mazzola, Matt and Liu, Swadheen and Wang, Han and Nguyen, Nam and Rao, Varshita and others},
+  title        = {{BiomedCLIP}: a multimodal biomedical foundation model pretrained from fifteen million scientific image-text pairs},
+  howpublished = {arXiv:2303.00915},
+  year         = {2023}
+}
+
+@article{perezgarcia2025raddino,
+  author  = {P{\'e}rez-Garc{\'i}a, Fernando and Sharma, Harshita and Bond-Taylor, Sam and Bouzid, Kenza and Salvatelli, Valentina and Ilse, Maximilian and Bannur, Shruthi and Castro, Daniel C. and Schwaighofer, Anton and Lungren, Matthew P. and Wetscherek, Maria Teodora and Codella, Noel and Hyland, Stephanie L. and Alvarez-Valle, Javier and Oktay, Ozan},
+  title   = {Exploring scalable medical image encoders beyond text supervision},
+  journal = {Nature Machine Intelligence},
+  volume  = {7},
+  pages   = {119--130},
+  year    = {2025},
+  note    = {RAD-DINO; arXiv:2401.10815}
+}
+
+@article{oliva2007context,
+  author  = {Oliva, Aude and Torralba, Antonio},
+  title   = {The role of context in object recognition},
+  journal = {Trends in Cognitive Sciences},
+  volume  = {11},
+  number  = {12},
+  pages   = {520--527},
+  year    = {2007}
+}
+
+% ---- (g) audio event detection (deferred) ----
+
+@inproceedings{gemmeke2017audioset,
+  author    = {Gemmeke, Jort F. and Ellis, Daniel P. W. and Freedman, Dylan and Jansen, Aren and Lawrence, Wade and Moore, R. Channing and Plakal, Manoj and Ritter, Marvin},
+  title     = {Audio Set: An ontology and human-labeled dataset for audio events},
+  booktitle = {IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  year      = {2017}
+}
+
+@article{kong2019attention,
+  author  = {Kong, Qiuqiang and Yu, Changsong and Xu, Yong and Iqbal, Turab and Wang, Wenwu and Plumbley, Mark D.},
+  title   = {Weakly Labelled {AudioSet} Tagging With Attention Neural Networks},
+  journal = {IEEE/ACM Transactions on Audio, Speech, and Language Processing},
+  volume  = {27},
+  number  = {11},
+  pages   = {1791--1802},
+  year    = {2019}
+}
+
+@inproceedings{wang2019milpooling,
+  author    = {Wang, Yun and Li, Juncheng and Metze, Florian},
+  title     = {A Comparison of Five Multiple Instance Learning Pooling Functions for Sound Event Detection with Weak Labeling},
+  booktitle = {IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  year      = {2019}
+}
+
+@article{kong2020panns,
+  author  = {Kong, Qiuqiang and Cao, Yin and Iqbal, Turab and Wang, Yuxuan and Wang, Wenwu and Plumbley, Mark D.},
+  title   = {{PANNs}: Large-Scale Pretrained Audio Neural Networks for Audio Pattern Recognition},
+  journal = {IEEE/ACM Transactions on Audio, Speech, and Language Processing},
+  volume  = {28},
+  pages   = {2880--2894},
+  year    = {2020}
+}
+
+@inproceedings{chen2023beats,
+  author    = {Chen, Sanyuan and Wu, Yu and Wang, Chengyi and Liu, Shujie and Tompkins, Daniel and Chen, Zhuo and Che, Wanxiang and Yu, Xiangzhan and Wei, Furu},
+  title     = {{BEATs}: Audio Pre-Training with Acoustic Tokenizers},
+  booktitle = {Proceedings of the 40th International Conference on Machine Learning (ICML)},
+  year      = {2023}
+}
