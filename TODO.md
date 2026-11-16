@@ -31,11 +31,11 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 3.5 Unit tests on synthetic data (20 tests, bootstrap 3 s at N=5000)
 
 ## 4. Fixed read-outs (baselines)
-- [ ] 4.1 Pooling: CLS, mean, CLS+mean concat, per-dimension max
-- [ ] 4.2 Linear probe trainer (joint BCE, early stopping on `val` split)
-- [ ] 4.3 Max-MIL (per-patch linear scores, max over patches)
-- [ ] 4.4 Oracle region pooling (GT boxes; matched random boxes for negatives), per-class probes
-- [ ] 4.5 Run 4.1 to 4.4 on `test`, save results JSON + scores
+- [x] 4.1 Pooling: CLS, mean, CLS+mean concat, per-dimension max
+- [x] 4.2 Linear probe trainer (joint BCE, early stopping on `val` split)
+- [~] 4.3 Max-MIL (per-patch linear scores, max over patches)
+- [~] 4.4 Oracle region pooling (GT boxes; matched random boxes for negatives), per-class probes
+- [~] 4.5 Run 4.1 to 4.4 on `test`, save results JSON + scores
 - [ ] 4.6 Blindness curve v1 figure + table committed
 
 ## 5. Learned head
