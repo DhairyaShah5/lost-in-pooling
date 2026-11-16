@@ -117,5 +117,5 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 16.1 Extract the full 20,721-image 448 px training cache for DINOv2 (31 min, 11 img/s)
 - [x] 16.2 Attention head on the full 448 px cache, seed 0: 0.766 overall AUROC (0.727 at 224 px on the same images), mAP 0.375, attention mass 3.4x chance, pointing 0.50
 - [ ] 16.3 Seeds 1 and 2 of the full-cache 448 px head (running in parallel)
-- [ ] 16.4 Like-for-like CLS / mean / max probes on the full 448 px cache
+- [x] 16.4 Like-for-like CLS / mean / max probes on the full 448 px cache (0.711 / 0.710 / 0.663 vs head 0.766)
 - [ ] 16.5 Report (chest resolution paragraph, Table tab:cxr row, limitations, plan), README, push
