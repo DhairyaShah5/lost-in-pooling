@@ -524,32 +524,37 @@ box-pooled from globally pooled statistics without reading content. We report th
 version as the upper bound.
 
 \subsection{Learned head and localisation}
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\guardedfig{\figAttention}{\columnwidth}
-\caption{Attention maps of the gated attention head for \todo{k} test images with small
-targets, one row per size bin. Ground-truth boxes in \todo{colour}; the attention map for the
-labelled class is overlaid on the $16\times16$ grid. \todo{confirm layout and which
-$\lambda$}.}
+\guardedfig{\figAttention}{\textwidth}
+\caption{Class-specific attention of the gated head ($\lambda=0$) for six test images whose
+largest instance of the named class covers 0.15--0.30\% of the image (sub-patch to one patch).
+Top: the squash-resized input with the ground-truth boxes of that class in white. Bottom: the
+class's attention map on the $16\times16$ grid, normalised by its maximum. The head finds the
+surfer, the traffic light, the glove and the clock; it lands one patch beside the bird; and for
+the tennis racket it attends to the player's body, a context cue, not the target.}
 \label{fig:attention}
-\end{figure}
+\end{figure*}
 
 \begin{table}[t]
 \centering\small
 \caption{Localisation audit of the attention head per size bin: mean attention mass inside the
 ground-truth boxes versus its chance level (box area as a fraction of the grid), and
-pointing-game accuracy. $\lambda=\todo{value}$.}
+pointing-game accuracy (arg-max patch inside a box). $\lambda=0$; $n$ is the number of
+positive (image, class) pairs. \emph{Uniform} attention would score exactly the chance column.}
 \label{tab:localisation}
-\begin{tabular}{lrrr}
+\begin{tabular}{lrrrrr}
 \toprule
-Bin & Mass in box & Chance & Pointing acc. \\
+Bin & $n$ & Mass in box & Chance & Ratio & Pointing \\
 \midrule
-$<0.1\%$     & \todo{} & \todo{} & \todo{} \\
-0.1--0.3\%   & \todo{} & \todo{} & \todo{} \\
-0.3--1\%     & \todo{} & \todo{} & \todo{} \\
-1--3\%       & \todo{} & \todo{} & \todo{} \\
-3--10\%      & \todo{} & \todo{} & \todo{} \\
-$>10\%$      & \todo{} & \todo{} & \todo{} \\
+$<0.1\%$     & 637   & 0.088 & 0.007 & 12.1 & 0.129 \\
+0.1--0.3\%   & 1,149 & 0.195 & 0.008 & 23.5 & 0.260 \\
+0.3--1\%     & 2,037 & 0.304 & 0.013 & 23.7 & 0.382 \\
+1--3\%       & 2,324 & 0.447 & 0.030 & 15.0 & 0.515 \\
+3--10\%      & 3,045 & 0.636 & 0.086 & 7.4  & 0.715 \\
+$>10\%$      & 5,439 & 0.813 & 0.410 & 2.0  & 0.842 \\
+\midrule
+All          & 14,631 & 0.567 & 0.178 & 3.2 & 0.623 \\
 \bottomrule
 \end{tabular}
 \end{table}
