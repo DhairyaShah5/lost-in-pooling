@@ -168,9 +168,7 @@ average pooling (GAP) of the patch tokens is the alternative; \citet{beyer2022be
 found that a plain ViT trained with GAP matches or slightly exceeds the CLS variant on
 ImageNet, and \citet{raghu2021vitcnn} showed that the two organise spatial information differently. The third option is a learned multihead
 attention pooling (MAP) head, a single cross-attention layer with a learned query, introduced
-for scaling ViTs \citep{zhai2022scaling} and used by SigLIP \citep{zhai2023siglip}. All three
-produce one fixed-size vector before any downstream task is specified, so none of them can know
-which patches will matter for a later label. \citet{darcet2024registers} add a complication:
+for scaling ViTs \citep{zhai2022scaling} and used by SigLIP \citep{zhai2023siglip}. All three produce one fixed-size vector before any downstream task is specified. \citet{darcet2024registers} add a complication:
 large supervised and self-supervised ViTs recycle low-information background patches as
 high-norm tokens that carry global rather than local content, which corrupts the patch map;
 adding dedicated register tokens removes the artefacts and improves dense downstream tasks. We
@@ -184,11 +182,9 @@ object. LOST \citep{simeoni2021lost} localises an object in a single forward pas
 the patch with the fewest positive correlations to the others as a seed and growing a region of
 correlated patches, with no training at all. TokenCut \citep{wang2022tokencut} builds a graph
 over patch tokens and applies a normalised cut to separate the object from the background.
-\citet{amir2022deepvit} show that intermediate DINO-ViT features act as dense descriptors with
-part-level correspondence across images. DINOv2 extended this with large-scale curated
+Intermediate DINO-ViT features act as dense descriptors \citep{amir2022deepvit}. DINOv2 extended this with large-scale curated
 pretraining and reports strong linear segmentation and depth results from frozen patch tokens
-\citep{oquab2024dinov2}. Together these results say that the information needed to find and to
-classify an object survives in the tokens; what is at issue is whether global pooling keeps it.
+\citep{oquab2024dinov2}. The information needed to find and classify an object survives in the tokens; at issue is whether global pooling keeps it.
 
 \subsection{Small objects, scale and resolution}
 Small objects are the hardest case for detectors: scale variation dominates detection error
