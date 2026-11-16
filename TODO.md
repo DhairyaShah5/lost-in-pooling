@@ -83,9 +83,9 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [ ] 10.2 Figure + table for the per-class analysis
 
 ## 11. Chest X-ray replication (stretch, strict time budget)
-- [~] 11.1 Obtain NIH ChestX-ray14 labels, the 984 boxed images, and a training subset
-- [ ] 11.2 Manifest/labels/boxes in the same contract (findings as classes, box area fraction as size)
-- [ ] 11.3 Features (DINOv2 and RAD-DINO) + CLS/mean/oracle/head read-outs
+- [x] 11.1 Obtain NIH ChestX-ray14 labels, the 984 boxed images, and a training subset
+- [x] 11.2 Manifest/labels/boxes in the same contract (findings as classes, box area fraction as size)
+- [~] 11.3 Features (DINOv2 and RAD-DINO) + CLS/mean/oracle/head read-outs
 - [ ] 11.4 Chest X-ray blindness curve in the report
 
 ## 12. Report v2

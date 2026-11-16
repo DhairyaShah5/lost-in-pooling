@@ -347,9 +347,10 @@ and early stopping only). No test image is seen during training or selection. La
 
 \paragraph{Chest radiographs (NIH ChestX-ray14).}
 To test the motivating domain we add NIH ChestX-ray14 \citep{wang2017chestxray8}: 14 findings as
-image-level labels, and 984 radiologist boxes for 8 findings on 880 images. We downloaded
-23,839 images (all 880 boxed ones plus a random subset). Test = the 880 boxed images; train/val
-= 20,721/2,238 images, patient-disjoint from test (seeded). Size = box area over the $1024^2$
+image-level labels, and 984 radiologist boxes for 8 findings on 880 images. We fetched 40,880
+of the 112,120 images (all 880 boxed ones plus a seeded random subset) and use 23,839 of them
+here. Test = the 880 boxed images; train/val = 20,721/2,238 images, patient-disjoint from test
+(images sharing a patient with a test image are dropped). Size = box area over the $1024^2$
 frame. A pair that carries a finding label but no box counts as a positive overall and enters
 no size bin. Because the training images have no boxes, the oracle cannot be fitted on them;
 Section~\ref{sec:cxr-protocol} gives the cross-validated protocol.
