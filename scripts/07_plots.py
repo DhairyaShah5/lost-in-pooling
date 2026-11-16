@@ -15,6 +15,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--report-fig-dir", default="report/figures")
     p.add_argument("--res", type=int, default=224)
     p.add_argument("--backbone", default="dinov2_vitb14_reg")
+    p.add_argument("--exclude", default="oracle_globalneg",
+                   help="comma-separated read-outs left out of both figure and table")
+    p.add_argument("--fig-readouts", default="",
+                   help="comma-separated read-outs to draw (default: all kept); table always has all")
     a = p.parse_args(argv)
 
     results_dir = Path(a.results_dir)
@@ -22,13 +26,17 @@ def main(argv: list[str] | None = None) -> int:
         r for r in load_all_results(results_dir)
         if str(r.get("backbone")) == a.backbone and int(r.get("res", -1)) == a.res
     ]
+    excl = {x for x in a.exclude.split(",") if x}
+    results = [r for r in results if str(r.get("readout")) not in excl]
     if not results:
         print(f"no results for backbone={a.backbone} res={a.res} in {results_dir}", file=sys.stderr)
         return 1
+    keep = {x for x in a.fig_readouts.split(",") if x}
+    fig_results = [r for r in results if not keep or str(r.get("readout")) in keep]
 
     stem = f"blindness_curve__{a.backbone}__res{a.res}"
     fig_dir = Path(a.fig_dir)
-    written = plot_blindness_curves(results, fig_dir / stem, res=a.res)
+    written = plot_blindness_curves(fig_results, fig_dir / stem, res=a.res)
     report_dir = Path(a.report_fig_dir)
     report_dir.mkdir(parents=True, exist_ok=True)
     for src in list(written):
