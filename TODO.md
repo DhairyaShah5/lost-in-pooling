@@ -112,3 +112,10 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 15.1 Multi-scale head seeds on DINOv2 (0.904 +- 0.004 sub-patch; lead over single-scale holds)
 - [x] 15.2 Chest head seeds: DINOv2 gain holds (0.732 +- 0.016 vs 0.699); RAD-DINO gain does not (0.764 +- 0.015 vs 0.773), report corrected
 - [x] 15.3 Limitations paragraph; final rebuild and push
+
+# Phase 6 (Nov 15, 20:47 to 23:30): chest X-rays on the full 448 px cache
+- [x] 16.1 Extract the full 20,721-image 448 px training cache for DINOv2 (31 min, 11 img/s)
+- [x] 16.2 Attention head on the full 448 px cache, seed 0: 0.766 overall AUROC (0.727 at 224 px on the same images), mAP 0.375, attention mass 3.4x chance, pointing 0.50
+- [ ] 16.3 Seeds 1 and 2 of the full-cache 448 px head (running in parallel)
+- [ ] 16.4 Like-for-like CLS / mean / max probes on the full 448 px cache
+- [ ] 16.5 Report (chest resolution paragraph, Table tab:cxr row, limitations, plan), README, push
