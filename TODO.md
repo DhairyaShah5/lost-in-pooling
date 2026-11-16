@@ -65,17 +65,17 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 # Phase 2: expand the study (Nov 15, 17:30 to 23:00)
 
 ## 8. More backbones (same harness, same images)
-- [ ] 8.1 Backbone abstraction: torch.hub DINOv2 + Hugging Face CLIP/SigLIP, per-model normalisation, patch size in meta
-- [ ] 8.2 Extract CLIP ViT-B/16 (224, 14x14 grid) for all splits
-- [ ] 8.3 Extract SigLIP ViT-B/16 (224, 14x14 grid) for all splits
+- [x] 8.1 Backbone abstraction: torch.hub DINOv2 + Hugging Face CLIP/SigLIP, per-model normalisation, patch size in meta
+- [~] 8.2 Extract CLIP ViT-B/16 (224, 14x14 grid) for all splits
+- [~] 8.3 Extract SigLIP ViT-B/16 (224, 14x14 grid) for all splits
 - [ ] 8.4 Probes + oracle + attention head on CLIP
 - [ ] 8.5 Probes + oracle + attention head on SigLIP
 - [ ] 8.6 Cross-backbone figure (one panel per backbone) + table
 
 ## 9. Robustness
-- [ ] 9.1 Attention head seeds 1 and 2 on DINOv2 (mean +- std)
-- [ ] 9.2 Multi-scale attention head on DINOv2
-- [ ] 9.3 Max-MIL top-8 variant on DINOv2
+- [~] 9.1 Attention head seeds 1 and 2 on DINOv2 (mean +- std)
+- [~] 9.2 Multi-scale attention head on DINOv2
+- [~] 9.3 Max-MIL top-8 variant on DINOv2
 - [ ] 9.4 Paired bootstrap CI of per-bin AUROC differences (head vs mean, oracle vs mean)
 
 ## 10. Analysis
@@ -83,7 +83,7 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [ ] 10.2 Figure + table for the per-class analysis
 
 ## 11. Chest X-ray replication (stretch, strict time budget)
-- [ ] 11.1 Obtain NIH ChestX-ray14 labels, the 984 boxed images, and a training subset
+- [~] 11.1 Obtain NIH ChestX-ray14 labels, the 984 boxed images, and a training subset
 - [ ] 11.2 Manifest/labels/boxes in the same contract (findings as classes, box area fraction as size)
 - [ ] 11.3 Features (DINOv2 and RAD-DINO) + CLS/mean/oracle/head read-outs
 - [ ] 11.4 Chest X-ray blindness curve in the report
