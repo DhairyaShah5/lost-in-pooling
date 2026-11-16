@@ -6,6 +6,7 @@ dinov2_vitb14_reg / dinov2_vits14_reg : torch.hub DINOv2 with registers (patch 1
     cls = x_norm_clstoken, patches = x_norm_patchtokens.
 clip_vitb16   : Hugging Face `openai/clip-vit-base-patch16` vision tower (patch 16, CLIP norm).
     cls = pooler_output (post-LN CLS), patches = post_layernorm(last_hidden_state[:, 1:]).
+rad_dino      : Hugging Face `microsoft/rad-dino`, DINOv2-B/14 adapted to chest radiographs (patch 14, ImageNet norm).
 siglip_vitb16 : Hugging Face `google/siglip-base-patch16-224` vision tower (patch 16, mean/std 0.5).
     SigLIP has no CLS token; its global vector is a learned multihead attention-pooling (MAP) head,
     so cls := pooler_output (MAP output) and patches = last_hidden_state (already post-LN).
@@ -21,7 +22,8 @@ IMAGENET_MEAN, IMAGENET_STD = (0.485, 0.456, 0.406), (0.229, 0.224, 0.225)
 CLIP_MEAN, CLIP_STD = (0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)
 SIGLIP_MEAN, SIGLIP_STD = (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)
 
-HF_IDS = {"clip_vitb16": "openai/clip-vit-base-patch16", "siglip_vitb16": "google/siglip-base-patch16-224"}
+HF_IDS = {"clip_vitb16": "openai/clip-vit-base-patch16", "siglip_vitb16": "google/siglip-base-patch16-224",
+          "rad_dino": "microsoft/rad-dino"}
 
 
 @dataclass
@@ -79,5 +81,18 @@ def load_backbone(name: str, device: torch.device | None = None) -> Backbone:
 
         return Backbone(name, m, int(m.config.hidden_size), int(m.config.patch_size), SIGLIP_MEAN, SIGLIP_STD,
                         "MAP attention-pooling head output (no CLS token)", tok)
+
+    if name == "rad_dino":
+        # DINOv2 ViT-B/14 continued-pretrained on chest radiographs (Perez-Garcia et al.). HF Dinov2Model:
+        # last_hidden_state is post-layernorm with CLS at index 0; pooler_output == CLS. No register tokens.
+        from transformers import AutoModel
+        m = AutoModel.from_pretrained(HF_IDS[name]).eval().requires_grad_(False).to(device)
+
+        def tok(x):
+            out = m(pixel_values=x)
+            return out.pooler_output, out.last_hidden_state[:, 1:]
+
+        return Backbone(name, m, int(m.config.hidden_size), int(m.config.patch_size), IMAGENET_MEAN, IMAGENET_STD,
+                        "layernorm(CLS)", tok)
 
     raise ValueError(f"unknown backbone {name!r}; known: dinov2_*, {list(HF_IDS)}")
