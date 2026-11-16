@@ -16,6 +16,7 @@ if __name__ == "__main__":
     p.add_argument("--workers", type=int, default=6)
     p.add_argument("--limit", type=int, default=None, help="benchmark: only first N images per split")
     p.add_argument("--manifest", default="data/coco/manifest.parquet")
+    p.add_argument("--features-root", default="features", help="output root (e.g. features_cxr for the chest X-ray arm)")
     a = p.parse_args()
 
     dev = get_device()
@@ -25,6 +26,6 @@ if __name__ == "__main__":
     manifest = pd.read_parquet(a.manifest)
     for split in a.splits.split(","):
         t1 = time.time()
-        out = extract_split(model, a.backbone, manifest, split, a.res, Path("features"),
+        out = extract_split(model, a.backbone, manifest, split, a.res, Path(a.features_root),
                             a.batch_size, a.workers, a.limit, dev)
         print(f"{split} -> {out}  ({time.time()-t1:.0f}s)")
