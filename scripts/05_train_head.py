@@ -34,6 +34,7 @@ def main() -> None:
     p.add_argument("--batch-size", type=int, default=128)
     p.add_argument("--patience", type=int, default=5)
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--readout-suffix", default="", help="appended to the read-out name, e.g. _s1 for seed repeats")
     p.add_argument("--device", default="auto")
     p.add_argument("--out", default="results")
     p.add_argument("--features-root", default="features")
@@ -60,7 +61,7 @@ def main() -> None:
     torch.manual_seed(a.seed)
     np.random.seed(a.seed)
     out = Path(a.out)
-    readout = readout_name(a.kind, a.lam)
+    readout = readout_name(a.kind, a.lam) + a.readout_suffix
     print(f"[05] readout={readout} backbone={a.backbone} res={a.res}")
 
     st_tr = FeatureStore(a.backbone, a.res, a.train_split, root=a.features_root)
