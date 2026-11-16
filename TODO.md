@@ -59,5 +59,5 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [ ] 6.9 Final compile, proofread, PDF committed
 
 ## 7. Wrap-up
-- [ ] 7.1 README with reproduction commands
+- [x] 7.1 README with reproduction commands
 - [ ] 7.2 Final push; verify GitHub shows all commits under DhairyaShah5

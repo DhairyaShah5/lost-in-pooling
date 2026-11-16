@@ -26,5 +26,28 @@ data/ features/ local only, gitignored
 
 ## Reproduce
 
-See `docs/CONTRACTS.md` for file formats and `TODO.md` for the step list.
-Reproduction commands are filled in as each script lands.
+Tested on an Apple M4 laptop (16 GB, MPS). Full pipeline is under 40 minutes; the probes
+themselves take seconds to minutes on cached features.
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -e .
+.venv/bin/python scripts/00_download.py          # COCO annotations + val2017 + seeded 10k train subset (~2.4 GB)
+.venv/bin/python scripts/01_build_manifest.py    # manifest.parquet, labels.npz, boxes.parquet
+.venv/bin/python scripts/01b_dataset_stats.py    # positives per size bin
+.venv/bin/python scripts/02_extract.py           # DINOv2 ViT-B/14-reg, 224 px, fp16 CLS + patch tokens (~7 min)
+.venv/bin/python scripts/03_probes.py            # cls / mean / cls_mean / max / maxmil read-outs
+.venv/bin/python scripts/04_oracle.py            # oracle region read-out (matched random negatives)
+.venv/bin/python scripts/05_train_head.py --lam 0        # gated attention head + localisation audit
+.venv/bin/python scripts/07_plots.py --fig-readouts cls,mean,max,maxmil,attn,oracle
+.venv/bin/python scripts/08_attention_figure.py
+# resolution ablation
+.venv/bin/python scripts/02_extract.py --res 448 --limit 5000
+.venv/bin/python scripts/03_probes.py --res 448 --kinds cls,mean,max && .venv/bin/python scripts/04_oracle.py --res 448
+# report
+report/build.sh
+```
+
+Tests: `.venv/bin/python -m pytest -q` (synthetic data, no download needed).
+
+File formats, bins, metric and result schema: `docs/CONTRACTS.md`. Plan and decisions: `docs/PLAN.md`.
+Progress checklist: `TODO.md`. Committed results live in `results/` (JSON + per-image test scores).
