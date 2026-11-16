@@ -46,10 +46,12 @@ if __name__ == "__main__":
     lab = load_labels(split="test")
     y, frac = lab["y"], lab["max_box_frac"]
     variants = {224: {"cls": "cls_train5k", "mean": "mean_train5k", "max": "max_train5k", "oracle": "oracle"},
+                336: {"cls": "cls", "mean": "mean", "max": "max", "oracle": "oracle"},
                 448: {"cls": "cls", "mean": "mean", "max": "max", "oracle": "oracle"}}
+    STYLE = {224: ("-", "o"), 336: (":", "D"), 448: ("--", "s")}
     summary = {}
     fig, ax = plt.subplots(figsize=(6.5, 3.6))
-    for res, ls in ((224, "-"), (448, "--")):
+    for res, (ls, mk) in STYLE.items():
         grid = res // a.patch
         units = frac * grid * grid
         bins = np.digitize(units, EDGES[1:-1]).astype(np.int16)  # 0..6
@@ -69,7 +71,7 @@ if __name__ == "__main__":
             summary[res][name] = {"readout": readout, "auroc": [v for v, _ in m], "n_classes": [n for _, n in m],
                                   "ci_lo": [float(v) for v in lo], "ci_hi": [float(v) for v in hi]}
             xs = np.arange(len(NAMES)); ys = np.array([v for v, _ in m])
-            ax.plot(xs, ys, ls=ls, marker="o" if res == 224 else "s", ms=4, color=COLORS[name],
+            ax.plot(xs, ys, ls=ls, marker=mk, ms=4, color=COLORS[name],
                     label=f"{name} @ {res}px", lw=2 if name in ("mean", "oracle") else 1.3)
             if np.isfinite(lo).all():
                 ax.fill_between(xs, lo, hi, color=COLORS[name], alpha=0.08, lw=0)
@@ -78,7 +80,7 @@ if __name__ == "__main__":
     ax.set_xticks(range(len(NAMES))); ax.set_xticklabels(NAMES)
     ax.set_xlabel("largest instance, in patches covered (bbox area / patch area)")
     ax.set_ylabel("macro AUROC"); ax.set_ylim(0.78, 1.0)
-    ax.legend(ncol=2, fontsize=8, frameon=False, loc="lower right")
+    ax.legend(ncol=3, fontsize=7, frameon=False, loc="lower right")
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     fig.tight_layout()
