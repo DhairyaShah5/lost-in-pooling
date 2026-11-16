@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lip"
+version = "0.1.0"
+description = "Lost in Pooling: measuring and recovering small-signal evidence discarded by frozen foundation models"
+requires-python = ">=3.11"
+dependencies = [
+  "torch", "torchvision", "numpy", "pandas", "pyarrow", "scikit-learn",
+  "matplotlib", "pillow", "tqdm", "requests",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

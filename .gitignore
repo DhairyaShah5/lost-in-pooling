@@ -1,0 +1,32 @@
+# data and cached features are never committed
+data/
+features/
+checkpoints/
+*.npy
+*.npz
+*.parquet
+*.zip
+
+# python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# latex build artefacts (the PDF itself IS committed)
+report/*.aux
+report/*.log
+report/*.out
+report/*.bbl
+report/*.blg
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
