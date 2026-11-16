@@ -24,11 +24,11 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [~] 2.5 Extract 448-res features (test + val + 5k train) for the resolution ablation (started early, GPU was idle)
 
 ## 3. Evaluation harness
-- [ ] 3.1 Size bins (6 log-spaced) + COCO S/M/L mapping + box-to-patch mask
-- [ ] 3.2 Per-class per-bin AUROC, macro average, bootstrap CI, overall mAP/AUROC
-- [ ] 3.3 Results JSON writer following docs/CONTRACTS.md
-- [ ] 3.4 Blindness-curve plot (all read-outs on one figure) + per-bin table generator
-- [ ] 3.5 Unit tests on synthetic data
+- [x] 3.1 Size bins (6 log-spaced) + COCO S/M/L mapping + box-to-patch mask
+- [x] 3.2 Per-class per-bin AUROC, macro average, bootstrap CI, overall mAP/AUROC
+- [x] 3.3 Results JSON writer following docs/CONTRACTS.md
+- [x] 3.4 Blindness-curve plot (all read-outs on one figure) + per-bin table generator
+- [x] 3.5 Unit tests on synthetic data (20 tests, bootstrap 3 s at N=5000)
 
 ## 4. Fixed read-outs (baselines)
 - [ ] 4.1 Pooling: CLS, mean, CLS+mean concat, per-dimension max
