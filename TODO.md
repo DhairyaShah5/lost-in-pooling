@@ -66,11 +66,11 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 
 ## 8. More backbones (same harness, same images)
 - [x] 8.1 Backbone abstraction: torch.hub DINOv2 + Hugging Face CLIP/SigLIP, per-model normalisation, patch size in meta
-- [~] 8.2 Extract CLIP ViT-B/16 (224, 14x14 grid) for all splits
-- [~] 8.3 Extract SigLIP ViT-B/16 (224, 14x14 grid) for all splits
-- [ ] 8.4 Probes + oracle + attention head on CLIP
-- [ ] 8.5 Probes + oracle + attention head on SigLIP
-- [ ] 8.6 Cross-backbone figure (one panel per backbone) + table
+- [x] 8.2 Extract CLIP ViT-B/16 (224, 14x14 grid) for all splits
+- [x] 8.3 Extract SigLIP ViT-B/16 (224, 14x14 grid) for all splits
+- [x] 8.4 Probes + oracle + attention head on CLIP (head 0.910 sub-patch, oracle 0.935)
+- [x] 8.5 Probes + oracle + attention head on SigLIP (head 0.872, oracle 0.934)
+- [x] 8.6 Cross-backbone figure (one panel per backbone) + table
 
 ## 9. Robustness
 - [x] 9.1 Attention head seeds 1 and 2 on DINOv2 (0.899, 0.891, 0.889 sub-patch)
@@ -89,7 +89,7 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [ ] 11.4 Chest X-ray blindness curve in the report
 
 ## 12. Report v2
-- [ ] 12.1 Cross-backbone results section
+- [x] 12.1 Cross-backbone results section
 - [x] 12.2 Robustness and per-class subsections
 - [ ] 12.3 Abstract, introduction, progress, plan updated
 - [ ] 12.4 Final compile, proofread, push

@@ -740,9 +740,13 @@ reaches 0.973 on DINOv2 against 0.935 on CLIP and 0.934 on SigLIP, and its gap t
 pooling is 0.11, 0.10 and 0.09. Self-supervised patch tokens carry the most small-object
 evidence, which matches the object-discovery literature on DINO features
 (Section~\ref{sec:lit-patch}). Third, the attention head recovers part of the gap on every
-backbone: \todo{CLIP head} on CLIP and 0.872 on SigLIP (29\% of its gap, mAP 0.758 vs.\ 0.729
-for mean pooling), with weaker localisation than on DINOv2 (attention mass 6.5 times chance on
-SigLIP vs.\ 12). Max-MIL is the one read-out whose behaviour changes qualitatively: it
+backbone: 0.910 on CLIP, three quarters of its gap (mAP 0.735 vs.\ 0.691 for mean pooling),
+and 0.872 on SigLIP, 29\% of its gap (mAP 0.758 vs.\ 0.729), with weaker localisation than on
+DINOv2 (attention mass 7.1 and 6.5 times chance vs.\ 12). On CLIP the head is the best
+read-out in every bin below 3\%, and the three heads land within 0.04 of each other on
+sub-patch targets (0.899, 0.910, 0.872) although their oracles differ by 0.04 in the other
+direction, so the head is limited more by what it can learn from image-level labels than by
+what the tokens contain. Max-MIL is the one read-out whose behaviour changes qualitatively: it
 collapses on CLIP (0.770) and SigLIP (0.750), consistent with their patch tokens not being
 linearly class-separable one patch at a time, whereas region means over several patches (the
 oracle) remain informative.
