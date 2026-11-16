@@ -302,14 +302,12 @@ The repository is organised as a small library \fname{src/lip/} with numbered sc
 written data and feature contract (\fname{docs/CONTRACTS.md}) that every module reads and
 writes against, and committed JSON results under \fname{results/}. The steps are:
 \begin{enumerate}
-\item \textbf{Download.} COCO 2017 annotations, all 5,000 val2017 images, and a seeded
-  10,000-image subset of train2017 (sorted image ids, permuted with seed 0, first 10,000).
-\item \textbf{Manifest, labels and boxes.} One manifest row per image with split and size;
-  an $N\times80$ presence matrix, an $N\times80$ matrix of largest-instance box-area fractions
-  and the same for segmentation area; and a boxes table in normalised coordinates. Crowd
-  annotations are ignored throughout.
-\item \textbf{Feature cache.} DINOv2 ViT-B/14-reg on the MPS backend, squash-resize and
-  ImageNet normalisation, fp16 memmap writer, one directory per backbone, resolution and split.
+\item \textbf{Data.} COCO 2017 annotations, all 5,000 val2017 images and a seeded
+  10,000-image subset of train2017; one manifest row per image with split and size; an
+  $N\times80$ presence matrix and an $N\times80$ matrix of largest-instance box-area fractions;
+  a boxes table in normalised coordinates (crowd annotations ignored).
+\item \textbf{Feature cache.} Each backbone on the MPS backend, squash-resize and the model's
+  own normalisation, fp16 memmap writer, one directory per backbone, resolution and split.
 \item \textbf{Fixed read-outs.} CLS, mean, CLS+mean, per-dimension max, max-MIL and oracle
   region pooling, each with a linear probe trained by joint binary cross-entropy with early
   stopping on the 1,000-image validation split.
@@ -624,14 +622,7 @@ against 0.862 for mean pooling and 0.973 for the oracle, closing a third of the 
 there, a fifth in the 0.1--0.3\% bin and a third in the 0.3--1\% bin; it raises overall mAP from
 0.734 (mean) and 0.758 (CLS+mean) to 0.800. On targets above 10\% it sits 0.006 below mean
 pooling, the price of a class-specific attention that no longer averages over the whole object.
-An entropy sweep over $\lambda\in\{-0.1, 0, 0.01, 0.1\}$ (normalised entropies 0.90,
-0.44, 0.29, 0.06) is in \texttt{results/}. A mild sharpening term ($\lambda=0.01$)
-changes nothing; a strong one ($\lambda=0.1$) collapses the attention onto a few patches
-(normalised entropy 0.06) and both AUROC and mAP fall. Pushing the other way
-($\lambda=-0.1$) keeps the attention near uniform (entropy 0.90) and gives the best
-per-bin AUROC of the sweep (0.908 on sub-patch targets) at slightly lower mAP (0.790), but its
-attention mass on small targets drops to 3.6 times chance: it is mean pooling with a mild,
-class-specific tilt, and it ranks images well without looking at the object much. The
+An entropy sweep over $\lambda\in\{-0.1, 0, 0.01, 0.1\}$ (normalised entropies 0.90, 0.44, 0.29, 0.06; full results in \texttt{results/}) shows that a strong sharpening term ($\lambda=0.1$) collapses the attention onto a few patches and both AUROC and mAP fall, while pushing towards uniform ($\lambda=-0.1$) gives the best per-bin AUROC of the sweep (0.908 on sub-patch targets) at lower mAP (0.790) with attention mass on small targets only 3.6 times chance: mean pooling with a mild class-specific tilt that ranks images well without looking at the object much. The
 $\lambda=0$ head is the one that both improves on mean pooling and localises, so we report it
 as the main result; the trade-off between ranking and localisation is itself a finding we will
 pursue with the multi-scale variant.
