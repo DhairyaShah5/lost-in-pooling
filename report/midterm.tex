@@ -820,7 +820,10 @@ averaging over four times as many tokens, does not. For a frozen-backbone pipeli
 radiographs, raising the input resolution without changing the aggregation buys nothing for
 small findings. RAD-DINO behaves the same way at 448 px: its cross-validated oracle rises to
 0.96 to 0.98 in every bin (0.960 for 0.1--0.3\% lesions, from 0.904) while its cross-validated
-CLS probe stays at 0.62 overall.
+CLS probe stays at 0.62 overall. The attention head trained on the 5,000-image 448 px cache
+reaches only 0.65 overall (0.73 with the 20,721-image cache at 224 px), so for the head the
+training set matters more than the pixels; a like-for-like comparison needs the full cache at
+448 px and is part of the plan.
 
 \begin{figure*}[t]
 \centering
