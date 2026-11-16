@@ -1,0 +1,91 @@
+{
+  "readout": "attn",
+  "backbone": "rad_dino",
+  "res": 224,
+  "n_seeds": 1,
+  "seeds": [
+    0
+  ],
+  "readouts": [
+    "attn"
+  ],
+  "files": [
+    "results_cxr/attn__rad_dino__res224.json"
+  ],
+  "std_ddof": 1,
+  "note": "single seed: std reported as 0",
+  "per_bin": {
+    "<0.1%": {
+      "auroc_macro_mean": null,
+      "auroc_macro_std": null,
+      "n": 0,
+      "values": [
+        null
+      ],
+      "n_classes": 0
+    },
+    "0.1-0.3%": {
+      "auroc_macro_mean": 0.7152142193924923,
+      "auroc_macro_std": 0.0,
+      "n": 1,
+      "values": [
+        0.7152142193924923
+      ],
+      "n_classes": 1
+    },
+    "0.3-1%": {
+      "auroc_macro_mean": 0.7947977823054222,
+      "auroc_macro_std": 0.0,
+      "n": 1,
+      "values": [
+        0.7947977823054222
+      ],
+      "n_classes": 5
+    },
+    "1-3%": {
+      "auroc_macro_mean": 0.7620332401916158,
+      "auroc_macro_std": 0.0,
+      "n": 1,
+      "values": [
+        0.7620332401916158
+      ],
+      "n_classes": 7
+    },
+    "3-10%": {
+      "auroc_macro_mean": 0.8031161000226507,
+      "auroc_macro_std": 0.0,
+      "n": 1,
+      "values": [
+        0.8031161000226507
+      ],
+      "n_classes": 6
+    },
+    ">10%": {
+      "auroc_macro_mean": 0.8714348343850356,
+      "auroc_macro_std": 0.0,
+      "n": 1,
+      "values": [
+        0.8714348343850356
+      ],
+      "n_classes": 7
+    }
+  },
+  "overall": {
+    "auroc_macro": {
+      "mean": 0.7789186885463868,
+      "std": 0.0,
+      "n": 1,
+      "values": [
+        0.7789186885463868
+      ]
+    },
+    "map": {
+      "mean": 0.4144484838793677,
+      "std": 0.0,
+      "n": 1,
+      "values": [
+        0.4144484838793677
+      ]
+    }
+  }
+}
