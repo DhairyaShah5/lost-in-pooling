@@ -8,6 +8,7 @@ series also gets its own marker shape so identity never rests on colour alone.
 from __future__ import annotations
 
 import math
+import re
 from pathlib import Path
 
 import numpy as np
@@ -310,4 +311,216 @@ def results_table_text(results: list[dict]) -> str:
             s = "--" if not np.isfinite(v) else f"{v:.3f}" + ("*" if best[i, j] else " ")
             cells.append(s.rjust(col_w))
         lines.append(str(r["readout"]).ljust(name_w) + "".join(cells))
+    return "\n".join(lines) + "\n"
+
+
+# --------------------------------------------------------------------------------------
+# Cross-backbone small multiples and table
+# --------------------------------------------------------------------------------------
+_PATCH_NOTE_RE = re.compile(r"patch(?:_size)?\s*[=:]\s*(\d+)")
+_PATCH_NAME_RE = re.compile(r"vit[a-z]?(\d+)")
+
+
+def resolve_patch_size(backbone: str, results: list[dict] | None = None, patch_sizes: dict | None = None) -> int:
+    """ViT patch size of a backbone for the one-patch marker.
+
+    Resolution order: an explicit ``patch_sizes[backbone]``; ``patch_size=NN`` (or
+    ``patch=NN``) in the ``notes`` of any of its results; the number in a
+    ``vitb14`` / ``vitb16``-style backbone name; else 14 for DINOv2 names and 16
+    otherwise.
+    """
+    if patch_sizes and backbone in patch_sizes:
+        return int(patch_sizes[backbone])
+    for r in results or []:
+        m = _PATCH_NOTE_RE.search(str(r.get("notes", "")))
+        if m:
+            return int(m.group(1))
+    m = _PATCH_NAME_RE.search(backbone.lower())
+    if m:
+        return int(m.group(1))
+    return 14 if "dinov2" in backbone.lower() else 16
+
+
+def _one_patch_boundary_at(res: int, patch: int) -> int:
+    """:func:`one_patch_boundary` for an arbitrary patch size."""
+    target = math.log(patch_area_frac(res, patch))
+    interior = BIN_EDGES[1:-1]
+    return int(np.argmin([abs(math.log(e) - target) for e in interior])) + 1
+
+
+def _style_axes(ax) -> None:
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_color(_AXIS)
+        ax.spines[side].set_linewidth(0.8)
+    ax.yaxis.grid(True, color=_GRID, linewidth=0.6)
+    ax.set_axisbelow(True)
+
+
+def plot_backbone_panels(
+    results_by_backbone: dict[str, list[dict]],
+    out_path: Path | str,
+    readouts: tuple[str, ...] = ("cls", "mean", "attn", "oracle"),
+    res: int = 224,
+    titles: dict | None = None,
+    patch_sizes: dict | None = None,
+    figsize: tuple[float, float] = (7.0, 2.6),
+    ylim: tuple[float, float] = (0.5, 1.0),
+) -> list[Path]:
+    """Small multiples: one blindness-curve panel per backbone, side by side.
+
+    Parameters
+    ----------
+    results_by_backbone
+        ``{backbone: [results dicts]}`` in display order; backbones with an empty
+        list are skipped. Results whose ``res`` differs from ``res`` are ignored.
+    out_path
+        Output path; its suffix is replaced by ``.png`` (dpi 200) and ``.pdf``.
+    readouts
+        Read-outs drawn (in this order) when present; colours and markers come from
+        :func:`series_styles`, so they match the single-backbone figure.
+    res
+        Input resolution (selects results and places the one-patch marker).
+    titles
+        Optional ``{backbone: panel title}``; default is the backbone name.
+    patch_sizes
+        Optional ``{backbone: patch}`` overriding :func:`resolve_patch_size`.
+    figsize
+        Full two-column width by default.
+    ylim
+        Shared y range; the lower end is extended when a curve falls below it.
+
+    Returns
+    -------
+    list[Path]
+        The two written files.
+    """
+    backbones = [bb for bb, rs in results_by_backbone.items() if rs]
+    if not backbones:
+        raise ValueError("no backbone has results to plot")
+    styles = series_styles(list(readouts))
+    titles = titles or {}
+    x = np.arange(N_BINS)
+
+    fig = Figure(figsize=figsize, layout="constrained")
+    axes = fig.subplots(1, len(backbones), sharey=True, squeeze=False)[0]
+    y_lo = ylim[0]
+    handles: dict[str, object] = {}
+    for ax, bb in zip(axes, backbones):
+        by_name = {str(r["readout"]): r for r in results_by_backbone[bb] if int(r.get("res", res)) == res}
+        for name in readouts:
+            r = by_name.get(name)
+            if r is None:
+                continue
+            st = styles[name]
+            ym = _bin_values(r, "auroc_macro")
+            lo = _bin_values(r, "ci_lo")
+            hi = _bin_values(r, "ci_hi")
+            if np.isfinite(lo).any():
+                ax.fill_between(x, lo, hi, color=st["color"], alpha=0.14, linewidth=0, zorder=1)
+                y_lo = min(y_lo, float(np.nanmin(lo)))
+            if np.isfinite(ym).any():
+                y_lo = min(y_lo, float(np.nanmin(ym)))
+            thin = st["marker"] in ("P", "X", "*")
+            (line,) = ax.plot(
+                x, ym, color=st["color"], linestyle=st["ls"], marker=st["marker"], linewidth=1.6,
+                markersize=6.0 if thin else 4.2, markeredgecolor=st["color"] if thin else "white",
+                markeredgewidth=0.0 if thin else 0.6, label=name, zorder=3 if name == ORACLE else 2,
+            )
+            handles.setdefault(name, line)
+        ax.axhline(expected_chance, color=_MUTED, linestyle="--", linewidth=0.8, zorder=0)
+        patch = resolve_patch_size(bb, results_by_backbone[bb], patch_sizes)
+        xv = _one_patch_boundary_at(res, patch) - 0.5
+        ax.axvline(xv, color=_MUTED, linestyle=":", linewidth=0.8, zorder=0)
+        ax.text(xv + 0.06, 0.03, f"one patch ({patch}px)", rotation=90, ha="left", va="bottom",
+                fontsize=6, color=_MUTED, transform=ax.get_xaxis_transform())
+        ax.set_xticks(x)
+        ax.set_xticklabels(BIN_NAMES, fontsize=6.5, rotation=30, ha="right", rotation_mode="anchor")
+        ax.set_xlim(-0.4, N_BINS - 0.6)
+        ax.tick_params(axis="both", labelsize=7, colors=_INK, length=3, width=0.8)
+        ax.set_title(str(titles.get(bb, bb)), fontsize=8.5)
+        _style_axes(ax)
+
+    y_lo = math.floor((y_lo - 0.01) * 20) / 20 if y_lo < ylim[0] else ylim[0] - 0.01
+    for ax in axes:
+        ax.set_ylim(y_lo, ylim[1] + 0.01)
+    axes[0].set_yticks(np.arange(ylim[0], ylim[1] + 1e-9, 0.1))
+    axes[0].set_ylabel("macro AUROC", fontsize=8)
+    axes[0].text(-0.35, expected_chance + 0.006, "chance", ha="left", va="bottom", fontsize=6.5, color=_MUTED)
+    fig.supxlabel("relative area of largest instance (bbox / image)", fontsize=8)
+    ordered = [handles[n] for n in readouts if n in handles]
+    leg = axes[0].legend(handles=ordered, loc="lower right", fontsize=7, frameon=True, framealpha=1.0,
+                         edgecolor="none", facecolor="white", borderpad=0.4, handlelength=2.0)
+    leg.set_zorder(4)
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    png = out_path.with_suffix(".png")
+    pdf = out_path.with_suffix(".pdf")
+    fig.savefig(png, dpi=200)
+    fig.savefig(pdf)
+    return [png, pdf]
+
+
+def _backbone_rows(
+    results_by_backbone: dict[str, list[dict]], readouts: tuple[str, ...], res: int
+) -> list[tuple[str, list[dict], np.ndarray, np.ndarray]]:
+    """Per backbone: ``(name, results in readout order, (k, 7) values, (k, 7) bold mask)``."""
+    out = []
+    for bb, rs in results_by_backbone.items():
+        by_name = {str(r["readout"]): r for r in rs if int(r.get("res", res)) == res}
+        sel = [by_name[n] for n in readouts if n in by_name]
+        if not sel:
+            continue
+        vals = _cell_values(sel)
+        out.append((bb, sel, vals, _best_mask(sel, vals)))
+    return out
+
+
+def cross_backbone_table_latex(
+    results_by_backbone: dict[str, list[dict]],
+    readouts: tuple[str, ...] = ("cls", "mean", "attn", "oracle"),
+    res: int = 224,
+) -> str:
+    """Tabular-only booktabs table: rows = backbone x read-out, columns = 6 bins + ``all``.
+
+    The best non-oracle value per backbone and column is bold; missing cells are
+    ``--``. Backbone groups are separated by rules.
+    """
+    header = " & ".join(["backbone", "read-out"] + [_latex_bin_name(n) for n in BIN_NAMES] + ["all"])
+    lines = [r"\begin{tabular}{ll" + "c" * (N_BINS + 1) + "}", r"\toprule", header + r" \\", r"\midrule"]
+    groups = _backbone_rows(results_by_backbone, readouts, res)
+    for g, (bb, sel, vals, best) in enumerate(groups):
+        if g > 0:
+            lines.append(r"\midrule")
+        for i, r in enumerate(sel):
+            cells = []
+            for j in range(vals.shape[1]):
+                v = vals[i, j]
+                s = "--" if not np.isfinite(v) else f"{v:.3f}"
+                cells.append(rf"\textbf{{{s}}}" if (best[i, j] and np.isfinite(v)) else s)
+            first = _latex_escape(bb.replace("_", " ")) if i == 0 else ""
+            lines.append(" & ".join([first, _latex_escape(str(r["readout"]))] + cells) + r" \\")
+    lines += [r"\bottomrule", r"\end{tabular}"]
+    return "\n".join(lines) + "\n"
+
+
+def cross_backbone_table_text(
+    results_by_backbone: dict[str, list[dict]],
+    readouts: tuple[str, ...] = ("cls", "mean", "attn", "oracle"),
+    res: int = 224,
+) -> str:
+    """Plain-text version of :func:`cross_backbone_table_latex` (``*`` marks the best)."""
+    cols = list(BIN_NAMES) + ["all"]
+    bb_w = max([8] + [len(bb) for bb in results_by_backbone])
+    col_w = 10
+    lines = ["backbone".ljust(bb_w + 1) + "read-out".ljust(9) + "".join(c.rjust(col_w) for c in cols)]
+    lines.append("-" * (bb_w + 10 + col_w * len(cols)))
+    for bb, sel, vals, best in _backbone_rows(results_by_backbone, readouts, res):
+        for i, r in enumerate(sel):
+            cells = ["--".rjust(col_w) if not np.isfinite(vals[i, j])
+                     else (f"{vals[i, j]:.3f}" + ("*" if best[i, j] else " ")).rjust(col_w)
+                     for j in range(vals.shape[1])]
+            lines.append((bb if i == 0 else "").ljust(bb_w + 1) + str(r["readout"]).ljust(9) + "".join(cells))
     return "\n".join(lines) + "\n"
