@@ -333,8 +333,13 @@ writes against, and committed JSON results under \fname{results/}. The steps are
 Every script is seeded, takes \texttt{--backbone}, \texttt{--res} and \texttt{--out} flags, and
 writes to the paths in the contract. Unit tests run on synthetic data without the real dataset. The code is public at
 \url{https://github.com/DhairyaShah5/lost-in-pooling}.
-Status at submission: \todo{which steps are complete, which are running, and which results
-JSON files are committed}.
+Status at submission: steps 0 to 5 are complete and committed: the data (15,000 images), both
+feature caches (224 px for all splits; 448 px for test, val and 5,000 training images), the six
+fixed read-outs, the oracle and its negative-sampling ablation, the attention head with a
+four-value $\lambda$ sweep, the localisation audit, the resolution ablation, and every figure
+and table in this report, each regenerated from the committed \texttt{results/*.json} files by
+\texttt{scripts/07\_plots.py}. Not yet run: the multi-scale head, top-$k$ max-MIL variants, and
+any second backbone or dataset.
 
 % ======================================================================
 \section{Experimental Setup}
@@ -581,9 +586,45 @@ All          & 14,631 & 0.567 & 0.178 & 3.2 & 0.623 \\
 \end{tabular}
 \end{table}
 
-\todo{Per-bin AUROC of the attention head for each $\lambda$, against mean pooling (its
-$\lambda\to\infty$ limit) and against the oracle. State how much of the oracle gap the head
-closes in each bin.}
+\paragraph{Learned head.}
+Figure~\ref{fig:blindness} and Table~\ref{tab:blindness} include the gated attention head at
+$\lambda=0$. It beats every fixed read-out in every bin below 10\%: 0.899 on sub-patch targets
+against 0.862 for mean pooling and 0.973 for the oracle, closing a third of the oracle gap
+there, a fifth in the 0.1--0.3\% bin and a third in the 0.3--1\% bin; it raises overall mAP from
+0.734 (mean) and 0.758 (CLS+mean) to 0.800. On targets above 10\% it sits 0.006 below mean
+pooling, the price of a class-specific attention that no longer averages over the whole object.
+Table~\ref{tab:lambda} gives the entropy sweep. A mild sharpening term ($\lambda=0.01$)
+changes nothing; a strong one ($\lambda=0.1$) collapses the attention onto a few patches
+(normalised entropy 0.06) and both AUROC and mAP fall. Pushing the other way
+($\lambda=-0.1$) keeps the attention near uniform (entropy 0.90) and gives the best
+per-bin AUROC of the sweep (0.908 on sub-patch targets) at slightly lower mAP (0.790), but its
+attention mass on small targets drops to 3.6 times chance: it is mean pooling with a mild,
+class-specific tilt, and it ranks images well without looking at the object much. The
+$\lambda=0$ head is the one that both improves on mean pooling and localises, so we report it
+as the main result; the trade-off between ranking and localisation is itself a finding we will
+pursue with the multi-scale variant.
+
+\begin{table}[t]
+\centering\small
+\caption{Entropy-regulariser sweep for the attention head, test split. \emph{Ent.}: normalised
+attention entropy at the selected epoch (uniform $=1$). \emph{Mass}: attention mass inside
+the boxes of sub-patch targets (chance 0.007). Mean pooling and the oracle are repeated for
+reference.}
+\label{tab:lambda}
+\begin{tabular}{lrrrrrrr}
+\toprule
+$\lambda$ & Ent. & $<0.1\%$ & 0.1--0.3\% & 0.3--1\% & All & mAP & Mass \\
+\midrule
+$-0.1$  & 0.90 & \textbf{0.908} & \textbf{0.941} & \textbf{0.959} & \textbf{0.971} & 0.790 & 0.026 \\
+$0$     & 0.44 & 0.899 & 0.933 & 0.951 & 0.968 & \textbf{0.800} & \textbf{0.088} \\
+$0.01$  & 0.29 & 0.899 & 0.929 & 0.950 & 0.968 & 0.790 & 0.072 \\
+$0.1$   & 0.06 & 0.886 & 0.916 & 0.939 & 0.956 & 0.713 & 0.061 \\
+\midrule
+mean pooling & 1.00 & 0.862 & 0.918 & 0.928 & 0.961 & 0.734 & 0.007 \\
+oracle       & --   & 0.973 & 0.989 & 0.992 & 0.995 & 0.944 & --    \\
+\bottomrule
+\end{tabular}
+\end{table}
 \paragraph{Localisation audit.}
 Table~\ref{tab:localisation} shows that the head's attention sits on the target far more often
 than chance in every bin. For sub-patch targets ($<0.1\%$) the mean attention mass inside the

@@ -40,7 +40,7 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 
 ## 5. Learned head
 - [x] 5.1 Gated attention MIL head (class-specific attention) over memmapped tokens
-- [~] 5.2 Entropy regularizer; sweep lambda in {0, 0.01, 0.1}
+- [x] 5.2 Entropy regularizer; sweep lambda in {-0.1, 0, 0.01, 0.1}
 - [x] 5.3 Localization metrics: attention mass inside GT boxes vs chance, pointing game, per bin
 - [x] 5.4 Train + evaluate on `test`; results JSON (attn: sub-patch 0.899 vs mean 0.862, mAP 0.800 vs 0.734)
 - [x] 5.5 Blindness curve v2 (with head) + localization figure
@@ -51,9 +51,9 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 6.1 LaTeX skeleton in pre-proposal style, compiles with tectonic
 - [x] 6.2 Bibliography with verified references
 - [x] 6.3 Literature review draft
-- [~] 6.4 Progress-so-far section (scope change after feedback, decisions, pipeline)
+- [x] 6.4 Progress-so-far section (scope change after feedback, decisions, pipeline)
 - [x] 6.5 Experimental setup section
-- [~] 6.6 Initial results: figures, tables, discussion (context-prior caveat)
+- [x] 6.6 Initial results: figures, tables, discussion (context-prior caveat)
 - [x] 6.7 Updated plan for the remaining three weeks
 - [x] 6.8 Abstract + introduction refresh
 - [ ] 6.9 Final compile, proofread, PDF committed
