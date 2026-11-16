@@ -120,8 +120,11 @@ class MultiScaleGatedAttentionHead(GatedAttentionHead):
     def __init__(self, dim: int = 768, n_classes: int = 80, hidden: int = 256,
                  dropout: float = 0.1, grid: int = 16):
         super().__init__(dim, n_classes, hidden, dropout)
-        if grid % 4 != 0:
-            raise ValueError(f"grid must be divisible by 4 for the multi-scale head, got {grid}")
+        # coarse scales must tile the grid exactly: (2, 4) for 16x16 / 32x32 grids, (2, 7) for 14x14
+        coarse = (2, 4) if grid % 4 == 0 else tuple(f for f in (2, 7, 3, 5, 6) if grid % f == 0)[:2]
+        if len(coarse) < 2:
+            raise ValueError(f"no two coarse factors tile a {grid}x{grid} grid")
+        self.factors = (1,) + coarse
         self.grid = grid
         self.scale_emb = nn.Parameter(torch.zeros(len(self.factors), dim))
         nn.init.normal_(self.scale_emb, std=0.02)
