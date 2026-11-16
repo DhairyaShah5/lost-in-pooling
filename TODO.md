@@ -107,3 +107,8 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 14.2 Seed repeats of the CLIP and SigLIP heads (CLIP 0.892 +- 0.016, SigLIP 0.875 +- 0.007)
 - [x] 14.3 Chest X-ray heads at 448 px (DINOv2 done; 5k-train caveat noted)
 - [x] 14.4 Final pass: full visual review, trims, README, push
+
+# Phase 5 (Nov 15, 20:20 to 20:50)
+- [x] 15.1 Multi-scale head seeds on DINOv2 (0.904 +- 0.004 sub-patch; lead over single-scale holds)
+- [x] 15.2 Chest head seeds: DINOv2 gain holds (0.732 +- 0.016 vs 0.699); RAD-DINO gain does not (0.764 +- 0.015 vs 0.773), report corrected
+- [x] 15.3 Limitations paragraph; final rebuild and push

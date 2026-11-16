@@ -755,9 +755,7 @@ pooled vector does not. What differs from COCO is the absence of scene context. 
 radiograph is a chest, so a global vector has nothing to predict a finding from except the
 finding itself, and without a context prior to fall back on the loss at pooling is close to
 total. The attention head, trained from the image-level labels of the 20,721 training
-radiographs, is the best read-out that sees no boxes: 0.73 overall AUROC against 0.70 for CLS,
-0.63 against 0.52 for lesions covering 0.1--0.3\% of the frame and 0.82 against 0.76 for the
-largest findings, and its attention mass on small lesions is 13 to 15 times chance. The
+radiographs, is the best read-out that sees no boxes: $0.73\pm0.02$ overall AUROC over three seeds against 0.70 for CLS, 0.61 (seed spread 0.04) against 0.52 for lesions covering 0.1--0.3\% of the frame and 0.83 against 0.76 for the largest findings, and its attention mass on small lesions is 13 to 15 times chance. The
 multi-scale variant is level with it. The head therefore recovers part of what pooling loses
 on radiographs, as on COCO, but on radiographs the remaining distance to the oracle (0.15 to
 0.28 AUROC) is much larger: with no scene prior to lean on and only a few hundred positives
@@ -777,8 +775,7 @@ probes reach 0.77 overall (from 0.70) and 0.79 to 0.87 in the bins above 0.3\%, 
 cross-validated probes stay at 0.61 to 0.62 overall. The gap between the oracle and the best
 global read-out on the same training data is therefore still 0.19 to 0.31 AUROC per bin, so
 domain adaptation of the encoder does not remove the loss at aggregation; it raises both
-sides of it. The attention head adds little AUROC on RAD-DINO (0.78 vs.\ 0.77 for CLS) but
-localises better than on any other backbone, with attention mass on small lesions 21 to 24
+sides of it. The attention head does not improve AUROC on RAD-DINO ($0.76\pm0.02$ over three seeds vs.\ 0.77 for CLS; the seed-0 run reported in Table~\ref{tab:cxr} is the best of the three) but localises better than on any other backbone, with attention mass on small lesions 21 to 24
 times chance and pointing accuracy 0.19 to 0.27, which suggests the adapted tokens make the
 lesion easy to find and the remaining difficulty is in scoring it from a few hundred positives.
 
@@ -883,8 +880,7 @@ tennis-racket panel of Figure~\ref{fig:attention} shows that context routes stil
 the audit is what makes them visible.
 
 \paragraph{Limitations.}
-Several numbers rest on one seed: every linear probe, the oracle, and the chest heads; the
-COCO heads are seeded and their seed spread (0.005 to 0.016) is a guide to the rest. The
+Every linear probe and the oracle rest on one seed; the heads are seeded (three seeds), with spreads of 0.005 to 0.016 on COCO and 0.015 to 0.084 on radiographs, where the thinnest bin moves most. The
 chest bins are thin, with one to seven findings per bin and one finding in the 0.1--0.3\% bin,
 so chest-side per-bin numbers carry wide intervals and we lean on the overall and paired
 figures. The resolution ablations train probes on 5,000 images rather than 9,000 (or 20,721
