@@ -52,6 +52,7 @@
 \newcommand{\figAttention}{figures/attention_examples.png}
 \newcommand{\tabBlindness}{../results/blindness_table__dinov2_vitb14_reg__res224.tex}
 
+\raggedbottom
 \begin{document}
 
 % ======================================================================
@@ -236,9 +237,6 @@ companions, and recognition systems, human and artificial, exploit this
 \citep{oliva2007context}.
 
 \subsection{How our work differs}
-Audio event detection is the natural second modality, where a ``small'' event is a brief one
-and attention pooling over frames is already standard \citep{kong2019attention,chen2023beats};
-per the feedback it is deferred until the vision result is settled.
 Each of the lines above answers part of our question. What is missing is a controlled comparison
 that holds the encoder, the tokens and the training images fixed, varies only the read-out, and
 reports performance as a function of target size. We provide that comparison on one dataset and
@@ -246,7 +244,9 @@ one backbone, with a told-where-to-look oracle on the same tokens as the ceiling
 attention head that contains mean pooling as a special case, so the baseline is nested in the
 model and any gain is attributable to where the head looks. Finally, we audit the head's
 attention against ground-truth boxes, which separates ``sees the object'' from ``guesses from
-context'' in a way that the AUROC curve alone cannot.
+context'' in a way that the AUROC curve alone cannot. Audio event detection is the natural second modality, where a ``small'' event is a brief one
+and attention pooling over frames is already standard \citep{kong2019attention,chen2023beats};
+per the feedback it is deferred until the vision result is settled.
 
 % ======================================================================
 \section{Progress So Far}
@@ -296,17 +296,10 @@ localise objects; register tokens that remove the high-norm artefacts
 Apple-silicon laptop with 16 GB of unified memory (measured throughput: 38 images per second at 224 px).
 
 \paragraph{Input handling: squash-resize to $224\times224$, no crop.}
-A centre crop would discard boxes near the border and change the size variable per image.
-Squashing keeps every box inside the $16\times16$ token grid at the price of an aspect-ratio
-distortion that affects every read-out equally and is therefore not a confound for the
-comparison.
-
-\paragraph{One feature cache, fp16.}
-The backbone is run once per image and its outputs, the CLS token and the 256 patch tokens
-after the final layer norm, are stored as float16 memory-mapped arrays
-(15,000 images $\times$ 257 tokens $\times$ 768 dims $\approx$ 5.9 GB). Every read-out,
-including the attention head, reads from this cache, which is what makes the comparison
-same-token by construction.
+A centre crop would discard boxes near the border; squashing keeps every box inside the token
+grid at the price of a distortion that affects every read-out equally. The backbone runs once
+per image and every read-out, including the attention head, reads the same fp16 cache, which
+is what makes the comparison same-token by construction.
 
 \subsection{Pipeline and repository}
 The repository is organised as a small library \fname{src/lip/} with numbered scripts under \fname{scripts/} that run in order, a
@@ -611,17 +604,18 @@ attention entropy at the selected epoch (uniform $=1$). \emph{Mass}: attention m
 the boxes of sub-patch targets (chance 0.007). Mean pooling and the oracle are repeated for
 reference.}
 \label{tab:lambda}
-\begin{tabular}{lrrrrrrr}
+\setlength{\tabcolsep}{3.5pt}\footnotesize
+\begin{tabular}{lrrrrrr}
 \toprule
-$\lambda$ & Ent. & $<0.1\%$ & 0.1--0.3\% & 0.3--1\% & All & mAP & Mass \\
+$\lambda$ & Ent. & $<0.1\%$ & 0.1--0.3\% & 0.3--1\% & mAP & Mass \\
 \midrule
-$-0.1$  & 0.90 & \textbf{0.908} & \textbf{0.941} & \textbf{0.959} & \textbf{0.971} & 0.790 & 0.026 \\
-$0$     & 0.44 & 0.899 & 0.933 & 0.951 & 0.968 & \textbf{0.800} & \textbf{0.088} \\
-$0.01$  & 0.29 & 0.899 & 0.929 & 0.950 & 0.968 & 0.790 & 0.072 \\
-$0.1$   & 0.06 & 0.886 & 0.916 & 0.939 & 0.956 & 0.713 & 0.061 \\
+$-0.1$  & 0.90 & \textbf{0.908} & \textbf{0.941} & \textbf{0.959} & 0.790 & 0.026 \\
+$0$     & 0.44 & 0.899 & 0.933 & 0.951 & \textbf{0.800} & \textbf{0.088} \\
+$0.01$  & 0.29 & 0.899 & 0.929 & 0.950 & 0.790 & 0.072 \\
+$0.1$   & 0.06 & 0.886 & 0.916 & 0.939 & 0.713 & 0.061 \\
 \midrule
-mean pooling & 1.00 & 0.862 & 0.918 & 0.928 & 0.961 & 0.734 & 0.007 \\
-oracle       & --   & 0.973 & 0.989 & 0.992 & 0.995 & 0.944 & --    \\
+mean   & 1.00 & 0.862 & 0.918 & 0.928 & 0.734 & 0.007 \\
+oracle & --   & 0.973 & 0.989 & 0.992 & 0.944 & --    \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -710,12 +704,14 @@ Dec 7 &
 \end{table}
 
 \paragraph{Risks and fallbacks.}
-If ViT-B extraction is too slow on our hardware we switch to ViT-S/14-reg, which changes the
-numbers but not the design. If the attention head does not beat mean pooling, the oracle gap
-and the size-stratified evaluation remain the result, and we report the negative finding for
-this head on this dataset. If the replication cannot be completed by Dec 7, the final report
-presents COCO alone and states the chest-radiograph transfer as untested. Audio, distillation
-and additional backbones stay out of scope for this semester.
+The midterm result stands on its own, so the remaining risks are to the extensions. The
+chest-radiograph replication depends on downloading NIH ChestX-ray14 (42 GB) and on
+ChestX-Det10 boxes aligning with it; if either fails we use the 984 boxed images that ship with
+ChestX-ray14 for binning only. A second backbone with a 16-pixel patch changes the grid and the
+one-patch boundary, which the harness already parameterises. Seeds: every number here is one
+seed, so the final report repeats the head and the probes over three seeds before claiming any
+difference under 0.01 AUROC. Audio, distillation and further backbones stay out of scope for
+this semester unless everything above is complete.
 
 % ======================================================================
 \bibliographystyle{unsrtnat}
