@@ -42,8 +42,8 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 5.1 Gated attention MIL head (class-specific attention) over memmapped tokens
 - [~] 5.2 Entropy regularizer; sweep lambda in {0, 0.01, 0.1}
 - [x] 5.3 Localization metrics: attention mass inside GT boxes vs chance, pointing game, per bin
-- [~] 5.4 Train + evaluate on `test`; results JSON
-- [ ] 5.5 Blindness curve v2 (with head) + localization figure
+- [x] 5.4 Train + evaluate on `test`; results JSON (attn: sub-patch 0.899 vs mean 0.862, mAP 0.800 vs 0.734)
+- [x] 5.5 Blindness curve v2 (with head) + localization figure
 - [ ] 5.6 Optional: multi-scale attention variant
 - [ ] 5.7 Optional: resolution ablation probes at 448
 
