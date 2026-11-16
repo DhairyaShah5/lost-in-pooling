@@ -678,6 +678,50 @@ for the single-scale head). It closes 41\% of the oracle gap on sub-patch target
 where the single-scale head was weakest, and it does so while looking at the object more, not
 less.
 
+\paragraph{Paired tests.}
+Because every read-out scores the same test images, differences can be tested with a paired
+bootstrap over images (500 draws, same resample for both read-outs). The $\lambda=0$ head beats
+mean pooling by $+0.037$ AUROC on sub-patch targets (95\% CI $+0.018$ to $+0.055$) and by
+$+0.014$ to $+0.023$ in the next three bins (every interval excludes zero), and is $0.005$
+worse on targets above 10\% (CI $-0.009$ to $-0.002$); overall mAP gains $+0.066$ ($+0.058$ to
+$+0.074$). The oracle's margin over mean pooling is $+0.111$ ($+0.094$ to $+0.129$) on
+sub-patch targets and shrinks monotonically to $+0.005$ on large ones.
+
+\subsection{Which classes does pooling lose?}
+\label{sec:perclass}
+Figure~\ref{fig:perclass} and Table~\ref{tab:perclass} break the small-target result down by
+class (positives whose largest instance is under 0.3\% of the image; 41 classes have at least
+10 such test positives). The oracle is above 0.92 for every class, so the tokens carry every
+class's small instances. The mean probe spreads from 0.46 (banana) to 1.00 (tennis racket):
+the classes it loses are objects that appear in unpredictable scenes (banana, motorcycle,
+suitcase, orange, apple, boat), and the classes it keeps are the sports equipment whose scene
+predicts it (tennis racket, kite, baseball glove and bat, skis, surfboard). The Spearman
+correlation between a class's mean-probe small-target AUROC and its oracle gap is $-0.98$; the
+gap averages 0.11 (median 0.08). The head's gain is largest exactly where the gap is largest
+(rank correlation $+0.85$; banana 0.46 to 0.90, apple 0.76 to 0.90, motorcycle 0.61 to 0.73)
+and is positive for 76\% of classes. This makes the context-prior story concrete: averaging
+over patches keeps the scene and drops the object, and whether that matters for a class
+depends on how much the scene already says about it.
+
+\begin{figure}[t]
+\centering
+\guardedfig{figures/perclass__dinov2_vitb14_reg__res224.pdf}{0.92\columnwidth}
+\caption{Per-class AUROC on small targets ($<0.3\%$ of the image), DINOv2 ViT-B/14-reg at
+224 px: mean-pooling probe (x) against the oracle on the same tokens (y). Point size is the
+number of small positives. Every class sits above the diagonal; the farther left, the more the
+global vector depends on scene context for that class.}
+\label{fig:perclass}
+\end{figure}
+
+\begin{table}[t]
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\caption{Classes with the largest and smallest oracle gap on small targets. $n$: small test
+positives; columns are AUROC of the mean probe, the $\lambda=0$ head and the oracle; gap =
+oracle $-$ mean.}
+\label{tab:perclass}
+\IfFileExists{../results/perclass_table__dinov2_vitb14_reg__res224.tex}{\input{../results/perclass_table__dinov2_vitb14_reg__res224.tex}}{\todo{per-class table missing}}
+\end{table}
+
 \subsection{Discussion and caveats}
 \label{sec:discussion}
 \paragraph{Context priors.}

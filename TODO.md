@@ -76,11 +76,11 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 9.1 Attention head seeds 1 and 2 on DINOv2 (0.899, 0.891, 0.889 sub-patch)
 - [x] 9.2 Multi-scale attention head on DINOv2 (best read-out: 0.908 sub-patch, mAP 0.816)
 - [x] 9.3 Max-MIL top-8 variant on DINOv2
-- [ ] 9.4 Paired bootstrap CI of per-bin AUROC differences (head vs mean, oracle vs mean)
+- [x] 9.4 Paired bootstrap CI of per-bin AUROC differences (head vs mean, oracle vs mean)
 
 ## 10. Analysis
-- [ ] 10.1 Per-class sub-patch AUROC and oracle gap; context-rich vs context-poor classes
-- [ ] 10.2 Figure + table for the per-class analysis
+- [x] 10.1 Per-class sub-patch AUROC and oracle gap; context-rich vs context-poor classes
+- [x] 10.2 Figure + table for the per-class analysis
 
 ## 11. Chest X-ray replication (stretch, strict time budget)
 - [x] 11.1 Obtain NIH ChestX-ray14 labels, the 984 boxed images, and a training subset
@@ -90,6 +90,6 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 
 ## 12. Report v2
 - [ ] 12.1 Cross-backbone results section
-- [ ] 12.2 Robustness and per-class subsections
+- [x] 12.2 Robustness and per-class subsections
 - [ ] 12.3 Abstract, introduction, progress, plan updated
 - [ ] 12.4 Final compile, proofread, push
