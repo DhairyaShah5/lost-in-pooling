@@ -24,6 +24,24 @@ docs/           plan, data/feature contracts, todo
 data/ features/ local only, gitignored
 ```
 
+## Headline results (COCO val2017, 5,000 images, macro AUROC on sub-patch targets, <0.1% of the image)
+
+| Backbone | CLS probe | Mean probe | Attention head | Oracle region |
+|---|---|---|---|---|
+| DINOv2 ViT-B/14-reg | 0.832 | 0.862 | 0.899 (multi-scale 0.908) | 0.973 |
+| CLIP ViT-B/16 | 0.832 | 0.838 | 0.910 | 0.935 |
+| SigLIP ViT-B/16 | 0.824 | 0.847 | 0.872 | 0.934 |
+
+Every read-out in a row is trained and evaluated on the same cached tokens. The oracle pools only the
+patches under the ground-truth boxes (negatives get a matched random box). Large targets score ~0.99 for
+every read-out. Doubling the input to 448 px lifts the oracle to 0.994 and leaves the global read-outs
+unchanged: global pooling tracks the fraction of tokens an object occupies, not the patches it covers.
+
+Chest radiographs (NIH ChestX-ray14, 880 boxed images, DINOv2): global probes 0.58 (5-fold CV) to 0.70
+(trained on 20k radiographs) overall AUROC; oracle on the same tokens 0.88 to 0.94 per lesion-size bin;
+attention head 0.73. Full tables, intervals and per-class breakdowns: `report/midterm.pdf`, `results/`,
+`results_cxr/`.
+
 ## Reproduce
 
 Tested on an Apple M4 laptop (16 GB, MPS). Full pipeline is under 40 minutes; the probes
@@ -43,6 +61,15 @@ python3 -m venv .venv && .venv/bin/pip install -e .
 # resolution ablation
 .venv/bin/python scripts/02_extract.py --res 448 --limit 5000
 .venv/bin/python scripts/03_probes.py --res 448 --kinds cls,mean,max && .venv/bin/python scripts/04_oracle.py --res 448
+# more backbones, chest X-rays, analyses
+scripts/run_backbone.sh clip_vitb16 && scripts/run_backbone.sh siglip_vitb16
+.venv/bin/python scripts/12_cross_backbone.py --backbones dinov2_vitb14_reg,clip_vitb16,siglip_vitb16
+.venv/bin/python scripts/13_build_cxr_manifest.py      # after placing NIH ChestX-ray14 under data/nih_cxr/
+.venv/bin/python scripts/02_extract.py --manifest data/nih_cxr/manifest.parquet --features-root features_cxr
+scripts/run_cxr_backbone.sh dinov2_vitb14_reg
+.venv/bin/python scripts/09_perclass.py && .venv/bin/python scripts/10_compare.py --pairs attn:mean,oracle:mean
+.venv/bin/python scripts/11_seeds.py --readouts attn --suffixes ",_s1,_s2"
+.venv/bin/python scripts/15_patch_units.py
 # report
 report/build.sh
 ```
