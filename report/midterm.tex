@@ -175,6 +175,7 @@ adding dedicated register tokens removes the artefacts and improves dense downst
 therefore use the register variant of DINOv2, since the patch tokens are our object of study.
 
 \subsection{Patch tokens localise objects without supervision}
+\label{sec:lit-patch}
 Self-supervised ViT features are unusually good at separating foreground from background with
 no labels. \citet{caron2021dino} observed that the CLS attention maps of DINO segment the main
 object. LOST \citep{simeoni2021lost} localises an object in a single forward pass by picking
@@ -721,6 +722,48 @@ oracle $-$ mean.}
 \label{tab:perclass}
 \IfFileExists{../results/perclass_table__dinov2_vitb14_reg__res224.tex}{\input{../results/perclass_table__dinov2_vitb14_reg__res224.tex}}{\todo{per-class table missing}}
 \end{table}
+
+\subsection{Does the pattern depend on the backbone?}
+\label{sec:backbones-results}
+Figure~\ref{fig:backbones} and Table~\ref{tab:backbones} repeat the comparison on CLIP
+ViT-B/16 and SigLIP ViT-B/16, two backbones with a different pretraining objective (language
+supervision) and a different patch size (16 px, one patch $=0.51\%$ of the image), on the same
+images and with the same harness. Three things hold across all three backbones. First, the
+global read-outs lose the same amount: the best global read-out scores 0.862 (DINOv2), 0.838
+(CLIP) and 0.847 (SigLIP) on sub-patch targets, from about 0.99 on large ones, and the CLS
+probes are within 0.01 of each other (0.832, 0.832, 0.824). SigLIP's global vector is already a
+learned attention pool (its MAP head) and it is no better on small targets than DINOv2's CLS
+token, so a pooling head trained inside the backbone does not by itself solve the problem.
+Second, the oracle stays far above the global read-outs on every backbone, so the loss is at
+aggregation for all three, but the amount of evidence in the tokens differs: the oracle
+reaches 0.973 on DINOv2 against 0.935 on CLIP and 0.934 on SigLIP, and its gap to mean
+pooling is 0.11, 0.10 and 0.09. Self-supervised patch tokens carry the most small-object
+evidence, which matches the object-discovery literature on DINO features
+(Section~\ref{sec:lit-patch}). Third, the attention head recovers part of the gap on every
+backbone: \todo{CLIP head} on CLIP and 0.872 on SigLIP (29\% of its gap, mAP 0.758 vs.\ 0.729
+for mean pooling), with weaker localisation than on DINOv2 (attention mass 6.5 times chance on
+SigLIP vs.\ 12). Max-MIL is the one read-out whose behaviour changes qualitatively: it
+collapses on CLIP (0.770) and SigLIP (0.750), consistent with their patch tokens not being
+linearly class-separable one patch at a time, whereas region means over several patches (the
+oracle) remain informative.
+
+\begin{figure*}[t]
+\centering
+\guardedfig{figures/cross_backbone__res224.pdf}{\textwidth}
+\caption{Blindness curves for three frozen backbones on the same 5,000 COCO test images, 224 px
+input: CLS (or SigLIP's MAP-pooled vector), mean pooling, the attention head and the oracle,
+each trained on identical cached tokens. Bands are 95\% bootstrap intervals; the dotted line
+marks one patch for each backbone's patch size.}
+\label{fig:backbones}
+\end{figure*}
+
+\begin{table*}[t]
+\centering\small
+\caption{Macro AUROC per size bin for the four main read-outs on each backbone (COCO val2017,
+224 px). Best non-oracle read-out per backbone and column in bold.}
+\label{tab:backbones}
+\IfFileExists{../results/cross_backbone_table__res224.tex}{\input{../results/cross_backbone_table__res224.tex}}{\todo{cross-backbone table missing}}
+\end{table*}
 
 \subsection{Discussion and caveats}
 \label{sec:discussion}
