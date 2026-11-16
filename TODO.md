@@ -73,9 +73,9 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [ ] 8.6 Cross-backbone figure (one panel per backbone) + table
 
 ## 9. Robustness
-- [~] 9.1 Attention head seeds 1 and 2 on DINOv2 (mean +- std)
-- [~] 9.2 Multi-scale attention head on DINOv2
-- [~] 9.3 Max-MIL top-8 variant on DINOv2
+- [x] 9.1 Attention head seeds 1 and 2 on DINOv2 (0.899, 0.891, 0.889 sub-patch)
+- [x] 9.2 Multi-scale attention head on DINOv2 (best read-out: 0.908 sub-patch, mAP 0.816)
+- [x] 9.3 Max-MIL top-8 variant on DINOv2
 - [ ] 9.4 Paired bootstrap CI of per-bin AUROC differences (head vs mean, oracle vs mean)
 
 ## 10. Analysis

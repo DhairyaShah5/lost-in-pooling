@@ -661,6 +661,22 @@ box or on a correlated object (the player rather than the racket), and the box i
 most one of 256 patches. The attention is nevertheless far from uniform: its normalised entropy
 settles at 0.43 during training (uniform $=1$), so the head is not re-deriving mean pooling.
 
+\paragraph{Robustness and variants.}
+Three seeds of the $\lambda=0$ head give sub-patch AUROC 0.899, 0.891 and 0.889 (mean 0.893,
+s.d.\ 0.005) and mAP 0.800, 0.802 and 0.798, so the gain over mean pooling (0.862) is not a
+seed effect. Max-MIL with top-8 instead of top-1 pooling recovers on large targets (0.958 vs.\
+0.945) and in mAP (0.654 vs.\ 0.631) but stays below mean pooling in every bin: the linear
+per-patch scorer is the limitation, not the pooling rule. The multi-scale head
+(\texttt{attn\_ms}), which attends jointly over the $16\times16$ grid and its $2\times$ and
+$4\times$ average-pooled versions (336 tokens with learned scale embeddings, 478k parameters),
+is the best read-out we trained: 0.908 on sub-patch targets, 0.948 and 0.963 in the next two
+bins, 0.990 on large targets (level with mean pooling), overall AUROC 0.973 and mAP 0.816, with
+attention mass on sub-patch targets 16 times chance and pointing accuracy 0.195 (vs.\ 0.129
+for the single-scale head). It closes 41\% of the oracle gap on sub-patch targets, 42\% in the
+0.1--0.3\% bin and 55\% in the 0.3--1\% bin, so letting the head choose its scale helps exactly
+where the single-scale head was weakest, and it does so while looking at the object more, not
+less.
+
 \subsection{Discussion and caveats}
 \label{sec:discussion}
 \paragraph{Context priors.}

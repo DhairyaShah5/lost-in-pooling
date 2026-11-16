@@ -16,7 +16,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--res", type=int, default=224)
     p.add_argument("--backbone", default="dinov2_vitb14_reg")
     p.add_argument("--exclude",
-                   default="oracle_globalneg,cls_train5k,mean_train5k,max_train5k,attn_ent-0.1,attn_ent0.01,attn_ent0.1",
+                   default="oracle_globalneg,cls_train5k,mean_train5k,max_train5k,attn_ent-0.1,attn_ent0.01,attn_ent0.1,"
+                           "attn_s1,attn_s2,maxmil_top8",
                    help="comma-separated read-outs left out of both figure and table")
     p.add_argument("--fig-readouts", default="",
                    help="comma-separated read-outs to draw (default: all kept); table always has all")
