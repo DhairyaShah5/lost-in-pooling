@@ -440,9 +440,8 @@ with train negatives subsampled to 3,000 per class. The attention head is traine
 the same selection rule. All experiments run on one Apple-silicon laptop (M4, 16 GB). Feature
 extraction runs at 38 images/s at 224 px and 10 images/s at 448 px, so the 224 px cache of all
 15,000 images takes about seven minutes and occupies 5.5 GB in fp16; every probe then trains
-in well under a minute. We also cache 448 px features ($32\times32$ grid, one patch
-$=0.098\%$ of the image) for the test split and a 5,000-image training subset, to test whether
-the sub-patch bins recover once the object spans at least one token.
+in well under a minute. Caches at 336 and 448 px cover the test split and a 5,000-image
+training subset.
 
 \subsection{Chest radiograph protocol}
 \label{sec:cxr-protocol}
@@ -756,7 +755,7 @@ marks one patch for each backbone's patch size.}
 
 \begin{table*}[t]
 \centering\small
-\caption{Macro AUROC per size bin for the four main read-outs on each backbone (COCO val2017,
+\caption{Macro AUROC per size bin for the five main read-outs on each backbone (COCO val2017,
 224 px). Best non-oracle read-out per backbone and column in bold.}
 \label{tab:backbones}
 \IfFileExists{../results/cross_backbone_table__res224.tex}{\input{../results/cross_backbone_table__res224.tex}}{\todo{cross-backbone table missing}}
@@ -936,9 +935,9 @@ recommended in the pre-proposal feedback; LUNA16 (3D CT) is dropped.}
 Week & Deliverable \\
 \midrule
 Nov 16--22 &
-  Chest radiographs at 448 px and with RAD-DINO completed and seeded (three seeds for every
-  head, on both datasets); multi-scale head on every backbone; formalise the token-fraction
-  pre-deployment check of Section~\ref{sec:results} and validate it on both datasets. \\
+  Chest heads on the full 448 px cache; three seeds for every head on both datasets;
+  formalise the token-fraction pre-deployment check of Section~\ref{sec:results} and
+  validate it on both datasets. \\
 Nov 23--29 &
   \textbf{Clinic, Nov 23}: present the cross-backbone curves, the oracle gap, the mechanism
   figure and the radiograph replication; get feedback on the causal argument. Add a fourth
