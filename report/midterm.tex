@@ -580,9 +580,10 @@ the final report.
 \guardedfig{figures/patch_units__dinov2_vitb14_reg.pdf}{\columnwidth}
 \caption{Macro AUROC against the largest instance's size in patches covered, DINOv2 ViT-B/14-reg
 on COCO val2017 at 224 px (solid), 336 px (dotted) and 448 px (dashed), probes trained on the
-same 5,000 images at every resolution. The oracle curves coincide; the global read-outs order
-themselves by token count, because the same patch coverage is a smaller fraction of more
-tokens. Bands: 95\% bootstrap over images (200 draws).}
+same 5,000 images at every resolution. Mean pooling and the oracle are drawn; CLS and max
+follow mean pooling and are in \texttt{results/}. The oracle curves coincide; the global
+read-out orders itself by token count, because the same patch coverage is a smaller fraction
+of more tokens. Bands: 95\% bootstrap over images (200 draws).}
 \label{fig:patchunits}
 \end{figure}
 

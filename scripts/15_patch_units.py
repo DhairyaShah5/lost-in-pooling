@@ -41,6 +41,7 @@ if __name__ == "__main__":
     p.add_argument("--results-dir", default="results")
     p.add_argument("--out-fig", default="results/figures/patch_units__dinov2_vitb14_reg")
     p.add_argument("--report-fig-dir", default="report/figures")
+    p.add_argument("--fig-readouts", default="mean,oracle", help="read-outs drawn (all are written to the JSON)")
     a = p.parse_args()
 
     lab = load_labels(split="test")
@@ -71,16 +72,17 @@ if __name__ == "__main__":
             summary[res][name] = {"readout": readout, "auroc": [v for v, _ in m], "n_classes": [n for _, n in m],
                                   "ci_lo": [float(v) for v in lo], "ci_hi": [float(v) for v in hi]}
             xs = np.arange(len(NAMES)); ys = np.array([v for v, _ in m])
-            ax.plot(xs, ys, ls=ls, marker=mk, ms=4, color=COLORS[name],
-                    label=f"{name} @ {res}px", lw=2 if name in ("mean", "oracle") else 1.3)
-            if np.isfinite(lo).all():
-                ax.fill_between(xs, lo, hi, color=COLORS[name], alpha=0.08, lw=0)
+            if name in a.fig_readouts.split(","):
+                ax.plot(xs, ys, ls=ls, marker=mk, ms=4, color=COLORS[name],
+                        label=f"{name} @ {res}px", lw=2 if name in ("mean", "oracle") else 1.3)
+                if np.isfinite(lo).all():
+                    ax.fill_between(xs, lo, hi, color=COLORS[name], alpha=0.08, lw=0)
             print(f"{res}px {name:7s}", " ".join(f"{NAMES[b]}={v:.3f}({n})" for b, (v, n) in enumerate(m)))
     ax.axhline(0.5, color="grey", ls=":", lw=1)
     ax.set_xticks(range(len(NAMES))); ax.set_xticklabels(NAMES)
     ax.set_xlabel("largest instance, in patches covered (bbox area / patch area)")
     ax.set_ylabel("macro AUROC"); ax.set_ylim(0.78, 1.0)
-    ax.legend(ncol=3, fontsize=7, frameon=False, loc="lower right")
+    ax.legend(ncol=2, fontsize=8, frameon=False, loc="lower right")
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     fig.tight_layout()
