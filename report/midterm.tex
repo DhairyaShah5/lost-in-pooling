@@ -786,13 +786,10 @@ cross-validated global probes do not move: CLS 0.582 overall (0.584 at 224 px) a
 0.77 per bin against 0.64 to 0.73 before. A radiologist's nodule that covers one 14-pixel
 patch at 224 px covers four at 448 px, and the region read-out sees that; the global vector,
 averaging over four times as many tokens, does not. For a frozen-backbone pipeline on
-radiographs, raising the input resolution without changing the aggregation buys nothing for
+radiographs, raising the input resolution without changing the aggregation buys almost nothing for
 small findings. RAD-DINO behaves the same way at 448 px: its cross-validated oracle rises to
 0.96 to 0.98 in every bin (0.960 for 0.1--0.3\% lesions, from 0.904) while its cross-validated
-CLS probe stays at 0.62 overall. The attention head trained on the 5,000-image 448 px cache
-reaches only 0.65 overall (0.73 with the 20,721-image cache at 224 px), so for the head the
-training set matters more than the pixels, and a like-for-like comparison needs the full
-cache at 448 px. RAD-DINO's head on the same 5,000-image cache scores 0.71 overall but
+CLS probe stays at 0.62 overall. Trained on the full 20,721-image cache at 448 px, the attention head reaches 0.77 overall (0.73 at 224 px on the same images; one seed) and 0.73 for lesions covering 0.1--0.3\% of the frame (0.63 at 224 px), while the CLS probe retrained on the same 448 px cache moves from 0.70 to 0.71 overall and from 0.52 to 0.57 in that bin. The head's attention mass on lesions rises to 3.4 times chance overall and 47 times chance for 0.1--0.3\% lesions (13 times at 224 px), with pointing accuracy 0.50 (0.40 at 224 px). The learned read-out therefore gains from the extra patches much as the oracle does while the global probe gains little, which is the COCO mechanism result again, this time with a read-out that sees no boxes. RAD-DINO's head on a 5,000-image 448 px cache scores 0.71 overall but
 localises small lesions far better than at 224 px (attention mass 67 times chance and
 pointing accuracy 0.38 for 0.1--0.3\% lesions, vs.\ 24 times and 0.19), so the extra pixels
 help the head find lesions even where the training set limits how well it scores them.
@@ -820,7 +817,7 @@ unboxed training radiographs (no suffix).}
 \begin{table}[t]
 \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
 \caption{Chest radiographs, macro AUROC per lesion-size bin on the 880 boxed NIH images at
-224 px, for DINOv2 ViT-B/14-reg (upper half) and RAD-DINO (lower half). Parenthesised:
+224 px (and, for DINOv2, at 448 px on the full cache), for DINOv2 ViT-B/14-reg (upper half) and RAD-DINO (lower half). Parenthesised:
 findings contributing to the bin. \emph{All} pools every labelled positive, including those
 without a box, which for the oracle receive a random region and so understate it.}
 \label{tab:cxr}
@@ -842,6 +839,9 @@ Max    & 0.554 & 0.682 & 0.682 & 0.701 & 0.734 & 0.668 \\
 Max-MIL          & 0.394 & 0.541 & 0.541 & 0.609 & 0.618 & 0.564 \\
 Attention head   & 0.634 & 0.755 & 0.719 & 0.749 & 0.821 & 0.727 \\
 Multi-scale head & 0.632 & 0.753 & 0.728 & 0.750 & 0.821 & 0.724 \\
+\multicolumn{7}{l}{\emph{the same, at 448 px (full 20,721-image cache)}} \\
+CLS            & 0.568 & 0.712 & 0.685 & 0.706 & 0.792 & 0.711 \\
+Attention head & 0.732 & 0.775 & 0.723 & 0.773 & 0.840 & 0.766 \\
 \midrule
 \multicolumn{7}{l}{\emph{RAD-DINO, 5-fold cross-validation on the boxed images}} \\
 CLS    & 0.849 & 0.707 & 0.695 & 0.712 & 0.786 & 0.620 \\
@@ -881,9 +881,10 @@ the audit is what makes them visible.
 The oracle and the CLIP, SigLIP and chest probes rest on one seed; the DINOv2 CLS and mean probes and every head are seeded (three seeds), with spreads of 0.003 to 0.016 on COCO and 0.015 to 0.084 on radiographs, where the thinnest bin moves most. The
 chest bins are thin, with one to seven findings per bin and one finding in the 0.1--0.3\% bin,
 so chest-side per-bin numbers carry wide intervals and we lean on the overall and paired
-figures. The resolution ablations train probes on 5,000 images rather than 9,000 (or 20,721
-on radiographs) so that the resolutions are comparable with each other, which makes their
-absolute numbers lower than the main tables. The oracle's ``all'' column on radiographs
+figures. The COCO resolution ablations train probes on 5,000 images rather than 9,000 so that the
+resolutions are comparable with each other, which makes their absolute numbers lower than the
+main tables; on radiographs the 448 px head and CLS probe use the full 20,721-image cache and
+the RAD-DINO 448 px head a 5,000-image one. The oracle's ``all'' column on radiographs
 includes label-positive pairs without a box, which it cannot see. A control that removes
 scene context on COCO is not available, because images with one small object and nothing
 else annotated are too rare (one class qualifies), so the context argument rests on the
@@ -923,7 +924,7 @@ recommended in the pre-proposal feedback; LUNA16 (3D CT) is dropped.}
 Week & Deliverable \\
 \midrule
 Nov 16--22 &
-  Chest heads on the full 448 px cache; three seeds for every head on both datasets;
+  RAD-DINO head on the full 448 px cache; three seeds for every head on both datasets;
   formalise the token-fraction pre-deployment check of Section~\ref{sec:results} and
   validate it on both datasets. \\
 Nov 23--29 &
