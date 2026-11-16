@@ -166,8 +166,7 @@ Three global read-outs are in common use. The CLS token aggregates through self-
 inside the network, so what it keeps is shaped entirely by the pretraining objective. Global
 average pooling (GAP) of the patch tokens is the alternative; \citet{beyer2022betterplain}
 found that a plain ViT trained with GAP matches or slightly exceeds the CLS variant on
-ImageNet, and \citet{raghu2021vitcnn} showed that CLS- and GAP-trained models organise spatial
-information differently in their upper layers. The third option is a learned multihead
+ImageNet, and \citet{raghu2021vitcnn} showed that the two organise spatial information differently. The third option is a learned multihead
 attention pooling (MAP) head, a single cross-attention layer with a learned query, introduced
 for scaling ViTs \citep{zhai2022scaling} and used by SigLIP \citep{zhai2023siglip}. All three
 produce one fixed-size vector before any downstream task is specified, so none of them can know
@@ -821,8 +820,11 @@ small findings. RAD-DINO behaves the same way at 448 px: its cross-validated ora
 0.96 to 0.98 in every bin (0.960 for 0.1--0.3\% lesions, from 0.904) while its cross-validated
 CLS probe stays at 0.62 overall. The attention head trained on the 5,000-image 448 px cache
 reaches only 0.65 overall (0.73 with the 20,721-image cache at 224 px), so for the head the
-training set matters more than the pixels; a like-for-like comparison needs the full cache at
-448 px and is part of the plan.
+training set matters more than the pixels, and a like-for-like comparison needs the full
+cache at 448 px. RAD-DINO's head on the same 5,000-image cache scores 0.71 overall but
+localises small lesions far better than at 224 px (attention mass 67 times chance and
+pointing accuracy 0.38 for 0.1--0.3\% lesions, vs.\ 24 times and 0.19), so the extra pixels
+help the head find lesions even where the training set limits how well it scores them.
 
 \begin{figure*}[t]
 \centering
