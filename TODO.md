@@ -44,7 +44,7 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 5.3 Localization metrics: attention mass inside GT boxes vs chance, pointing game, per bin
 - [x] 5.4 Train + evaluate on `test`; results JSON (attn: sub-patch 0.899 vs mean 0.862, mAP 0.800 vs 0.734)
 - [x] 5.5 Blindness curve v2 (with head) + localization figure
-- [ ] 5.6 Optional: multi-scale attention variant
+- [-] 5.6 Multi-scale attention variant (implemented, not run today)
 - [x] 5.7 Resolution ablation probes at 448 (oracle +0.02 on sub-patch, global read-outs unchanged)
 
 ## 6. Report (`report/midterm.tex`, 5 to 6 pages, pre-proposal style)
@@ -56,8 +56,8 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 6.6 Initial results: figures, tables, discussion (context-prior caveat)
 - [x] 6.7 Updated plan for the remaining three weeks
 - [x] 6.8 Abstract + introduction refresh
-- [ ] 6.9 Final compile, proofread, PDF committed
+- [x] 6.9 Final compile, proofread, PDF committed (8 pages incl. references, 0 placeholders)
 
 ## 7. Wrap-up
 - [x] 7.1 README with reproduction commands
-- [ ] 7.2 Final push; verify GitHub shows all commits under DhairyaShah5
+- [x] 7.2 Final push; verify GitHub shows all commits under DhairyaShah5
