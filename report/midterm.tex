@@ -96,7 +96,8 @@ seeds and paired bootstrap tests confirm it. Doubling the input resolution helps
 but not the global read-outs: what governs global pooling is the fraction of all tokens the
 object occupies, not the patches it covers. On NIH ChestX-ray14 the cliff of the motivating
 study reappears, with global probes at 0.58 to 0.70 AUROC against 0.88 to 0.94 for the oracle
-on the same tokens, and the head recovers part of it. We explain why natural images, with
+on the same tokens, and a radiograph-adapted backbone (RAD-DINO) raises both sides without
+closing the gap; the head recovers part of it. We explain why natural images, with
 their strong context priors, show a graded loss where radiographs show a cliff, and set out
 the plan to the final report.
 \end{list}
@@ -335,7 +336,8 @@ Status at submission: the COCO study is complete on three backbones at 224 px an
 at 448 px (six fixed read-outs, the oracle and its negative-sampling ablation, the attention
 head with a $\lambda$ sweep, three seeds and a multi-scale variant, the localisation audit,
 paired bootstrap tests and the per-class analysis); the chest radiograph arm is complete on
-DINOv2 \todo{raddino status}. Every figure and table is regenerated from the committed
+DINOv2 and RAD-DINO at 224 px, with 448 px runs in progress. Every figure and table is
+regenerated from the committed
 \texttt{results*/} JSON files by the numbered scripts.
 
 % ======================================================================
@@ -760,7 +762,7 @@ marks one patch for each backbone's patch size.}
 \subsection{Chest radiographs: the cliff reappears}
 \label{sec:cxr-results}
 Table~\ref{tab:cxr} and Figure~\ref{fig:cxr} give the chest radiograph results for DINOv2
-ViT-B/14-reg at 224 px (RAD-DINO: \todo{raddino}). With image-level training on 20,721
+ViT-B/14-reg and RAD-DINO at 224 px. We describe DINOv2 first. With image-level training on 20,721
 radiographs, the global probes reach 0.70 (CLS) and 0.69 (mean) overall AUROC on the boxed
 test images and between 0.52 and 0.79 per lesion-size bin; fitted by 5-fold cross-validation on
 the 880 boxed images alone they fall to 0.58, essentially the chance-level result of the
@@ -790,6 +792,19 @@ Figure~\ref{fig:cxr-attn} shows the head's attention on six small findings: it l
 nodules and the mass, is close on the effusion, and misses the pneumothorax and the
 atelectasis.
 
+\paragraph{RAD-DINO.}
+The radiograph-adapted backbone moves every read-out up and leaves the structure intact
+(Table~\ref{tab:cxr}, lower half). Its tokens carry more: the cross-validated oracle rises to
+0.95 to 0.97 per bin (from 0.88 to 0.94). Its global vector also carries more: image-level
+probes reach 0.77 overall (from 0.70) and 0.79 to 0.87 in the bins above 0.3\%, while the
+cross-validated probes stay at 0.61 to 0.62 overall. The gap between the oracle and the best
+global read-out on the same training data is therefore still 0.19 to 0.31 AUROC per bin, so
+domain adaptation of the encoder does not remove the loss at aggregation; it raises both
+sides of it. The attention head adds little AUROC on RAD-DINO (0.78 vs.\ 0.77 for CLS) but
+localises better than on any other backbone, with attention mass on small lesions 21 to 24
+times chance and pointing accuracy 0.19 to 0.27, which suggests the adapted tokens make the
+lesion easy to find and the remaining difficulty is in scoring it from a few hundred positives.
+
 \begin{figure*}[t]
 \centering
 \guardedfig{figures/attention_examples_cxr.png}{\textwidth}
@@ -812,10 +827,10 @@ unboxed training radiographs (no suffix).}
 
 \begin{table}[t]
 \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
-\caption{Chest radiographs, macro AUROC per lesion-size bin on the 880 boxed NIH images,
-DINOv2 ViT-B/14-reg at 224 px. Parenthesised: findings contributing to the bin. \emph{All}
-pools every labelled positive, including those without a box, which for the oracle receive a
-random region and so understate it.}
+\caption{Chest radiographs, macro AUROC per lesion-size bin on the 880 boxed NIH images at
+224 px, for DINOv2 ViT-B/14-reg (upper half) and RAD-DINO (lower half). Parenthesised:
+findings contributing to the bin. \emph{All} pools every labelled positive, including those
+without a box, which for the oracle receive a random region and so understate it.}
 \label{tab:cxr}
 \begin{tabular}{lrrrrrr}
 \toprule
@@ -835,6 +850,16 @@ Max    & 0.554 & 0.682 & 0.682 & 0.701 & 0.734 & 0.668 \\
 Max-MIL          & 0.394 & 0.541 & 0.541 & 0.609 & 0.618 & 0.564 \\
 Attention head   & 0.634 & 0.755 & 0.719 & 0.749 & 0.821 & 0.727 \\
 Multi-scale head & 0.632 & 0.753 & 0.728 & 0.750 & 0.821 & 0.724 \\
+\midrule
+\multicolumn{7}{l}{\emph{RAD-DINO, 5-fold cross-validation on the boxed images}} \\
+CLS    & 0.849 & 0.707 & 0.695 & 0.712 & 0.786 & 0.620 \\
+Mean   & 0.746 & 0.749 & 0.644 & 0.694 & 0.725 & 0.613 \\
+Oracle & \textbf{0.904} & \textbf{0.964} & \textbf{0.954} & \textbf{0.966} & \textbf{0.952} & 0.675 \\
+\multicolumn{7}{l}{\emph{RAD-DINO, image-level training on 20,721 radiographs}} \\
+CLS            & 0.637 & 0.789 & 0.759 & 0.771 & 0.853 & 0.773 \\
+Mean           & 0.657 & 0.782 & 0.764 & 0.790 & 0.871 & 0.767 \\
+Max-MIL        & 0.475 & 0.715 & 0.669 & 0.756 & 0.788 & 0.687 \\
+Attention head & 0.715 & 0.795 & 0.762 & 0.803 & 0.871 & 0.779 \\
 \bottomrule
 \end{tabular}
 \end{table}
