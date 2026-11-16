@@ -34,6 +34,7 @@ def main() -> None:
     p.add_argument("--batch-size", type=int, default=128)
     p.add_argument("--patience", type=int, default=5)
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--min-pos", type=int, default=10, help="min positives per class per bin for the macro average")
     p.add_argument("--readout-suffix", default="", help="appended to the read-out name, e.g. _s1 for seed repeats")
     p.add_argument("--device", default="auto")
     p.add_argument("--out", default="results")
@@ -99,7 +100,7 @@ def main() -> None:
         man = pd.read_parquet(a.manifest).set_index("image_id")
         width = man.loc[lab_te["image_ids"], "width"].to_numpy()
         height = man.loc[lab_te["image_ids"], "height"].to_numpy()
-    results = R.evaluate_readout(scores, lab_te, readout, a.backbone, a.res,
+    results = R.evaluate_readout(scores, lab_te, readout, a.backbone, a.res, min_pos=a.min_pos,
                                  split=a.test_split, train_split=a.train_split, notes=notes,
                                  width=width, height=height, seed=a.seed)
     rpath = R.save_results(results, R.results_path(readout, a.backbone, a.res, results_dir=out))

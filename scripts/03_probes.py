@@ -68,6 +68,7 @@ def main() -> None:
                    help="linear-probe device; cpu is ~10x faster than mps for a 768x80 layer "
                         "(per-step launch overhead dominates), so it is the default")
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--min-pos", type=int, default=10, help="min positives per class per bin for the macro average")
     p.add_argument("--verbose", action="store_true")
     a = p.parse_args()
 
@@ -124,7 +125,7 @@ def main() -> None:
                      f"train_time_s={time.time() - t0:.0f}")
 
         name = kind + a.readout_suffix
-        res = evaluate_readout(scores, labels["test"], readout=name, backbone=a.backbone,
+        res = evaluate_readout(scores, labels["test"], readout=name, backbone=a.backbone, min_pos=a.min_pos,
                                res=a.res, split="test", train_split="train", notes=notes,
                                width=width, height=height, seed=a.seed)
         save_results(res, results_path(name, a.backbone, a.res, a.out))
