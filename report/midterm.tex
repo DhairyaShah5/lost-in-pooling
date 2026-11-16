@@ -731,13 +731,13 @@ reaches 0.973 on DINOv2 against 0.935 on CLIP and 0.934 on SigLIP, and its gap t
 pooling is 0.11, 0.10 and 0.09. Self-supervised patch tokens carry the most small-object
 evidence, which matches the object-discovery literature on DINO features
 (Section~\ref{sec:lit-patch}). Third, the attention head recovers part of the gap on every
-backbone: 0.910 on CLIP, three quarters of its gap (mAP 0.735 vs.\ 0.691 for mean pooling),
-and 0.872 on SigLIP, 29\% of its gap (mAP 0.758 vs.\ 0.729), with weaker localisation than on
-DINOv2 (attention mass 7.1 and 6.5 times chance vs.\ 12). On CLIP the head is the best
-read-out in every bin below 3\%, and the three heads land within 0.04 of each other on
-sub-patch targets (0.899, 0.910, 0.872) although their oracles differ by 0.04 in the other
-direction, so the head is limited more by what it can learn from image-level labels than by
-what the tokens contain. The multi-scale head is the best read-out on all three backbones
+backbone. Over three seeds its sub-patch AUROC is $0.893\pm0.005$ on DINOv2, $0.892\pm0.016$
+on CLIP and $0.875\pm0.007$ on SigLIP, against 0.862, 0.838 and 0.847 for mean pooling, so it
+closes about 30\%, 55\% and 30\% of the respective oracle gaps (mAP 0.741 vs.\ 0.691 on CLIP,
+0.743 vs.\ 0.729 on SigLIP), with weaker localisation than on DINOv2 (attention mass 7 and
+6.5 times chance vs.\ 12). The three heads land within 0.02 of each other on sub-patch
+targets although their oracles differ by 0.04 in the other direction, so the head is limited
+more by what it can learn from image-level labels than by what the tokens contain. The multi-scale head is the best read-out on all three backbones
 (0.908, 0.913 and 0.878 on sub-patch targets; mAP 0.816, 0.747 and 0.775), so choosing the
 scale helps regardless of how the tokens were pretrained. Max-MIL is the one read-out whose behaviour changes qualitatively: it
 collapses on CLIP (0.770) and SigLIP (0.750), consistent with their patch tokens not being
@@ -910,8 +910,8 @@ same mechanism seen with and without a context prior: on COCO the global vector 
 on the scene, on a chest radiograph it cannot. What the controlled comparisons establish is
 that for these encoders and these tokens the loss occurs at aggregation and is recoverable
 by a read-out that can select patches; what they do not establish is how much of it a head
-trained without boxes can recover in general. On COCO the answer is a third to three
-quarters of the gap depending on the backbone, on radiographs much less, and the per-class
+trained without boxes can recover in general. On COCO the answer is a third to a half
+of the gap depending on the backbone, on radiographs much less, and the per-class
 analysis says the recoverable share is largest exactly where context helps least. All
 statements are about the named backbones at 224 or 448 px on COCO val2017 and the NIH boxed
 images, with one seed except where seeds are reported.
