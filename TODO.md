@@ -6,21 +6,21 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 0.1 Python venv + dependencies (torch, torchvision, scikit-learn, ...)
 - [x] 0.2 Repo scaffold: .gitignore, README, pyproject, docs/CONTRACTS.md, TODO.md
 - [x] 0.3 Public GitHub repo `DhairyaShah5/lost-in-pooling` created, first push
-- [~] 0.4 Download COCO 2017 annotations (241 MB)
-- [~] 0.5 Download val2017 images (5,000 images, ~780 MB) = `test` split
-- [~] 0.6 Download 10,000-image seeded subset of train2017 (~1.6 GB) = `train`/`val` splits
+- [x] 0.4 Download COCO 2017 annotations (241 MB)
+- [x] 0.5 Download val2017 images (5,000 images, ~780 MB) = `test` split
+- [x] 0.6 Download 10,000-image seeded subset of train2017 (~1.6 GB) = `train`/`val` splits
 
 ## 1. Data
-- [ ] 1.1 Manifest builder: images, splits (train 9k / val 1k / test 5k)
-- [ ] 1.2 Labels: presence (N,80), largest-instance box-area fraction (N,80), seg-area fraction
-- [ ] 1.3 Boxes table in normalized coordinates
-- [ ] 1.4 Dataset stats: positives per class per size bin (sanity table for the report)
+- [x] 1.1 Manifest builder: images, splits (train 9k / val 1k / test 5k)
+- [x] 1.2 Labels: presence (N,80), largest-instance box-area fraction (N,80), seg-area fraction
+- [x] 1.3 Boxes table in normalized coordinates
+- [x] 1.4 Dataset stats: positives per class per size bin (sanity table for the report)
 
 ## 2. Features
-- [ ] 2.1 DINOv2 ViT-B/14-reg loader on MPS; squash-resize 224; fp16 memmap writer
-- [ ] 2.2 Benchmark 200 images; decide ViT-B vs ViT-S (threshold 20 img/s)
-- [ ] 2.3 Extract `test` (val2017) features
-- [ ] 2.4 Extract `train` + `val` subset features
+- [x] 2.1 DINOv2 ViT-B/14-reg loader on MPS; squash-resize 224; fp16 memmap writer
+- [x] 2.2 Benchmark: ViT-B/14-reg runs at 38 img/s on MPS, kept
+- [~] 2.3 Extract `test` (val2017) features
+- [~] 2.4 Extract `train` + `val` subset features
 - [ ] 2.5 Go/no-go at ~19:00: extract 448-res features (test + 5k train) for the resolution ablation
 
 ## 3. Evaluation harness

@@ -9,6 +9,8 @@ from lip.data.labels import load_labels
 
 EDGES = [0, 0.001, 0.003, 0.01, 0.03, 0.10, 1.0]
 NAMES = ["<0.1%", "0.1-0.3%", "0.3-1%", "1-3%", "3-10%", ">10%"]
+TEX_NAMES = {"<0.1%": r"$<0.1\%$", "0.1-0.3%": r"$0.1$--$0.3\%$", "0.3-1%": r"$0.3$--$1\%$",
+             "1-3%": r"$1$--$3\%$", "3-10%": r"$3$--$10\%$", ">10%": r"$>10\%$"}
 
 
 def stats_for_split(lab: dict, min_pos: int = 10) -> dict:
@@ -34,7 +36,7 @@ if __name__ == "__main__":
     rows = []
     for name in NAMES:
         t, te = res["train"]["bins"][name], res["test"]["bins"][name]
-        rows.append(f"{name} & {t['n_pos']} & {te['n_pos']} & {te['n_classes_ge_min']} \\\\")
+        rows.append(f"{TEX_NAMES[name]} & {t['n_pos']} & {te['n_pos']} & {te['n_classes_ge_min']} \\\\")
     tex = "\n".join([
         r"\begin{table}[t]\centering\small",
         r"\begin{tabular}{lrrr}\toprule",

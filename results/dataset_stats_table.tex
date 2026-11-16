@@ -1,0 +1,13 @@
+\begin{table}[t]\centering\small
+\begin{tabular}{lrrr}\toprule
+size bin & train pos. & test pos. & test classes ($\geq$10) \\ \midrule
+$<0.1\%$ & 1160 & 637 & 19 \\
+$0.1$--$0.3\%$ & 2008 & 1149 & 30 \\
+$0.3$--$1\%$ & 3666 & 2037 & 50 \\
+$1$--$3\%$ & 4092 & 2324 & 62 \\
+$3$--$10\%$ & 5622 & 3045 & 68 \\
+$>10\%$ & 9654 & 5439 & 71 \\
+\midrule all & 26202 & 14631 & 80 \\
+\bottomrule\end{tabular}
+\caption{Positive (image, class) pairs per size bin of the largest instance (relative bbox area). The last column counts classes with at least 10 test positives in the bin, i.e.\ those entering the macro average.}
+\label{tab:data}\end{table}

@@ -1,0 +1,110 @@
+{
+  "train": {
+    "n_images": 9000,
+    "n_pos_pairs": 26202,
+    "bins": {
+      "<0.1%": {
+        "n_pos": 1160,
+        "n_classes_ge_min": 29,
+        "median_pos_per_class": 9.0
+      },
+      "0.1-0.3%": {
+        "n_pos": 2008,
+        "n_classes_ge_min": 43,
+        "median_pos_per_class": 12.0
+      },
+      "0.3-1%": {
+        "n_pos": 3666,
+        "n_classes_ge_min": 66,
+        "median_pos_per_class": 24.0
+      },
+      "1-3%": {
+        "n_pos": 4092,
+        "n_classes_ge_min": 71,
+        "median_pos_per_class": 33.0
+      },
+      "3-10%": {
+        "n_pos": 5622,
+        "n_classes_ge_min": 77,
+        "median_pos_per_class": 48.0
+      },
+      ">10%": {
+        "n_pos": 9654,
+        "n_classes_ge_min": 74,
+        "median_pos_per_class": 56.0
+      }
+    }
+  },
+  "val": {
+    "n_images": 1000,
+    "n_pos_pairs": 2917,
+    "bins": {
+      "<0.1%": {
+        "n_pos": 138,
+        "n_classes_ge_min": 2,
+        "median_pos_per_class": 2.0
+      },
+      "0.1-0.3%": {
+        "n_pos": 236,
+        "n_classes_ge_min": 7,
+        "median_pos_per_class": 3.0
+      },
+      "0.3-1%": {
+        "n_pos": 369,
+        "n_classes_ge_min": 11,
+        "median_pos_per_class": 3.5
+      },
+      "1-3%": {
+        "n_pos": 468,
+        "n_classes_ge_min": 9,
+        "median_pos_per_class": 4.0
+      },
+      "3-10%": {
+        "n_pos": 584,
+        "n_classes_ge_min": 14,
+        "median_pos_per_class": 6.0
+      },
+      ">10%": {
+        "n_pos": 1122,
+        "n_classes_ge_min": 30,
+        "median_pos_per_class": 7.0
+      }
+    }
+  },
+  "test": {
+    "n_images": 5000,
+    "n_pos_pairs": 14631,
+    "bins": {
+      "<0.1%": {
+        "n_pos": 637,
+        "n_classes_ge_min": 19,
+        "median_pos_per_class": 5.0
+      },
+      "0.1-0.3%": {
+        "n_pos": 1149,
+        "n_classes_ge_min": 30,
+        "median_pos_per_class": 8.0
+      },
+      "0.3-1%": {
+        "n_pos": 2037,
+        "n_classes_ge_min": 50,
+        "median_pos_per_class": 15.0
+      },
+      "1-3%": {
+        "n_pos": 2324,
+        "n_classes_ge_min": 62,
+        "median_pos_per_class": 19.5
+      },
+      "3-10%": {
+        "n_pos": 3045,
+        "n_classes_ge_min": 68,
+        "median_pos_per_class": 27.0
+      },
+      ">10%": {
+        "n_pos": 5439,
+        "n_classes_ge_min": 71,
+        "median_pos_per_class": 33.0
+      }
+    }
+  }
+}

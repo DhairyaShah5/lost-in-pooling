@@ -41,7 +41,7 @@ class SquashDataset(Dataset):
 
     def __getitem__(self, i):
         img = Image.open(self.paths[i]).convert("RGB").resize((self.res, self.res), Image.BICUBIC)
-        x = torch.from_numpy(np.asarray(img, dtype=np.uint8)).permute(2, 0, 1).float() / 255.0
+        x = torch.from_numpy(np.array(img, dtype=np.uint8)).permute(2, 0, 1).float() / 255.0
         return (x - self.mean) / self.std
 
 
