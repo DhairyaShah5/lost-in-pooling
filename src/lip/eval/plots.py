@@ -48,13 +48,22 @@ _GRID = "#e1e0d9"
 # --------------------------------------------------------------------------------------
 # Ordering and styling
 # --------------------------------------------------------------------------------------
+_VARIANT_SUFFIX = re.compile(r"_(cv\d+|s\d+|top\d+|train5k)$")
+
+
+def _base_name(name: str) -> str:
+    """Read-out name without a variant suffix (``oracle_cv5`` -> ``oracle``), for ordering/styling."""
+    return _VARIANT_SUFFIX.sub("", str(name))
+
+
 def readout_rank(name: str) -> tuple[int, str]:
     """Sort key implementing the fixed order (unknown names sit between attn* and oracle)."""
-    if name in READOUT_ORDER:
-        return (READOUT_ORDER.index(name), name)
-    if name.startswith("attn"):
+    base = _base_name(name)
+    if base in READOUT_ORDER:
+        return (READOUT_ORDER.index(base), name)
+    if base.startswith("attn"):
         return (len(READOUT_ORDER), name)
-    if name == ORACLE:
+    if base == ORACLE:
         return (len(READOUT_ORDER) + 2, name)
     return (len(READOUT_ORDER) + 1, name)
 
@@ -66,11 +75,12 @@ def sort_results(results: list[dict]) -> list[dict]:
 
 def series_styles(names: list[str]) -> dict[str, dict]:
     """Colour / marker / linestyle per read-out name (stable across figures)."""
-    extra = sorted(n for n in set(names) if n not in _FIXED_COLORS)
+    extra = sorted(n for n in set(names) if _base_name(n) not in _FIXED_COLORS)
     styles: dict[str, dict] = {}
     for n in names:
-        if n in _FIXED_COLORS:
-            styles[n] = {"color": _FIXED_COLORS[n], "marker": _FIXED_MARKERS[n], "ls": "-"}
+        if _base_name(n) in _FIXED_COLORS:
+            b = _base_name(n)
+            styles[n] = {"color": _FIXED_COLORS[b], "marker": _FIXED_MARKERS[b], "ls": "-"}
         else:
             k = extra.index(n)
             styles[n] = {
@@ -149,7 +159,7 @@ def plot_blindness_curves(
         ax.plot(
             x, ym, color=st["color"], linestyle=st["ls"], marker=st["marker"], linewidth=2.0,
             markersize=7.5 if thin else 5.5, markeredgecolor=st["color"] if thin else "white",
-            markeredgewidth=0.0 if thin else 0.8, label=name, zorder=3 if name == ORACLE else 2,
+            markeredgewidth=0.0 if thin else 0.8, label=name, zorder=3 if _base_name(name) == ORACLE else 2,
         )
 
     # Axis limits: leave room for the legend in the lower right.
@@ -229,7 +239,7 @@ def _best_mask(results: list[dict], vals: np.ndarray) -> np.ndarray:
     rounded = np.round(vals, 3)
     cand = rounded.copy()
     for i, n in enumerate(names):
-        if n == ORACLE:
+        if _base_name(n) == ORACLE:
             cand[i] = np.nan
     best = np.full(vals.shape, False)
     for j in range(vals.shape[1]):
@@ -277,7 +287,7 @@ def results_table_latex(
         header + r" \\",
         r"\midrule",
     ]
-    oracle_rows = [i for i, r in enumerate(results) if str(r["readout"]) == ORACLE]
+    oracle_rows = [i for i, r in enumerate(results) if _base_name(str(r["readout"])) == ORACLE]
     for i, r in enumerate(results):
         if oracle_rows and i == oracle_rows[0]:
             lines.append(r"\midrule")
@@ -426,7 +436,7 @@ def plot_backbone_panels(
             (line,) = ax.plot(
                 x, ym, color=st["color"], linestyle=st["ls"], marker=st["marker"], linewidth=1.6,
                 markersize=6.0 if thin else 4.2, markeredgecolor=st["color"] if thin else "white",
-                markeredgewidth=0.0 if thin else 0.6, label=name, zorder=3 if name == ORACLE else 2,
+                markeredgewidth=0.0 if thin else 0.6, label=name, zorder=3 if _base_name(name) == ORACLE else 2,
             )
             handles.setdefault(name, line)
         ax.axhline(expected_chance, color=_MUTED, linestyle="--", linewidth=0.8, zorder=0)

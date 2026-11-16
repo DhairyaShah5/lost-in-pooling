@@ -19,6 +19,7 @@ def main(argv: list[str] | None = None) -> int:
                    default="oracle_globalneg,cls_train5k,mean_train5k,max_train5k,attn_ent-0.1,attn_ent0.01,attn_ent0.1,"
                            "attn_s1,attn_s2,maxmil_top8",
                    help="comma-separated read-outs left out of both figure and table")
+    p.add_argument("--tag", default="", help="appended to output stems, e.g. _cxr")
     p.add_argument("--fig-readouts", default="",
                    help="comma-separated read-outs to draw (default: all kept); table always has all")
     a = p.parse_args(argv)
@@ -36,7 +37,7 @@ def main(argv: list[str] | None = None) -> int:
     keep = {x for x in a.fig_readouts.split(",") if x}
     fig_results = [r for r in results if not keep or str(r.get("readout")) in keep]
 
-    stem = f"blindness_curve__{a.backbone}__res{a.res}"
+    stem = f"blindness_curve__{a.backbone}__res{a.res}{a.tag}"
     fig_dir = Path(a.fig_dir)
     written = plot_blindness_curves(fig_results, fig_dir / stem, res=a.res)
     report_dir = Path(a.report_fig_dir)
@@ -54,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
                  f"({a.backbone.replace('_', ' ')}, {a.res}px input). Best non-oracle read-out per column in bold."),
         label=f"tab:blindness_{a.backbone}_res{a.res}",
     )
-    tex_path = results_dir / f"blindness_table__{a.backbone}__res{a.res}.tex"
+    tex_path = results_dir / f"blindness_table__{a.backbone}__res{a.res}{a.tag}.tex"
     tex_path.parent.mkdir(parents=True, exist_ok=True)
     tex_path.write_text(tex)
     written.append(tex_path)
