@@ -1,0 +1,15 @@
+class,n_small,n_pos_all,small_auroc_cls,small_auroc_mean,small_auroc_attn,small_auroc_oracle,oracle_gap,head_gain,context_score,eligible
+Atelectasis,2,302,,,,,,,,False
+Cardiomegaly,0,185,,,,,,,,False
+Consolidation,0,73,,,,,,,,False
+Edema,0,42,,,,,,,,False
+Effusion,4,312,,,,,,,,False
+Emphysema,0,34,,,,,,,,False
+Fibrosis,0,18,,,,,,,,False
+Hernia,0,2,,,,,,,,False
+Infiltration,0,312,,,,,,,,False
+Mass,2,138,,,,,,,,False
+Nodule,23,162,0.532639,0.541117,0.636854,0.886944,0.345828,0.095737,0.541117,True
+Pleural_Thickening,0,41,,,,,,,,False
+Pneumonia,0,131,,,,,,,,False
+Pneumothorax,3,163,,,,,,,,False
