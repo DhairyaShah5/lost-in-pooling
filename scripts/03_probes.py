@@ -45,6 +45,7 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--backbone", default="dinov2_vitb14_reg")
     p.add_argument("--res", type=int, default=224)
+    p.add_argument("--readout-suffix", default="", help="appended to the read-out name, e.g. _top8")
     p.add_argument("--kinds", default="cls,mean,cls_mean,max,maxmil",
                    help="comma-separated subset of cls,mean,cls_mean,max,maxmil")
     p.add_argument("--epochs", type=int, default=40, help="linear-probe epochs")
@@ -119,11 +120,12 @@ def main() -> None:
                      f"BCEWithLogits, AdamW, cosine: {probe.summary()} "
                      f"train_time_s={time.time() - t0:.0f}")
 
-        res = evaluate_readout(scores, labels["test"], readout=kind, backbone=a.backbone,
+        name = kind + a.readout_suffix
+        res = evaluate_readout(scores, labels["test"], readout=name, backbone=a.backbone,
                                res=a.res, split="test", train_split="train", notes=notes,
                                width=width, height=height, seed=a.seed)
-        save_results(res, results_path(kind, a.backbone, a.res, a.out))
-        save_scores(scores, scores_path(kind, a.backbone, a.res, a.out))
+        save_results(res, results_path(name, a.backbone, a.res, a.out))
+        save_scores(scores, scores_path(name, a.backbone, a.res, a.out))
         print_bins(kind, res)
         print(f"    notes: {notes}")
 
