@@ -45,7 +45,7 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 5.4 Train + evaluate on `test`; results JSON (attn: sub-patch 0.899 vs mean 0.862, mAP 0.800 vs 0.734)
 - [x] 5.5 Blindness curve v2 (with head) + localization figure
 - [ ] 5.6 Optional: multi-scale attention variant
-- [ ] 5.7 Optional: resolution ablation probes at 448
+- [~] 5.7 Resolution ablation probes at 448
 
 ## 6. Report (`report/midterm.tex`, 5 to 6 pages, pre-proposal style)
 - [x] 6.1 LaTeX skeleton in pre-proposal style, compiles with tectonic
