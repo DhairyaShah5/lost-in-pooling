@@ -252,7 +252,8 @@ def _latex_bin_name(name: str) -> str:
 
 
 def results_table_latex(
-    results: list[dict], caption: str = "Macro AUROC per size bin.", label: str = "tab:blindness"
+    results: list[dict], caption: str = "Macro AUROC per size bin.", label: str = "tab:blindness",
+    floating: bool = True,
 ) -> str:
     """Booktabs table: rows = read-outs (fixed order), columns = 6 bins + ``all``.
 
@@ -263,12 +264,13 @@ def results_table_latex(
     vals = _cell_values(results)
     best = _best_mask(results, vals)
     header = " & ".join(["read-out"] + [_latex_bin_name(n) for n in BIN_NAMES] + ["all"])
-    lines = [
+    lines = ([
         r"\begin{table}[t]",
         r"\centering",
         r"\small",
         rf"\caption{{{caption}}}",
         rf"\label{{{label}}}",
+    ] if floating else []) + [
         r"\begin{tabular}{l" + "c" * (N_BINS + 1) + "}",
         r"\toprule",
         header + r" \\",
@@ -287,7 +289,7 @@ def results_table_latex(
                 s = f"{v:.3f}"
                 cells.append(rf"\textbf{{{s}}}" if best[i, j] else s)
         lines.append(" & ".join([_latex_escape(str(r["readout"]))] + cells) + r" \\")
-    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    lines += [r"\bottomrule", r"\end{tabular}"] + ([r"\end{table}"] if floating else [])
     return "\n".join(lines) + "\n"
 
 

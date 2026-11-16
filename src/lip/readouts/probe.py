@@ -85,17 +85,18 @@ class LinearProbe:
         for ep in range(1, epochs + 1):
             t0 = time.time()
             model.train()
-            perm = torch.randperm(n, generator=gen)
-            tot = 0.0
+            perm = torch.randperm(n, generator=gen).to(dev)
+            tot = torch.zeros((), device=dev)  # accumulate on device: one host sync per epoch
             for s in range(0, n, batch_size):
-                idx = perm[s:s + batch_size].to(dev)
+                idx = perm[s:s + batch_size]
                 logits = model(Xt[idx])
                 loss = F.binary_cross_entropy_with_logits(logits, Yt[idx])
                 opt.zero_grad(set_to_none=True)
                 loss.backward()
                 opt.step()
-                tot += float(loss.detach()) * len(idx)
+                tot += loss.detach() * len(idx)
             sched.step()
+            tot = float(tot)
 
             model.eval()
             with torch.no_grad():

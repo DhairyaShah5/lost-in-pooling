@@ -63,7 +63,11 @@ def cache_pooled(store: FeatureStore, kind: str, root: Path | str | None = None,
         x = np.load(path)
         if x.shape[0] == len(store):
             return x.astype(np.float32, copy=False)
-    x = pooled_features(store, kind, batch_size)
+    if kind == "cls_mean":  # reuse the cached parts instead of re-streaming the memmap
+        x = np.concatenate([cache_pooled(store, "cls", root, batch_size, force),
+                            cache_pooled(store, "mean", root, batch_size, force)], axis=1)
+    else:
+        x = pooled_features(store, kind, batch_size)
     path.parent.mkdir(parents=True, exist_ok=True)
     np.save(path, x)
     return x

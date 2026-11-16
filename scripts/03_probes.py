@@ -60,7 +60,10 @@ def main() -> None:
     p.add_argument("--manifest", default="data/coco/manifest.parquet")
     p.add_argument("--out", default="results")
     p.add_argument("--checkpoints", default="checkpoints")
-    p.add_argument("--device", default="auto", help="auto (mps if available), mps or cpu")
+    p.add_argument("--device", default="auto", help="max-MIL device: auto (mps if available), mps or cpu")
+    p.add_argument("--probe-device", default="cpu",
+                   help="linear-probe device; cpu is ~10x faster than mps for a 768x80 layer "
+                        "(per-step launch overhead dominates), so it is the default")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--verbose", action="store_true")
     a = p.parse_args()
@@ -110,7 +113,7 @@ def main() -> None:
             probe = LinearProbe().fit(
                 X["train"], labels["train"]["y"], X["val"], labels["val"]["y"],
                 epochs=a.epochs, lr=a.lr, weight_decay=a.weight_decay,
-                batch_size=a.batch_size, device=a.device, seed=a.seed, verbose=a.verbose)
+                batch_size=a.batch_size, device=a.probe_device, seed=a.seed, verbose=a.verbose)
             scores = probe.predict(X["test"])
             notes = (f"linear probe on {kind} (d={X['train'].shape[1]}), standardised, "
                      f"BCEWithLogits, AdamW, cosine: {probe.summary()} "
