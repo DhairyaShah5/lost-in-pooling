@@ -95,9 +95,15 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [ ] 12.4 Final compile, proofread, push
 
 # Phase 3: depth (Nov 15, 18:45 to 22:00)
-- [~] 13.1 Chest X-rays at 448 px (DINOv2, RAD-DINO): features + CV read-outs + head
+- [x] 13.1 Chest X-rays at 448 px (DINOv2, RAD-DINO): oracle rises to 0.96-0.98, global probes unchanged (heads still running)
 - [x] 13.2 Chest X-ray attention examples, per-finding table, paired bootstrap (oracle gap +0.27 to +0.31)
-- [~] 13.3 Multi-scale head on CLIP and SigLIP
-- [x] 13.4 Mechanism test: AUROC vs patches covered at 224 vs 448 px (global pooling tracks token fraction)
+- [x] 13.3 Multi-scale head on CLIP and SigLIP (best read-out on every backbone)
+- [x] 13.4 Mechanism test: AUROC vs patches covered at 224, 336, 448 px (global pooling tracks token fraction)
 - [x] 13.5 Report v2: abstract, intro, feedback response, status, plan rewritten; literature trimmed
 - [ ] 13.6 Final pass: trim, full visual review, README results summary, push
+
+# Phase 4 (Nov 15, 19:30 to 21:30)
+- [x] 14.1 COCO at 336 px: third resolution point on the mechanism figure
+- [~] 14.2 Seed repeats of the CLIP and SigLIP heads
+- [~] 14.3 Chest X-ray heads at 448 px (DINOv2, RAD-DINO)
+- [ ] 14.4 Final pass: full visual review, trims, README, push

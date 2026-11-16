@@ -29,17 +29,18 @@ data/ features/ local only, gitignored
 | Backbone | CLS probe | Mean probe | Attention head | Oracle region |
 |---|---|---|---|---|
 | DINOv2 ViT-B/14-reg | 0.832 | 0.862 | 0.899 (multi-scale 0.908) | 0.973 |
-| CLIP ViT-B/16 | 0.832 | 0.838 | 0.910 | 0.935 |
-| SigLIP ViT-B/16 | 0.824 | 0.847 | 0.872 | 0.934 |
+| CLIP ViT-B/16 | 0.832 | 0.838 | 0.910 (multi-scale 0.913) | 0.935 |
+| SigLIP ViT-B/16 | 0.824 | 0.847 | 0.872 (multi-scale 0.878) | 0.934 |
 
 Every read-out in a row is trained and evaluated on the same cached tokens. The oracle pools only the
 patches under the ground-truth boxes (negatives get a matched random box). Large targets score ~0.99 for
 every read-out. Doubling the input to 448 px lifts the oracle to 0.994 and leaves the global read-outs
 unchanged: global pooling tracks the fraction of tokens an object occupies, not the patches it covers.
 
-Chest radiographs (NIH ChestX-ray14, 880 boxed images, DINOv2): global probes 0.58 (5-fold CV) to 0.70
-(trained on 20k radiographs) overall AUROC; oracle on the same tokens 0.88 to 0.94 per lesion-size bin;
-attention head 0.73. Full tables, intervals and per-class breakdowns: `report/midterm.pdf`, `results/`,
+Chest radiographs (NIH ChestX-ray14, 880 boxed images): with DINOv2, global probes score 0.58 (5-fold CV) to
+0.70 (trained on 20k radiographs) overall AUROC while the oracle on the same tokens reaches 0.88 to 0.94 per
+lesion-size bin and the attention head 0.73; RAD-DINO lifts every read-out (oracle 0.95 to 0.97, probes 0.77)
+without closing the gap. At 448 px the chest oracle rises to 0.96 to 0.98 and the global probes do not move. Full tables, intervals and per-class breakdowns: `report/midterm.pdf`, `results/`,
 `results_cxr/`.
 
 ## Reproduce
