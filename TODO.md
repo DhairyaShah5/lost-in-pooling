@@ -21,7 +21,7 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 2.2 Benchmark: ViT-B/14-reg runs at 38 img/s on MPS, kept
 - [x] 2.3 Extract `test` (val2017) features (5,000 x 256 x 768 fp16, 1.8 GB)
 - [x] 2.4 Extract `train` + `val` subset features (9,000 + 1,000, 3.7 GB)
-- [~] 2.5 Extract 448-res features (test + val + 5k train) for the resolution ablation (started early, GPU was idle)
+- [x] 2.5 Extract 448-res features (test + val + 5k train) for the resolution ablation (started early, GPU was idle)
 
 ## 3. Evaluation harness
 - [x] 3.1 Size bins (6 log-spaced) + COCO S/M/L mapping + box-to-patch mask
@@ -45,17 +45,17 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 5.4 Train + evaluate on `test`; results JSON (attn: sub-patch 0.899 vs mean 0.862, mAP 0.800 vs 0.734)
 - [x] 5.5 Blindness curve v2 (with head) + localization figure
 - [ ] 5.6 Optional: multi-scale attention variant
-- [~] 5.7 Resolution ablation probes at 448
+- [x] 5.7 Resolution ablation probes at 448 (oracle +0.02 on sub-patch, global read-outs unchanged)
 
 ## 6. Report (`report/midterm.tex`, 5 to 6 pages, pre-proposal style)
 - [x] 6.1 LaTeX skeleton in pre-proposal style, compiles with tectonic
 - [x] 6.2 Bibliography with verified references
 - [x] 6.3 Literature review draft
-- [ ] 6.4 Progress-so-far section (scope change after feedback, decisions, pipeline)
-- [ ] 6.5 Experimental setup section
-- [ ] 6.6 Initial results: figures, tables, discussion (context-prior caveat)
-- [ ] 6.7 Updated plan for the remaining three weeks
-- [ ] 6.8 Abstract + introduction refresh
+- [~] 6.4 Progress-so-far section (scope change after feedback, decisions, pipeline)
+- [x] 6.5 Experimental setup section
+- [~] 6.6 Initial results: figures, tables, discussion (context-prior caveat)
+- [x] 6.7 Updated plan for the remaining three weeks
+- [x] 6.8 Abstract + introduction refresh
 - [ ] 6.9 Final compile, proofread, PDF committed
 
 ## 7. Wrap-up

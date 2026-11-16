@@ -511,6 +511,40 @@ sub-patch targets and 0.992 mAP overall (vs.\ 0.944), because the probe can then
 box-pooled from globally pooled statistics without reading content. We report the matched
 version as the upper bound.
 
+\paragraph{Resolution ablation.}
+If the loss were in the encoder, giving it more pixels per object should help every read-out.
+We re-extracted the test split and a 5,000-image training subset at 448 px ($32\times32$ grid,
+one patch $=0.098\%$, so the $<0.1\%$ bin is now about one patch and the 0.1--0.3\% bin spans
+one to three patches) and trained the same probes; the 224 px probes in
+Table~\ref{tab:resolution} are retrained on the same 5,000 images so that only the resolution
+differs. The oracle improves in every small bin (0.973 to 0.994 for sub-patch targets), so the
+tokens at 448 px carry more evidence about small objects. The global read-outs do not move:
+CLS, mean and max change by at most 0.008 in the three smallest bins. Four times as many tokens
+now describe the same object, and four times as many describe everything else, so the pooled
+vector dilutes the object by the same factor. For DINOv2 ViT-B/14 on COCO, resolution fixes the
+encoder's view of small objects but not the aggregation's.
+
+\begin{table}[t]
+\centering\small
+\caption{Resolution ablation, macro AUROC on COCO val2017. Both columns per bin use probes
+trained on the same 5,000 training images; the oracle uses all available training positives
+(9,000 images at 224 px, 5,000 at 448 px), which if anything disadvantages 448 px.}
+\label{tab:resolution}
+\begin{tabular}{l cc cc cc}
+\toprule
+ & \multicolumn{2}{c}{$<0.1\%$} & \multicolumn{2}{c}{0.1--0.3\%} & \multicolumn{2}{c}{0.3--1\%} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Read-out & 224 & 448 & 224 & 448 & 224 & 448 \\
+\midrule
+CLS    & 0.824 & 0.828 & 0.888 & 0.890 & 0.909 & 0.914 \\
+Mean   & 0.853 & 0.858 & 0.917 & 0.921 & 0.928 & 0.936 \\
+Max    & 0.843 & 0.837 & 0.905 & 0.906 & 0.918 & 0.927 \\
+\midrule
+Oracle & 0.973 & \textbf{0.994} & 0.989 & \textbf{0.996} & 0.992 & \textbf{0.999} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Learned head and localisation}
 \begin{figure*}[t]
 \centering
