@@ -33,10 +33,10 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 ## 4. Fixed read-outs (baselines)
 - [x] 4.1 Pooling: CLS, mean, CLS+mean concat, per-dimension max
 - [x] 4.2 Linear probe trainer (joint BCE, early stopping on `val` split)
-- [~] 4.3 Max-MIL (per-patch linear scores, max over patches)
-- [~] 4.4 Oracle region pooling (GT boxes; matched random boxes for negatives), per-class probes
-- [~] 4.5 Run 4.1 to 4.4 on `test`, save results JSON + scores
-- [ ] 4.6 Blindness curve v1 figure + table committed
+- [x] 4.3 Max-MIL (per-patch linear scores, max over patches)
+- [x] 4.4 Oracle region pooling (GT boxes; matched random boxes for negatives), per-class probes
+- [x] 4.5 Run 4.1 to 4.4 on `test`, save results JSON + scores
+- [x] 4.6 Blindness curve v1 figure + table committed (oracle 0.973 vs CLS 0.832 AUROC on sub-patch objects)
 
 ## 5. Learned head
 - [ ] 5.1 Gated attention MIL head (class-specific attention) over memmapped tokens

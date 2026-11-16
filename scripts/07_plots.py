@@ -37,8 +37,9 @@ def main(argv: list[str] | None = None) -> int:
             shutil.copyfile(src, dst)
             written.append(dst)
 
-    tex = results_table_latex(floating=False, 
+    tex = results_table_latex(
         results,
+        floating=False,
         caption=(f"Macro AUROC per relative-size bin of the largest instance "
                  f"({a.backbone.replace('_', ' ')}, {a.res}px input). Best non-oracle read-out per column in bold."),
         label=f"tab:blindness_{a.backbone}_res{a.res}",

@@ -1,8 +1,3 @@
-\begin{table}[t]
-\centering
-\small
-\caption{Macro AUROC per relative-size bin of the largest instance (dinov2 vitb14 reg, 224px input). Best non-oracle read-out per column in bold.}
-\label{tab:blindness_dinov2_vitb14_reg_res224}
 \begin{tabular}{lccccccc}
 \toprule
 read-out & $<$0.1\% & 0.1--0.3\% & 0.3--1\% & 1--3\% & 3--10\% & $>$10\% & all \\
@@ -11,6 +6,8 @@ cls & 0.832 & 0.892 & 0.912 & 0.934 & 0.963 & 0.978 & 0.948 \\
 mean & \textbf{0.862} & \textbf{0.918} & \textbf{0.928} & \textbf{0.956} & \textbf{0.978} & \textbf{0.992} & \textbf{0.961} \\
 cls\_mean & 0.843 & 0.905 & 0.921 & 0.948 & 0.976 & 0.990 & 0.956 \\
 max & 0.846 & 0.908 & 0.923 & 0.951 & 0.976 & 0.991 & 0.957 \\
+maxmil & 0.851 & 0.890 & 0.910 & 0.929 & 0.943 & 0.945 & 0.922 \\
+\midrule
+oracle & 0.973 & 0.989 & 0.992 & 0.997 & 0.998 & 0.997 & 0.995 \\
 \bottomrule
 \end{tabular}
-\end{table}
