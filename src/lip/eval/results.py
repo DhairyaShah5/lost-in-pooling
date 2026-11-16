@@ -203,6 +203,10 @@ def load_all_results(results_dir: Path | str = RESULTS_DIR) -> list[dict]:
     out: list[dict] = []
     for p in sorted(Path(results_dir).glob("*.json")):
         d = load_results(p)
-        if isinstance(d, dict) and "per_bin" in d and "readout" in d and "overall" in d and "bins" in d:
-            out.append(d)
+        if not (isinstance(d, dict) and "per_bin" in d and "readout" in d and "overall" in d and "bins" in d):
+            continue
+        # only canonical result files: {readout}__{backbone}__res{R}.json (skips localization__/history__ side files)
+        if p.stem != f"{d['readout']}__{d.get('backbone')}__res{d.get('res')}":
+            continue
+        out.append(d)
     return out
