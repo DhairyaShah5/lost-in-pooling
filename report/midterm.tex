@@ -235,18 +235,10 @@ is the obvious confound on natural images: objects co-occur with predictable sce
 companions, and recognition systems, human and artificial, exploit this
 \citep{oliva2007context}.
 
-\subsection{A note on audio}
-In audio event detection a ``small'' event is a brief one: a dog bark inside a ten-second
-AudioSet clip \citep{gemmeke2017audioset}. Attention pooling over frames was adopted early for
-weakly labelled tagging \citep{kong2019attention}, the candidate MIL pooling functions were
-compared head to head \citep{wang2019milpooling}, and pretrained backbones such as PANNs
-\citep{kong2020panns} and BEATs \citep{chen2023beats} are evaluated by clip-level pooling of
-frame embeddings. The parallel to our setting is exact, frames as instances and the clip label
-as the bag label, and the field has already converged on attention pooling. Per the feedback we
-defer audio to future work, but it is the natural second modality once the vision result is
-settled.
-
 \subsection{How our work differs}
+Audio event detection is the natural second modality, where a ``small'' event is a brief one
+and attention pooling over frames is already standard \citep{kong2019attention,chen2023beats};
+per the feedback it is deferred until the vision result is settled.
 Each of the lines above answers part of our question. What is missing is a controlled comparison
 that holds the encoder, the tokens and the training images fixed, varies only the read-out, and
 reports performance as a function of target size. We provide that comparison on one dataset and
@@ -301,8 +293,7 @@ audit rather than by pretending they do not exist.
 Self-supervised, so no COCO label leaks into the encoder; patch tokens that are known to
 localise objects; register tokens that remove the high-norm artefacts
 \citep{darcet2024registers}; and a ViT-B that fits the compute we have, a single
-Apple-silicon laptop with 16 GB of unified memory. ViT-S/14 is the fallback if extraction
-throughput falls below our threshold of 20 images per second.
+Apple-silicon laptop with 16 GB of unified memory (measured throughput: 38 images per second at 224 px).
 
 \paragraph{Input handling: squash-resize to $224\times224$, no crop.}
 A centre crop would discard boxes near the border and change the size variable per image.
@@ -316,12 +307,6 @@ after the final layer norm, are stored as float16 memory-mapped arrays
 (15,000 images $\times$ 257 tokens $\times$ 768 dims $\approx$ 5.9 GB). Every read-out,
 including the attention head, reads from this cache, which is what makes the comparison
 same-token by construction.
-
-\paragraph{Size variable and bins.}
-Relative bounding-box area of the \emph{largest} instance of the class in the image, in six
-log-spaced bins (Section~\ref{sec:bins}). One patch at 224 px covers $1/256 = 0.39\%$ of the
-image, so the two smallest bins are sub-patch: the object occupies less than one token. We
-also store segmentation area so the COCO small/medium/large convention can be reported.
 
 \subsection{Pipeline and repository}
 The repository is organised as a small library \fname{src/lip/} with numbered scripts under \fname{scripts/} that run in order, a
