@@ -33,3 +33,4 @@ report/*.synctex.gz
 
 # committed results: JSON + per-image test scores (small); attention maps stay local
 !results/scores/*.npy
+!results_cxr/scores/*.npy
