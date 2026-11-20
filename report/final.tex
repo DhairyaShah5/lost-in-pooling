@@ -515,7 +515,7 @@ the rest get synthetic patient ids. Two uses: (i) the cross-validated read-outs 
 Section~\ref{sec:setup} on all 3,543 images, with 5.4 times the boxed pairs of the NIH set
 (178 pairs under 0.1\% of the frame, 285 at 0.1--0.3\%, 824 at 0.3--1\%); (ii) transfer of
 the NIH-trained heads and probes, evaluated on the shared findings over the images whose
-patient is not in our NIH train or validation split (2,773 images; 587 of them matched, for
+patient is not in our NIH train or validation split (2,491 images; 305 of them matched, for
 which the exclusion is certain, and reported separately).
 
 \paragraph{Tiled-teacher distillation.}
@@ -1292,7 +1292,15 @@ chest bins are thin, with one to seven findings per bin and one finding in the 0
 so chest-side per-bin numbers carry wide intervals and we lean on the overall and paired
 figures. The COCO resolution ablations train probes on 5,000 images rather than 9,000 so that the
 resolutions are comparable with each other, which makes their absolute numbers lower than the
-main tables; on radiographs every 448 px head and probe uses the full 20,721-image cache. The oracle's ``all'' column on radiographs
+main tables; on radiographs every 448 px head and probe uses the full 20,721-image cache. The ChestX-Det10
+transfer excludes every image whose patient appears in our NIH training or validation split,
+which is certain for the 1,357 images matched to an NIH file by exact pixels and inferred for
+the rest from the absence of a match; the match rate (38\% of Det10) agrees with the share of
+NIH we hold on disk (36\%), so missed matches appear rare, and the 305 certainly-matched
+eligible images are reported alongside. The distillation result is one backbone, one student
+architecture and one loss weight; a student with more capacity or a feature-level
+distillation loss could behave differently, although the resolution argument says it should
+not. The oracle's ``all'' column on radiographs
 includes label-positive pairs without a box, which it cannot see. A control that removes
 scene context on COCO is not available, because images with one small object and nothing
 else annotated are too rare (one class qualifies), so the context argument rests on the
