@@ -1216,7 +1216,13 @@ overall on the 804 test slices over three seeds, no better than the global probe
 less stable, with early stopping at epoch 6 to 9. The head needs more training images than
 two LUNA16 subsets provide; the ChestX-Det10 transfer, where it had 20,721, shows what it
 does with them.
-% TODO(final): LUNA 448
+At 448 px (Table~\ref{tab:luna}, lower block) the oracle reaches 0.990 overall and 0.984 to
+0.995 in every diameter bin, so with four times the tokens the region read-out is near perfect
+even for nodules under 5 mm, while the cross-validated global probes move from 0.61 to 0.64
+(CLS 0.638, mean 0.647) and the context-only control moves with them (0.648): the resolution
+gain again goes almost entirely to the read-out that can select patches, and what the global
+vector gains, it gains from the slice.
+% TODO(final): LUNA 448 head
 
 \begin{figure}[t]
 \centering

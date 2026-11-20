@@ -66,7 +66,7 @@ On \textbf{identical cached tokens}, swap only the read-out: CLS, mean, max, an 
 \end{block}
 \begin{block}{LUNA16 slices}
 \centering\includegraphics[width=0.8\textwidth]{luna_curve__dinov2_vitb14_reg__res224.pdf}
-\small LUNA16 CT (subsets 0--1: 178 scans, 2,507 lung-window slices, 1,439 with a nodule): every nodule is a sub-patch target (median 0.05\% of the frame). Cross-validated global probes score 0.61 AUROC at every diameter from 3 to 20 mm, the context-only control 0.61, the oracle on the same tokens 0.95 (0.94 under 5 mm): the closest replication of the motivating study. The head, with only 1,330 training slices, does not beat the probes ($0.59\pm0.06$): recovery needs training images this arm does not have. % TODO(final): LUNA 448
+\small LUNA16 CT (subsets 0--1: 178 scans, 2,507 lung-window slices, 1,439 with a nodule): every nodule is a sub-patch target (median 0.05\% of the frame). Cross-validated global probes score 0.61 AUROC at every diameter from 3 to 20 mm, the context-only control 0.61, the oracle on the same tokens 0.95 (0.94 under 5 mm): the closest replication of the motivating study. The head, with only 1,330 training slices, does not beat the probes ($0.59\pm0.06$): recovery needs training images this arm does not have. At 448 px the oracle reaches 0.99 at every diameter while the global probes move from 0.61 to 0.64.
 \end{block}
 \begin{block}{Take-aways}
 \begin{itemize}

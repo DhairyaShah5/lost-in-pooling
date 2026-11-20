@@ -110,7 +110,8 @@ attention head (3 seeds) & $0.73\pm0.02$ & -- \\ \bottomrule
 \item Subsets 0--1: 178 scans, 2,507 lung-window slices, 1,439 with a nodule; every nodule is a sub-patch target (median 0.05\% of the frame).
 \item Scan-disjoint CV, DINOv2 224 px: global probes 0.61 AUROC at every diameter from 3 to 20 mm; context-only control 0.61; oracle on the same tokens 0.95 (0.94 under 5 mm).
 \item The closest replication of the motivating study: a tenth above chance for the pooled vector, near perfect for the region.
-\item The head, with 1,330 training slices, does not beat the probes ($0.59\pm0.06$): recovery needs training images this arm does not have. % TODO(final): LUNA 448
+\item The head, with 1,330 training slices, does not beat the probes ($0.59\pm0.06$): recovery needs training images this arm does not have.
+\item At 448 px the oracle reaches 0.99 at every diameter; the global probes move from 0.61 to 0.64.
 \end{itemize}
 \end{columns}
 \end{frame}
