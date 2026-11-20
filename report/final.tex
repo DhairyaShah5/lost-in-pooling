@@ -1081,15 +1081,16 @@ across 224, 336 and 448 px (DINOv2, probes trained on the same images), and the 
 AUROC as a function of log patches covered agrees to within 0.036 across the same three
 resolutions (0.057 when the oracle is wrongly plotted against token fraction, so patches are
 the better variable for the region read-out). The global curve transfers across backbones:
-fitted on any two of DINOv2, CLIP and SigLIP it predicts the third's per-bin macro AUROC with
-a mean absolute error of 0.006 to 0.012. It does not transfer across domains, and the size of
-the failure is the scene prior: the COCO fit overpredicts the radiograph probes by 0.26 to
-0.28 AUROC per bin for DINOv2 and 0.17 to 0.18 for RAD-DINO, while the radiograph oracles sit
+fitted on any three of DINOv2, CLIP, SigLIP and DINO ViT-B/16 it predicts the fourth's per-bin
+macro AUROC with a mean absolute error of 0.007 to 0.024, and 0.041 for DINO ViT-B/16, whose
+curve sits lowest. It does not transfer across domains, and the size of
+the failure is the scene prior: the COCO fit overpredicts the radiograph probes by 0.25 to
+0.27 AUROC per bin for DINOv2 and 0.16 to 0.17 for RAD-DINO, while the radiograph oracles sit
 only 0.05 below the COCO patch-units curve. The check therefore reports a band: given a
 target's expected share of the image and the token grid, the predicted global AUROC with a
 scene prior, the predicted region AUROC, and the gap. For a target covering 0.2\% of the
-image on a $16\times16$ grid (half a patch) the fitted curves give 0.90 for global pooling
-with a scene prior and 0.98 for a region read-out; on a $32\times32$ grid the region figure
+image on a $16\times16$ grid (half a patch) the fitted curves give 0.89 for global pooling
+with a scene prior and 0.97 for a region read-out; on a $32\times32$ grid the region figure
 rises to 0.99 and the global one does not move. The last panel answers how many boxed images are needed to
 confirm the gap on a new dataset: with the saved test scores, random subsets of 200 COCO
 images detect a sub-patch gap above 0.05 AUROC in 84\% of draws (400 images: 99\%), and 50
@@ -1101,7 +1102,7 @@ are in the repository.
 \centering
 \guardedfig{figures/deploy_check.pdf}{\textwidth}
 \caption{The pre-deployment check. Left: global read-out AUROC against token fraction, mean
-pooling on three backbones (circles), the COCO fit (solid), the radiograph probes (squares)
+pooling on four backbones (circles), the COCO fit (solid), the radiograph probes (squares)
 and their fit (dashed). Middle: oracle AUROC against patches covered at 224, 336 and 448 px
 with the patch-units fit. Right: probability that a random subset of $n$ boxed test images
 shows an oracle-vs-global gap above 0.05 AUROC on small targets (100 draws).}
