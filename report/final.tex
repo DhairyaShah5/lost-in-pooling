@@ -442,6 +442,80 @@ finding the bins are thin, so for this arm we lower the per-bin threshold to 5 p
 class and report the number of contributing findings.
 
 % ======================================================================
+\subsection{Extensions after the midterm}
+\label{sec:ext-setup}
+The midterm protocol is unchanged; the following arms were added on top of it with the same
+caches, bins, metrics and seeds.
+
+\paragraph{A fourth backbone: DINO ViT-B/16.}
+DINOv2 (14 px patch, self-supervised), CLIP and SigLIP (16 px, language-supervised) confound
+patch size with pretraining objective. DINO v1 ViT-B/16 \citep{caron2021emerging} is
+self-supervised with a 16 px patch, so with the other three it separates the two factors.
+It runs through the full COCO suite: probes, oracle, max-MIL, the attention head and the
+multi-scale head with three seeds, and the 448 px ablation on the 5,000-image training subset.
+
+\paragraph{Seeds for every read-out.}
+Every read-out that rested on one seed at the midterm (the oracles at 224, 336 and 448 px,
+the CLIP and SigLIP probes and oracles, max pooling and max-MIL, and the chest probes) was
+repeated with seeds 1 and 2. For the oracle the seed changes the matched random negative
+boxes and the negative subsample; for the probes it changes initialisation and batch order.
+
+\paragraph{Context-only control.}
+The oracle protocol with the complement of the box: for a positive pair the feature is the
+mean of the tokens \emph{outside} the union of that class's boxes, for a negative the mean
+outside a class-matched random box, and one logistic probe per class is fitted exactly as for
+the oracle. This read-out sees everything the oracle does not. Its size-stratified AUROC is the
+scene prior: how well the class can be predicted from the rest of the image alone. It is the
+within-dataset control the midterm said was unavailable, and it runs on COCO (three backbones,
+224 px, plus DINOv2 at 448 px) and, through the cross-validated chest protocol, on the NIH
+boxed images for DINOv2 and RAD-DINO.
+
+\paragraph{ChestX-Det10.}
+A second set of radiologist boxes on NIH images \citep{liu2020chestxdet10}: 3,543 images
+annotated by three radiologists with 8,339 boxes for 10 findings, 8 of which (atelectasis,
+consolidation, effusion, emphysema, fibrosis, mass, nodule, pneumothorax) are NIH image-level
+labels. The Det10 files are renumbered, so we recover NIH identities by a pixel hash against
+the 40,880 NIH images on disk (1,357 matched) and give matched images their NIH patient id;
+the rest get synthetic patient ids. Two uses: (i) the cross-validated read-outs of
+Section~\ref{sec:setup} on all 3,543 images, with 5.4 times the boxed pairs of the NIH set
+(178 pairs under 0.1\% of the frame, 285 at 0.1--0.3\%, 824 at 0.3--1\%); (ii) transfer of
+the NIH-trained heads and probes, evaluated on the shared findings over the images whose
+patient is not in our NIH train or validation split (2,773 images; 587 of them matched, for
+which the exclusion is certain, and reported separately).
+
+\paragraph{Tiled-teacher distillation.}
+Two teachers and one student, all on cached tokens. The \emph{tiled} teacher applies the
+224 px head to each of the four $16\times16$ quadrants of the 448 px token grid and takes the
+maximum over quadrants; it needs no training and sees the image at twice the effective
+resolution. The \emph{high-resolution} teacher is the head trained on the 448 px tokens. The
+student is a 224 px head trained on the same images with the label loss plus the binary
+cross-entropy against the teacher's probabilities (weight 1). On COCO the three heads use the
+5,000 training images present in both caches, so the plain 224 px head on those images is the
+baseline; on radiographs the full 20,721-image caches at both resolutions are used. Three
+seeds each. The tiled teacher is also evaluated on its own at test time (inference-time
+tiling of the 224 px head, four times the compute, no training).
+
+\paragraph{LUNA16 nodule slices.}
+A scoped CT arm \citep{setio2017luna16}: LUNA16 subsets 0 and 1 (178 scans) as 2D axial
+lung-window slices. Every slice through an annotated nodule, and its neighbours within the
+nodule radius, is a positive with a square box of the nodule's diameter; six nodule-free
+lung slices per scan (at least 20 mm from any nodule, inside the provided lung masks) are
+negatives. One class, scan-disjoint 5-fold cross-validation for CLS, mean, max, oracle and
+the context-only control, and an image-level head on a scan-level split, at 224 and 448 px
+with DINOv2. The size variable is the nodule diameter (3--5, 5--8, 8--12, 12--20, over 20 mm);
+a 5 mm nodule covers 0.02\% of a 350 mm field of view, well inside our smallest bin.
+
+\paragraph{Pre-deployment check.}
+Two curves fitted on the per-class per-bin points: the global read-out's AUROC as a logistic
+function of the log token fraction (the target's share of the image area, which equals its
+share of tokens under squash resizing), and the oracle's AUROC as a logistic function of the
+log patches covered (token fraction times grid size). We test resolution invariance (DINOv2 at
+224, 336 and 448 px), transfer across backbones (leave-one-backbone-out), transfer across
+domains (COCO fit against the radiograph probes), and how many boxed images a practitioner
+needs to detect the oracle-vs-global gap on small targets (random subsets of the test set, 100
+draws each). The fits ship as a command that takes a token grid and a target size and returns
+the predicted global and region AUROCs.
+
 \section{Results}
 \label{sec:results}
 % ======================================================================

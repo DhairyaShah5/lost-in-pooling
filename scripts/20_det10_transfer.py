@@ -79,7 +79,7 @@ def main():
         for tag, mask, labm in subsets:
             nm = name + tag
             s = scores14[:, nih_idx][mask]
-            r = R.evaluate_readout(s, labm, nm, bb, res, min_pos=a.min_pos, split="det10", train_split="nih-train",
+            r = R.evaluate_readout(s, labm, nm, bb, res, min_pos=a.min_pos, split="test", train_split="nih-train",
                                    notes=notes + (" [matched-to-NIH images only]" if tag else ""), seed=0)
             R.save_results(r, R.results_path(nm, bb, res, results_dir=out)); R.save_scores(s, R.scores_path(nm, bb, res, results_dir=out))
             pb = r["per_bin"]
