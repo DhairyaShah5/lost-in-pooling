@@ -1227,8 +1227,8 @@ head (804 test slices). Bands are 95\% bootstrap intervals.}
 \label{fig:luna}
 \end{figure}
 
-\begin{table}[t]
-\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{table*}[t]
+\centering\footnotesize\setlength{\tabcolsep}{5pt}
 \caption{LUNA16 nodule slices (DINOv2 ViT-B/14-reg), AUROC by nodule diameter. Cross-validated
 read-outs: scan-disjoint 5-fold cross-validation over all 2,507 slices (1,439 positive: 153,
 546, 288, 372 and 80 per bin). Attention head: trained from slice-level labels on the training
@@ -1236,7 +1236,7 @@ scans (1,330 slices), scored on the 804 test slices (486 positive: 62, 152, 97, 
 bin), mean $\pm$ sample standard deviation over three seeds.}
 \label{tab:luna}
 \IfFileExists{../results_luna/luna_table__dinov2_vitb14_reg.tex}{\input{../results_luna/luna_table__dinov2_vitb14_reg.tex}}{\todo{LUNA table missing}}
-\end{table}
+\end{table*}
 
 \subsection{Tiled-teacher distillation}
 \label{sec:distill}
