@@ -885,12 +885,12 @@ objective, but the amount of small-object evidence the tokens carry does, and no
 patch size alone would predict: the two 16 px models with language supervision keep more than
 the 16 px self-supervised one, and the 14 px self-supervised one keeps the most. The
 pretraining recipe (DINOv2's data, its patch-level iBOT objective and registers) matters more
-than the patch size. The attention head recovers less on this backbone (0.830 on sub-patch
-targets for seed 0, a third of its gap) and localises less sharply (attention mass 5 to 7 times
+than the patch size. The attention head recovers less on this backbone ($0.824\pm0.006$ on sub-patch
+targets over three seeds, a third of its gap; the multi-scale head $0.822\pm0.010$) and localises less sharply (attention mass 5 to 7 times
 chance against 12 to 24 on DINOv2), consistent with weaker tokens giving the head less to find.
 The context-only control scores 0.824 on sub-patch targets, above both global read-outs, so
 here too the global vector's sub-patch score is the scene.
-% TODO(final): DINO16 seeds and 448 px
+% TODO(final): DINO16 448 px
 
 \begin{figure*}[t]
 \centering
@@ -949,9 +949,10 @@ probes reach 0.77 overall (from 0.70) and 0.79 to 0.87 in the bins above 0.3\%, 
 cross-validated probes stay at 0.61 to 0.62 overall. The gap between the oracle and the best
 global read-out on the same training data is therefore still 0.19 to 0.31 AUROC per bin, so
 domain adaptation of the encoder does not remove the loss at aggregation; it raises both
-sides of it. The attention head does not improve AUROC on RAD-DINO ($0.76\pm0.02$ over three seeds vs.\ 0.77 for CLS; the seed-0 run reported in Table~\ref{tab:cxr} is the best of the three) but localises better than on any other backbone, with attention mass on small lesions 21 to 24
+sides of it. At 224 px the attention head does not improve AUROC on RAD-DINO ($0.76\pm0.02$ over three seeds vs.\ 0.77 for CLS; the seed-0 run reported in Table~\ref{tab:cxr} is the best of the three) but localises better than on any other backbone, with attention mass on small lesions 21 to 24
 times chance and pointing accuracy 0.19 to 0.27, which suggests the adapted tokens make the
-lesion easy to find and the remaining difficulty is in scoring it from a few hundred positives.
+lesion easy to find and the remaining difficulty is in scoring it from a few hundred positives;
+the 448 px run below bears this out.
 
 \paragraph{Resolution on radiographs.}
 Repeating the cross-validated comparison at 448 px (DINOv2, $32\times32$ grid, same 880
@@ -965,10 +966,22 @@ averaging over four times as many tokens, does not. For a frozen-backbone pipeli
 radiographs, raising the input resolution without changing the aggregation buys almost nothing for
 small findings. RAD-DINO behaves the same way at 448 px: its cross-validated oracle rises to
 0.96 to 0.98 in every bin (0.960 for 0.1--0.3\% lesions, from 0.904) while its cross-validated
-CLS probe stays at 0.62 overall. Trained on the full 20,721-image cache at 448 px, the attention head reaches $0.77\pm0.01$ overall over three seeds ($0.73\pm0.02$ at 224 px on the same images) and $0.72\pm0.01$ for lesions covering 0.1--0.3\% of the frame ($0.61\pm0.04$ at 224 px), while the global probes retrained on the same 448 px cache move from $0.71\pm0.01$ to $0.72\pm0.01$ (CLS) and from $0.71\pm0.02$ to $0.73\pm0.01$ (mean) overall, max pooling from 0.67 to 0.66, and, in that bin, CLS from $0.50\pm0.02$ to $0.57\pm0.02$ and mean from $0.54\pm0.01$ to $0.58\pm0.01$ (three seeds each). The head's lead over the best global read-out on the same cache therefore widens from 0.02 AUROC at 224 px to 0.05 at 448 px (paired bootstrap over the 880 images: $+0.055$, 95\% CI $[0.038, 0.072]$ against CLS and $[0.029, 0.082]$ against mean, against $+0.028$ $[0.012, 0.048]$ over CLS at 224 px). The head's attention mass on lesions rises to 3.5 times chance overall and 44 times chance for 0.1--0.3\% lesions (13 times at 224 px), with pointing accuracy 0.47 (0.40 at 224 px); all three seeds agree to within 0.4 and 3 times chance respectively. The learned read-out therefore gains from the extra patches much as the oracle does while the global probe gains little, which is the COCO mechanism result again, this time with a read-out that sees no boxes. RAD-DINO's head on a 5,000-image 448 px cache scores 0.71 overall but
-localises small lesions far better than at 224 px (attention mass 67 times chance and
-pointing accuracy 0.38 for 0.1--0.3\% lesions, vs.\ 24 times and 0.19), so the extra pixels
-help the head find lesions even where the training set limits how well it scores them.
+CLS probe stays at 0.62 overall. Trained on the full 20,721-image cache at 448 px, the attention head reaches $0.77\pm0.01$ overall over three seeds ($0.73\pm0.02$ at 224 px on the same images) and $0.72\pm0.01$ for lesions covering 0.1--0.3\% of the frame ($0.61\pm0.04$ at 224 px), while the global probes retrained on the same 448 px cache move from $0.71\pm0.01$ to $0.72\pm0.01$ (CLS) and from $0.71\pm0.02$ to $0.73\pm0.01$ (mean) overall, max pooling from 0.67 to 0.66, and, in that bin, CLS from $0.50\pm0.02$ to $0.57\pm0.02$ and mean from $0.54\pm0.01$ to $0.58\pm0.01$ (three seeds each). The head's lead over the best global read-out on the same cache therefore widens from 0.02 AUROC at 224 px to 0.05 at 448 px (paired bootstrap over the 880 images: $+0.055$, 95\% CI $[0.038, 0.072]$ against CLS and $[0.029, 0.082]$ against mean, against $+0.028$ $[0.012, 0.048]$ over CLS at 224 px). The head's attention mass on lesions rises to 3.5 times chance overall and 44 times chance for 0.1--0.3\% lesions (13 times at 224 px), with pointing accuracy 0.47 (0.40 at 224 px); all three seeds agree to within 0.4 and 3 times chance respectively. The learned read-out therefore gains from the extra patches much as the oracle does while the global probe gains little, which is the COCO mechanism result again, this time with a read-out that sees no boxes. RAD-DINO repeats this on the full cache (Table~\ref{tab:cxr}, last block). At 448 px its
+attention head reaches $0.800\pm0.006$ overall over three seeds ($0.76\pm0.02$ at 224 px) and
+$0.79\pm0.02$ for lesions covering 0.1--0.3\% of the frame ($0.63\pm0.08$ at 224 px). Its
+global probes gain more from the extra pixels than DINOv2's do: CLS moves from 0.773 to 0.790
+and mean pooling from 0.767 to 0.808, so on the ``all'' column, which is dominated by positives
+without a box, the head and mean pooling tie (paired bootstrap $-0.007$, 95\% CI
+$[-0.017, 0.022]$). Inside the size bins the head leads mean pooling in every bin: $+0.119$
+$[0.055, 0.185]$ at 0.1--0.3\%, $+0.033$ $[-0.001, 0.070]$ at 0.3--1\%, $+0.031$
+$[0.001, 0.063]$ at 1--3\% and $+0.023$ $[0.004, 0.042]$ at 3--10\%, and it leads CLS by
+$+0.108$ $[0.022, 0.204]$ in the smallest bin. The two readings agree: on a radiograph-adapted
+encoder at 448 px, mean pooling is already a good read-out for the large and diffuse findings
+that make up most of the unboxed positives, and what the head recovers is concentrated on the
+small boxed lesions. Its attention mass on 0.1--0.3\% lesions rises to 72 to 94 times chance
+over the three seeds (13 to 24 times at 224 px) with pointing accuracy 0.34 (0.09 to 0.19), and
+to 5.0 to 5.6 times chance overall with pointing accuracy 0.53 to 0.55 (4.3 and 0.47 for the
+seed-0 head at 224 px).
 
 \begin{figure*}[t]
 \centering
@@ -993,7 +1006,7 @@ unboxed training radiographs (no suffix).}
 \begin{table}[t]
 \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
 \caption{Chest radiographs, macro AUROC per lesion-size bin on the 880 boxed NIH images at
-224 px (and, for DINOv2, at 448 px on the full cache), for DINOv2 ViT-B/14-reg (upper half) and RAD-DINO (lower half). Parenthesised:
+224 px and at 448 px on the full training cache, for DINOv2 ViT-B/14-reg (upper half) and RAD-DINO (lower half). Parenthesised:
 findings contributing to the bin. \emph{All} pools every labelled positive, including those
 without a box, which for the oracle receive a random region and so understate it.}
 \label{tab:cxr}
@@ -1030,6 +1043,11 @@ CLS            & 0.637 & 0.789 & 0.759 & 0.771 & 0.853 & 0.773 \\
 Mean           & 0.657 & 0.782 & 0.764 & 0.790 & 0.871 & 0.767 \\
 Max-MIL        & 0.475 & 0.715 & 0.669 & 0.756 & 0.788 & 0.687 \\
 Attention head & 0.715 & 0.795 & 0.762 & 0.803 & 0.871 & 0.779 \\
+\multicolumn{7}{l}{\emph{RAD-DINO, the same, at 448 px (full 20,721-image cache)}} \\
+CLS            & 0.704 & 0.799 & 0.754 & 0.782 & 0.862 & 0.790 \\
+Mean           & 0.693 & 0.796 & 0.765 & 0.803 & 0.888 & 0.808 \\
+Max            & 0.623 & 0.774 & 0.733 & 0.761 & 0.822 & 0.768 \\
+Attention head & 0.812 & 0.829 & 0.796 & 0.826 & 0.896 & 0.801 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1053,7 +1071,7 @@ of image set; on the 305 images whose NIH identity is known with certainty the f
 0.74 to 0.75 against 0.66 to 0.68. The transfer gain sits in the 1--10\% bins (0.75 to 0.79
 against 0.68 to 0.70); under 0.3\% of the frame, where Det10 has one to four shared findings,
 the head and the probes are within noise of each other (0.70 against 0.72 at 0.1--0.3\%).
-At 448 px (Table~\ref{tab:det10}, last block) the Det10 oracle rises in every bin, to 0.96 for
+At 448 px (Table~\ref{tab:det10}, third block) the Det10 oracle rises in every bin, to 0.96 for
 lesions under 0.1\% of the frame (from 0.91) and 0.97 at 0.1--0.3\% (from 0.93). Unlike on
 the 880 NIH images, the cross-validated global probes also move here: CLS from 0.56 to 0.66 in
 the smallest bin and from 0.71 to 0.74 overall, mean pooling from 0.56 to 0.64 and 0.71 to
@@ -1061,47 +1079,146 @@ the smallest bin and from 0.71 to 0.74 overall, mean pooling from 0.56 to 0.64 a
 gain is that; the gap to the oracle on the same tokens is nonetheless 0.30 to 0.31 AUROC in
 the two smallest bins at 448 px against 0.24 to 0.35 at 224 px, so the resolution buys the
 region read-out more than it buys the global one on this set too.
-% TODO(final): RAD-DINO 448 Det10 + transfer at 448
+RAD-DINO at 448 px follows the same course (Table~\ref{tab:det10}, last block): its Det10
+oracle reaches 0.97 to 0.99 in every bin, the cross-validated CLS probe moves from 0.58 to 0.56
+in the smallest bin and from 0.81 to 0.83 overall, and mean pooling from 0.55 to 0.66 and from
+0.81 to 0.84, which leaves a gap of 0.25 to 0.41 AUROC under 0.3\% of the frame.
+
+The transfer results at 448 px (Table~\ref{tab:det10t}) are the cleanest head-versus-probe
+comparison in the project: the training set is the full 20,721-image NIH cache, the test set
+is 2,491 images annotated by different radiologists, and nothing in either read-out has seen
+a box. With DINOv2 the head scores 0.763 to 0.769 over three seeds against 0.700 for CLS and
+0.695 for mean pooling (0.74 against 0.68 to 0.69 at 224 px); with RAD-DINO 0.825 to 0.832
+against 0.775 and 0.796 (0.78 to 0.80 against 0.76 to 0.78 at 224 px), and on the 305
+certainly-matched images 0.81 to 0.82 against 0.78. The head's lead over the best probe
+therefore grows with resolution on both backbones, from 0.05 to 0.07 (DINOv2) and from 0.02
+to 0.03 (RAD-DINO), and for RAD-DINO it appears on Det10 although on the NIH test images the
+same head and the same mean probe tie overall (Section~\ref{sec:cxr-results}): the head's
+advantage survives a change of annotators better than the probe's does. Under 0.1\% of the
+frame, where the shared findings reduce to nodules, the 448 px heads score 0.56 to 0.68
+against 0.47 to 0.54 for the probes, with the wide intervals one finding carries.
 
 \begin{table}[t]
 \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
-\caption{ChestX-Det10 (3,543 boxed NIH images, 10 findings), macro AUROC per lesion-size bin at
-224 px unless stated. Upper blocks: 5-fold patient-disjoint cross-validation on the Det10 images.
-Lower block: read-outs trained on the NIH image-level labels, scored on the 8 shared findings over
-the 2,491 Det10 images outside our NIH train/val patients. Parenthesised: findings per bin.}
+\caption{ChestX-Det10 (3,543 boxed NIH images, 10 findings), macro AUROC per lesion-size bin
+under 5-fold patient-disjoint cross-validation on the Det10 images, at 224 and 448 px.
+Parenthesised: findings per bin.}
 \label{tab:det10}
 \begin{tabular}{lrrrrrr}
 \toprule
 Read-out & $<0.1\%$ & 0.1--0.3\% & 0.3--1\% & 1--3\% & 3--10\% & All \\
-\midrule
-\multicolumn{7}{l}{\emph{DINOv2, cross-validated}} \\
  & (3) & (7) & (9) & (9) & (8) & (10) \\
+\midrule
+\multicolumn{7}{l}{\emph{DINOv2, 224 px}} \\
 CLS    & 0.561 & 0.690 & 0.654 & 0.680 & 0.720 & 0.714 \\
 Mean   & 0.562 & 0.640 & 0.663 & 0.677 & 0.722 & 0.714 \\
 Max    & 0.478 & 0.553 & 0.594 & 0.661 & 0.668 & 0.655 \\
 Oracle & \textbf{0.908} & \textbf{0.928} & \textbf{0.925} & \textbf{0.938} & \textbf{0.942} & 0.936 \\
 \midrule
-\multicolumn{7}{l}{\emph{RAD-DINO, cross-validated}} \\
+\multicolumn{7}{l}{\emph{RAD-DINO, 224 px}} \\
 CLS    & 0.584 & 0.676 & 0.755 & 0.784 & 0.847 & 0.810 \\
 Mean   & 0.551 & 0.711 & 0.750 & 0.793 & 0.852 & 0.806 \\
 Max    & 0.547 & 0.637 & 0.644 & 0.708 & 0.776 & 0.730 \\
 Oracle & \textbf{0.915} & \textbf{0.957} & \textbf{0.965} & \textbf{0.969} & \textbf{0.963} & 0.967 \\
 \midrule
-\multicolumn{7}{l}{\emph{DINOv2, trained on NIH labels, 8 shared findings}} \\
+\multicolumn{7}{l}{\emph{DINOv2, 448 px}} \\
+CLS    & 0.655 & 0.668 & 0.684 & 0.708 & 0.751 & 0.741 \\
+Mean   & 0.641 & 0.645 & 0.671 & 0.707 & 0.762 & 0.730 \\
+Max    & 0.588 & 0.584 & 0.624 & 0.655 & 0.667 & 0.677 \\
+Oracle & \textbf{0.959} & \textbf{0.973} & \textbf{0.975} & \textbf{0.964} & \textbf{0.966} & 0.967 \\
+\midrule
+\multicolumn{7}{l}{\emph{RAD-DINO, 448 px}} \\
+CLS    & 0.556 & 0.733 & 0.773 & 0.808 & 0.867 & 0.825 \\
+Mean   & 0.657 & 0.730 & 0.770 & 0.809 & 0.884 & 0.837 \\
+Max    & 0.548 & 0.667 & 0.664 & 0.693 & 0.806 & 0.743 \\
+Oracle & \textbf{0.969} & \textbf{0.985} & \textbf{0.986} & \textbf{0.976} & \textbf{0.975} & 0.983 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+\caption{ChestX-Det10 transfer: read-outs trained on the NIH image-level labels (20,721
+radiographs, no boxes), scored on the 8 findings Det10 shares with NIH over the 2,491 Det10
+images outside our NIH train/val patients, macro AUROC per lesion-size bin. Heads: seed 0
+(three-seed ranges in the text). Parenthesised: findings per bin.}
+\label{tab:det10t}
+\begin{tabular}{lrrrrrr}
+\toprule
+Read-out & $<0.1\%$ & 0.1--0.3\% & 0.3--1\% & 1--3\% & 3--10\% & All \\
  & (1) & (4) & (7) & (7) & (7) & (8) \\
+\midrule
+\multicolumn{7}{l}{\emph{DINOv2, 224 px}} \\
 CLS probe        & 0.485 & 0.716 & 0.647 & 0.684 & 0.702 & 0.686 \\
 Mean probe       & 0.474 & 0.675 & 0.607 & 0.690 & 0.700 & 0.681 \\
 Attention head   & 0.510 & 0.697 & 0.660 & 0.756 & 0.785 & 0.740 \\
 Multi-scale head & 0.503 & 0.693 & 0.666 & 0.757 & 0.784 & 0.741 \\
 \midrule
-\multicolumn{7}{l}{\emph{DINOv2, cross-validated, 448 px}} \\
-CLS    & 0.655 & 0.668 & 0.684 & 0.708 & 0.751 & 0.741 \\
-Mean   & 0.641 & 0.645 & 0.671 & 0.707 & 0.762 & 0.730 \\
-Max    & 0.588 & 0.584 & 0.624 & 0.655 & 0.667 & 0.677 \\
-Oracle & \textbf{0.959} & \textbf{0.973} & \textbf{0.975} & \textbf{0.964} & \textbf{0.966} & 0.967 \\
+\multicolumn{7}{l}{\emph{DINOv2, 448 px}} \\
+CLS probe        & 0.470 & 0.665 & 0.672 & 0.692 & 0.732 & 0.700 \\
+Mean probe       & 0.484 & 0.668 & 0.664 & 0.691 & 0.687 & 0.695 \\
+Attention head   & 0.591 & 0.722 & 0.744 & 0.762 & 0.803 & 0.769 \\
+\midrule
+\multicolumn{7}{l}{\emph{RAD-DINO, 224 px}} \\
+CLS probe        & 0.542 & 0.663 & 0.741 & 0.773 & 0.800 & 0.760 \\
+Mean probe       & 0.498 & 0.714 & 0.750 & 0.783 & 0.788 & 0.776 \\
+Attention head   & 0.585 & 0.738 & 0.780 & 0.796 & 0.796 & 0.797 \\
+Multi-scale head & 0.548 & 0.740 & 0.765 & 0.798 & 0.804 & 0.800 \\
+\midrule
+\multicolumn{7}{l}{\emph{RAD-DINO, 448 px}} \\
+CLS probe        & 0.541 & 0.690 & 0.755 & 0.789 & 0.808 & 0.775 \\
+Mean probe       & 0.531 & 0.726 & 0.779 & 0.798 & 0.804 & 0.796 \\
+Attention head   & 0.662 & 0.778 & 0.811 & 0.833 & 0.837 & 0.832 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\subsection{Tiled-teacher distillation}
+\label{sec:distill}
+The resolution ablations say that a head reading 448 px tokens recovers more of the
+small-lesion evidence than one reading 224 px tokens. Distillation asks whether a 224 px head
+can be taught to recover it without the extra tokens at test time. Table~\ref{tab:distill}
+gives the radiograph result (DINOv2, full 20,721-image caches at both resolutions, three
+seeds). The 448 px teacher is 0.04 AUROC above the 224 px baseline overall ($0.771\pm0.005$
+against $0.732\pm0.016$) and 0.11 above it on lesions covering 0.1--0.3\% of the frame
+($0.723\pm0.010$ against $0.610\pm0.044$). Neither student closes any of that: the student of
+the tiled teacher scores $0.741\pm0.016$ overall and $0.581\pm0.026$ in the smallest bin, the
+student of the 448 px teacher $0.722\pm0.014$ and $0.633\pm0.046$, both within a seed spread
+of the baseline in every bin. Inference-time tiling, which applies the 224 px head to the
+four quadrants of the 448 px grid at four times the compute and with no training, also ties
+the baseline overall (0.732) and is below it in the smallest bin (0.582). The students'
+attention maps are no more lesion-focused than the baseline's (attention mass 10 to 15 times
+chance on 0.1--0.3\% lesions against 13 for the baseline). The negative result is specific:
+the information the 448 px head uses is not in the 224 px tokens, because it was lost when a
+lesion covering one patch was embedded together with the lung around it, and a teacher
+cannot supply through its probabilities what the student's input does not contain.
+Resolution gains on small findings have to be bought at the encoder's input; a read-out
+trained at low resolution, however well supervised, does not recover them.
+% TODO(final): COCO distillation sentence
+
+\begin{table*}[t]
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\caption{Tiled-teacher distillation (DINOv2 ViT-B/14-reg), macro AUROC per size bin, mean
+$\pm$ sample standard deviation over three seeds (single runs without). Radiographs: heads
+trained on the 20,721 training radiographs, scored on the 880 boxed test images. The students
+add a distillation loss against the teacher's probabilities (weight 1) to the label loss.
+Inference-time tiling applies the seed-0 224 px head to the four quadrants of the 448 px token
+grid and takes the maximum, at four times the compute.}
+\label{tab:distill}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Read-out (tokens at test time) & $<0.1\%$ & 0.1--0.3\% & 0.3--1\% & 1--3\% & 3--10\% & $>10\%$ & All \\
+\midrule
+\multicolumn{8}{l}{\emph{NIH radiographs}} \\
+224 px head, baseline (224 px) & -- & 0.610$\pm$0.044 & 0.743$\pm$0.011 & 0.702$\pm$0.021 & 0.747$\pm$0.002 & 0.828$\pm$0.008 & 0.732$\pm$0.016 \\
+Inference-time tiling (448 px) & -- & 0.582 & 0.717 & 0.715 & 0.729 & 0.803 & 0.732 \\
+448 px head, teacher (448 px) & -- & 0.723$\pm$0.010 & 0.783$\pm$0.007 & 0.724$\pm$0.005 & 0.775$\pm$0.004 & 0.851$\pm$0.013 & 0.771$\pm$0.005 \\
+Student of the tiled teacher (224 px) & -- & 0.581$\pm$0.026 & 0.745$\pm$0.010 & 0.716$\pm$0.017 & 0.750$\pm$0.005 & 0.822$\pm$0.005 & 0.741$\pm$0.016 \\
+Student of the 448 px teacher (224 px) & -- & 0.633$\pm$0.046 & 0.748$\pm$0.005 & 0.697$\pm$0.004 & 0.751$\pm$0.007 & 0.815$\pm$0.009 & 0.722$\pm$0.014 \\
+% TODO(final): COCO block
+\bottomrule
+\end{tabular}
+\end{table*}
 
 \subsection{A pre-deployment check}
 \label{sec:check}
@@ -1167,8 +1284,7 @@ chest bins are thin, with one to seven findings per bin and one finding in the 0
 so chest-side per-bin numbers carry wide intervals and we lean on the overall and paired
 figures. The COCO resolution ablations train probes on 5,000 images rather than 9,000 so that the
 resolutions are comparable with each other, which makes their absolute numbers lower than the
-main tables; on radiographs the 448 px DINOv2 head and probes use the full 20,721-image cache and
-the RAD-DINO 448 px head a 5,000-image one. The oracle's ``all'' column on radiographs
+main tables; on radiographs every 448 px head and probe uses the full 20,721-image cache. The oracle's ``all'' column on radiographs
 includes label-positive pairs without a box, which it cannot see. A control that removes
 scene context on COCO is not available, because images with one small object and nothing
 else annotated are too rare (one class qualifies), so the context argument rests on the

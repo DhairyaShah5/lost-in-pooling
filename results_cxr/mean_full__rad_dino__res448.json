@@ -5,7 +5,7 @@
   "split": "test",
   "n_images": 880,
   "train_split": "train",
-  "notes": "linear probe on mean (d=768), standardised, BCEWithLogits, AdamW, cosine: epochs=40 lr=0.001 wd=0.0001 bs=512 best_epoch=31 val_map=0.2599 seed=0 train_time_s=113",
+  "notes": "linear probe on mean (d=768), standardised, BCEWithLogits, AdamW, cosine: epochs=40 lr=0.001 wd=0.0001 bs=512 best_epoch=31 val_map=0.2599 seed=0 train_time_s=1",
   "seed": 0,
   "min_pos": 5,
   "n_boot": 500,
