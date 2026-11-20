@@ -1,0 +1,133 @@
+{
+  "map": "attn_kd_tiled_train5k_s2",
+  "n_pairs": 14631,
+  "bins": {
+    "edges": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      1.0
+    ],
+    "names": [
+      "<0.1%",
+      "0.1-0.3%",
+      "0.3-1%",
+      "1-3%",
+      "3-10%",
+      ">10%"
+    ]
+  },
+  "overall": {
+    "mass_in_box": 0.526184864281614,
+    "chance_mass": 0.17766001982092816,
+    "mass_ratio": 2.9617516918661857,
+    "pointing_acc": 0.618412958786139,
+    "n": 14631
+  },
+  "per_bin": {
+    "<0.1%": {
+      "mass_in_box": 0.07258062319628297,
+      "chance_mass": 0.007254464285714286,
+      "mass_ratio": 10.004959751364545,
+      "pointing_acc": 0.141287284144427,
+      "n": 637
+    },
+    "0.1-0.3%": {
+      "mass_in_box": 0.1450488519627079,
+      "chance_mass": 0.008268059181897302,
+      "mass_ratio": 17.543276937384356,
+      "pointing_acc": 0.2619669277632724,
+      "n": 1149
+    },
+    "0.3-1%": {
+      "mass_in_box": 0.23833881904520587,
+      "chance_mass": 0.012838656725576828,
+      "mass_ratio": 18.56415543616753,
+      "pointing_acc": 0.3642611683848797,
+      "n": 2037
+    },
+    "1-3%": {
+      "mass_in_box": 0.37642352344554797,
+      "chance_mass": 0.02989861230636833,
+      "mass_ratio": 12.589999816324942,
+      "pointing_acc": 0.5129087779690189,
+      "n": 2324
+    },
+    "3-10%": {
+      "mass_in_box": 0.5714470120877859,
+      "chance_mass": 0.08571300287356322,
+      "mass_ratio": 6.666981588904751,
+      "pointing_acc": 0.684072249589491,
+      "n": 3045
+    },
+    ">10%": {
+      "mass_in_box": 0.806279677649065,
+      "chance_mass": 0.4097425710148924,
+      "mass_ratio": 1.9677713146866553,
+      "pointing_acc": 0.8530979959551388,
+      "n": 5439
+    }
+  },
+  "uniform": {
+    "overall": {
+      "mass_in_box": 0.17766001982092816,
+      "chance_mass": 0.17766001982092816,
+      "mass_ratio": 1.0,
+      "pointing_acc": 0.17766001982092816,
+      "n": 14631
+    },
+    "per_bin": {
+      "<0.1%": {
+        "mass_in_box": 0.007254464285714286,
+        "chance_mass": 0.007254464285714286,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.007254464285714286,
+        "n": 637
+      },
+      "0.1-0.3%": {
+        "mass_in_box": 0.008268059181897302,
+        "chance_mass": 0.008268059181897302,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.008268059181897302,
+        "n": 1149
+      },
+      "0.3-1%": {
+        "mass_in_box": 0.012838656725576828,
+        "chance_mass": 0.012838656725576828,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.012838656725576828,
+        "n": 2037
+      },
+      "1-3%": {
+        "mass_in_box": 0.02989861230636833,
+        "chance_mass": 0.02989861230636833,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.02989861230636833,
+        "n": 2324
+      },
+      "3-10%": {
+        "mass_in_box": 0.08571300287356322,
+        "chance_mass": 0.08571300287356322,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.08571300287356322,
+        "n": 3045
+      },
+      ">10%": {
+        "mass_in_box": 0.4097425710148924,
+        "chance_mass": 0.4097425710148924,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.4097425710148924,
+        "n": 5439
+      }
+    }
+  },
+  "readout": "attn_kd_tiled_train5k_s2",
+  "backbone": "dinov2_vitb14_reg",
+  "res": 224,
+  "split": "test",
+  "seed": 2,
+  "notes": "224 px gated attention head trained on 5000 images with BCE(labels) + 1 * BCE(teacher probs from tiled teacher); epochs=20 lr=0.001 seed=2 best_epoch=20 val_map=0.7910 train_secs=55"
+}

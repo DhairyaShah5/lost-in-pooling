@@ -4,7 +4,7 @@
   "patch_size": 14,
   "grid": 16,
   "dim": 768,
-  "n": 1281,
+  "n": 2507,
   "resize": "squash",
   "mean": [
     0.485,
@@ -16,7 +16,7 @@
     0.224,
     0.225
   ],
-  "img_per_s": 30.11,
+  "img_per_s": 51.42,
   "tokens": "global=x_norm_clstoken; patches=final tokens",
   "autocast": "float16"
 }

@@ -102,19 +102,20 @@ attention head (3 seeds) & $0.73\pm0.02$ & -- \\ \bottomrule
 \end{frame}
 
 \begin{frame}{Tiled-teacher distillation: a negative result}
-NIH radiographs, DINOv2, three seeds, macro AUROC (0.1--0.3\% lesions / all)
-\begin{center}\small\begin{tabular}{@{}lcc@{}}\toprule
-Read-out (tokens at test time) & 0.1--0.3\% & All \\ \midrule
-224 px head, baseline (224 px) & $0.61\pm0.04$ & $0.73\pm0.02$ \\
-Inference-time tiling, $4\times$ compute (448 px) & 0.58 & 0.73 \\
-448 px head, teacher (448 px) & $\mathbf{0.72\pm0.01}$ & $\mathbf{0.77\pm0.01}$ \\
-Student of the tiled teacher (224 px) & $0.58\pm0.03$ & $0.74\pm0.02$ \\
-Student of the 448 px teacher (224 px) & $0.63\pm0.05$ & $0.72\pm0.01$ \\ \bottomrule
+DINOv2, three seeds, macro AUROC. COCO: sub-patch targets / all; radiographs: 0.1--0.3\% lesions / all
+\begin{center}\scriptsize\begin{tabular}{@{}lcccc@{}}\toprule
+ & \multicolumn{2}{c}{COCO (5k train)} & \multicolumn{2}{c}{NIH radiographs} \\
+Read-out (tokens at test time) & $<0.1\%$ & All & 0.1--0.3\% & All \\ \midrule
+224 px head, baseline (224 px) & $0.87\pm0.01$ & $0.96$ & $0.61\pm0.04$ & $0.73\pm0.02$ \\
+Inference-time tiling, $4\times$ compute (448 px) & 0.91 & 0.97 & 0.58 & 0.73 \\
+448 px head, teacher (448 px) & $\mathbf{0.92}$ & $\mathbf{0.98}$ & $\mathbf{0.72\pm0.01}$ & $\mathbf{0.77\pm0.01}$ \\
+Student of the tiled teacher (224 px) & $0.88\pm0.00$ & $0.96$ & $0.58\pm0.03$ & $0.74\pm0.02$ \\
+Student of the 448 px teacher (224 px) & $0.84\pm0.00$ & $0.96$ & $0.63\pm0.05$ & $0.72\pm0.01$ \\ \bottomrule
 \end{tabular}\end{center}
 \begin{itemize}\small
-\item Neither student moves off the baseline in any bin; tiling at test time does not either.
+\item Students gain at most 0.01 (COCO) or nothing (radiographs); tiling the 224 px head over 448 px tokens recovers 3/4 of the teacher's gain on COCO, none on radiographs.
 \item The 448 px head's extra evidence is not in the 224 px tokens: it was lost at patch embedding, and a teacher cannot supply what the student's input does not contain.
-\item Resolution gains on small findings must be bought at the encoder's input. % TODO(final): COCO
+\item Resolution gains on small targets must be bought at the encoder's input; a head can be carried up (tiling) but not taught down.
 \end{itemize}
 \end{frame}
 

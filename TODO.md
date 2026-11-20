@@ -126,7 +126,7 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 17.3 Seed repeats for every one-seed read-out (COCO oracles at 224/336/448, CLIP/SigLIP probes and oracles, chest probes, max-MIL); seeds__*.json summaries
 - [x] 17.4 ChestX-Det10 boxes: fetch annotations, map to our NIH images, patient-disjoint manifest, CV read-outs and NIH-trained heads at 224/448 px (both backbones; transfer head 0.77 vs 0.70 DINOv2, 0.83 vs 0.80 RAD-DINO at 448)
 - [x] 17.5 Token-fraction pre-deployment check: fits within 0.02 across resolutions, leave-one-backbone-out MAE <= 0.012, radiograph offset 0.17-0.28, 200 boxed images detect the gap; CLI `python -m lip.eval.deploy_check`
-- [ ] 17.6 Tiled-teacher distillation: 448 px head as teacher, 224 px student on the same images (COCO and chest)
+- [x] 17.6 Tiled-teacher distillation: 448 px head as teacher, 224 px student on the same images (COCO and chest) (negative: students <= +0.01; inference-time tiling recovers 3/4 of the gain on COCO, none on chest)
 - [ ] 17.7 LUNA16 arm (scoped): one or two subsets, 2D nodule slices, blindness curve of CLS / mean / oracle / head by nodule size
 - [x] 17.9 Context-only control (tokens outside the box): equals the mean probe on sub-patch targets (0.862 vs 0.862, DINOv2), on COCO x3 backbones + 448 px and on chest
 - [ ] 17.8 Update the memory notes and README as results land

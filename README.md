@@ -48,7 +48,9 @@ same as the global probes on sub-patch targets, so the global vector's floor is 
 images re-annotated with 8,339 boxes) shows the same cliff on 5.4x the boxes, and the NIH-trained head transfers to
 the new annotators better than the probes do (0.77 vs 0.70 for DINOv2 and 0.83 vs 0.80 for RAD-DINO at 448 px).
 Tiled-teacher distillation does not move a 224 px head off its baseline on radiographs (students 0.72 to 0.74 vs
-teacher 0.77): the evidence a 448 px head uses is not in the 224 px tokens. Full tables, intervals and per-class
+teacher 0.77) and gains at most 0.01 on COCO, while tiling the unchanged 224 px head over 448 px tokens at test time
+recovers three quarters of the 448 px head's gain on COCO (0.91 vs 0.92, baseline 0.87): the evidence a 448 px head
+uses is not in the 224 px tokens. Full tables, intervals and per-class
 breakdowns: `report/final.pdf`, `results/`, `results_cxr/`, `results_det10/`, `results_luna/`.
 
 ## Reproduce
