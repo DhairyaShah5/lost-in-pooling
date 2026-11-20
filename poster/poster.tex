@@ -34,7 +34,7 @@ On \textbf{identical cached tokens}, swap only the read-out: CLS, mean, max, an 
 \end{block}
 \begin{block}{Same pattern on four backbones}
 \centering\includegraphics[width=0.98\textwidth]{cross_backbone__res224.pdf}
-\small DINOv2, CLIP, SigLIP, DINO ViT-B/16: global read-outs $\approx 0.80$--$0.86$ on sub-patch targets, oracles above, heads in between. Three seeds per read-out; paired bootstrap intervals exclude zero. % TODO(final): numbers after seeds
+\small DINOv2, CLIP, SigLIP, DINO ViT-B/16: global read-outs 0.80--0.86 on sub-patch targets, oracles 0.90--0.97, heads in between on every backbone. The 16 px self-supervised model keeps the least small-object evidence, so patch size is not what decides it. Three seeds per read-out.
 \end{block}
 \end{column}
 % ---------------------------------------------------------------- column 2
@@ -48,8 +48,7 @@ On \textbf{identical cached tokens}, swap only the read-out: CLS, mean, max, an 
 \small 224, 336 and 448 px on the same images. The oracle's curves coincide in \emph{patch} units; global pooling orders itself by \emph{token fraction}: at 448 px a small object is the same share of four times as many tokens, and the probe does not improve.
 \end{block}
 \begin{block}{Context-only control}
-\small Pool only the tokens \emph{outside} the box: % TODO(final): context-only numbers
-how much of the global read-out's score is the scene rather than the object.
+\small Pool only the tokens \emph{outside} the box, with the oracle's own probe. On sub-patch targets it scores \textbf{0.862}, the mean probe's 0.862 exactly (CLIP 0.854 vs 0.838, SigLIP 0.856 vs 0.847): a global read-out on a sub-patch target does no better than a read-out forbidden to see the target. The oracle, which sees only what this control cannot, is 0.973.
 \end{block}
 \begin{block}{A pre-deployment check}
 \centering\includegraphics[width=0.98\textwidth]{deploy_check.pdf}
@@ -60,7 +59,7 @@ how much of the global read-out's score is the scene rather than the object.
 \begin{column}{0.31\textwidth}
 \begin{block}{Radiographs: the cliff reappears}
 \centering\includegraphics[width=0.8\textwidth]{blindness_curve__dinov2_vitb14_reg__res224_cxr.pdf}
-\small NIH ChestX-ray14, 880 boxed images: cross-validated global probes 0.58 vs oracle 0.88--0.94 on the same tokens; image-level probes 0.70; the attention head $0.73\pm0.02$. RAD-DINO raises both sides (oracle 0.95--0.97, probes 0.77) without closing the gap. At 448 px on the full cache the head gains 0.04 ($0.77\pm0.01$), the global probes 0.01. ChestX-Det10 (3,543 images, 10 findings) % TODO(final): Det10 numbers
+\small NIH ChestX-ray14, 880 boxed images: cross-validated global probes 0.58 vs oracle 0.88--0.94 on the same tokens; image-level probes 0.70; the attention head $0.73\pm0.02$. RAD-DINO raises both sides (oracle 0.95--0.97, probes 0.77) without closing the gap. At 448 px on the full cache the head gains 0.04 ($0.77\pm0.01$), the global probes 0.01. ChestX-Det10 (3,543 images re-annotated by three radiologists, 10 findings): the same cliff on 5.4$\times$ the boxes (global 0.56--0.69 vs oracle 0.91--0.93 under 0.3\% of the frame), and the NIH-trained head transfers (0.74 vs 0.69 for the CLS probe on the shared findings).
 \end{block}
 \begin{block}{Tiled-teacher distillation}
 \small The 224 px head applied to the four quadrants of the 448 px tokens is a teacher that needs no training; a 224 px student trained with its soft targets % TODO(final): distillation numbers

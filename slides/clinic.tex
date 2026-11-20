@@ -52,11 +52,12 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Same pattern on three backbones}
+\begin{frame}{Same pattern on four backbones}
 \centering
 \includegraphics[width=0.95\textwidth]{cross_backbone__res224.pdf}
 \begin{itemize}\small
-\item DINOv2, CLIP ViT-B/16, SigLIP ViT-B/16: global read-outs $\approx 0.83$--$0.86$ on sub-patch targets, oracles 0.93--0.97, heads in between on each.
+\item DINOv2, CLIP ViT-B/16, SigLIP ViT-B/16, DINO ViT-B/16: global read-outs 0.80--0.86 on sub-patch targets, oracles 0.90--0.97, heads in between on each.
+\item DINO ViT-B/16 (self-supervised, 16 px) has the weakest tokens: patch size does not decide how much small-object evidence survives the encoder; the pretraining recipe does.
 \item Three seeds per head; paired bootstrap intervals exclude zero in the small bins.
 \end{itemize}
 \end{frame}
@@ -67,6 +68,7 @@
 \begin{itemize}\small
 \item Attention mass inside the ground-truth box is 12 to 24 times chance on small targets; the head learned the object, not only its context.
 \item Classes that global pooling loses are the ones with unpredictable scenes (banana, motorcycle); the per-class oracle gap tracks a context score (Spearman $-0.98$).
+\item \textbf{Context-only control:} pooling only the tokens \emph{outside} the box scores 0.862 on sub-patch targets, the mean probe's 0.862 exactly. On a sub-patch target a global read-out does no better than one forbidden to see the target.
 \end{itemize}
 \end{frame}
 
@@ -93,7 +95,8 @@ attention head (3 seeds) & $0.73\pm0.02$ & -- \\ \bottomrule
 \begin{itemize}
 \item No scene prior: every radiograph is a chest, so the pooled vector has nothing to fall back on.
 \item RAD-DINO (radiograph-adapted) raises both sides (oracle 0.95--0.97, probes 0.77) without closing the gap.
-\item At 448 px on the full cache the head gains 0.04 ($0.77\pm0.01$), the global probes 0.01.
+\item At 448 px on the full cache the head gains 0.04 ($0.77\pm0.01$), the global probes 0.01--0.02.
+\item ChestX-Det10 (3,543 images, 10 findings, 5.4$\times$ the boxes): same cliff (global 0.56--0.69 vs oracle 0.91--0.93 under 0.3\%); NIH-trained head transfers (0.74 vs 0.69 for CLS).
 \end{itemize}
 \end{columns}
 \end{frame}
@@ -111,8 +114,8 @@ attention head (3 seeds) & $0.73\pm0.02$ & -- \\ \bottomrule
 \begin{frame}{What we would like feedback on}
 \begin{enumerate}
 \item \textbf{The causal argument.} Same tokens, swap the read-out: is the oracle-vs-global comparison plus the resolution mechanism test enough, or should we add an intervention (e.g. masking tokens outside the box for the global probe)?
-\item \textbf{Context priors.} The per-class and cross-domain evidence says scene context explains the floor of the global read-outs. A within-COCO control is not available (too few single-object images). Alternatives?
-\item \textbf{Extensions in flight.} ChestX-Det10 as a second boxed set (3,543 images, 10 findings); DINO ViT-B/16 to separate patch size from objective; tiled-teacher distillation; a scoped LUNA16 slice arm.
+\item \textbf{Context priors.} The context-only control now shows the floor of the global read-outs is the scene. Is that control convincing, or should we also mask tokens inside the box for the global probe at training time?
+\item \textbf{Extensions in flight.} Tiled-teacher distillation and a scoped LUNA16 slice arm are running; ChestX-Det10 and DINO ViT-B/16 are in.
 \item \textbf{Framing.} Is the blindness curve plus the deployment check the right headline for the final report?
 \end{enumerate}
 \end{frame}
