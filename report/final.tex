@@ -666,8 +666,8 @@ the same number of patches is a smaller fraction of 576 or 1,024 tokens than of 
 what governs the global read-out is what fraction of all tokens the object occupies, and
 raising the resolution improves the first while leaving the second unchanged. The second
 quantity can be computed from the box statistics of a dataset and the token count of a
-backbone without running the model, which is the pre-deployment check we will formalise in
-the final report.
+backbone without running the model, which is the pre-deployment check of
+Section~\ref{sec:check}.
 
 \begin{figure}[t]
 \centering
@@ -726,8 +726,8 @@ there, a fifth in the 0.1--0.3\% bin and a third in the 0.3--1\% bin; it raises 
 pooling, the price of a class-specific attention that no longer averages over the whole object.
 An entropy sweep over $\lambda\in\{-0.1, 0, 0.01, 0.1\}$ (normalised entropies 0.90, 0.44, 0.29, 0.06; full results in \texttt{results/}) shows that a strong sharpening term ($\lambda=0.1$) collapses the attention onto a few patches and both AUROC and mAP fall, while pushing towards uniform ($\lambda=-0.1$) gives the best per-bin AUROC of the sweep (0.908 on sub-patch targets) at lower mAP (0.790) with attention mass on small targets only 3.6 times chance: mean pooling with a mild class-specific tilt that ranks images well without looking at the object much. The
 $\lambda=0$ head is the one that both improves on mean pooling and localises, so we report it
-as the main result; the trade-off between ranking and localisation is itself a finding we will
-pursue with the multi-scale variant.
+as the main result; the trade-off between ranking and localisation is itself a finding, and
+the multi-scale variant below keeps the localisation while recovering the ranking.
 
 \paragraph{Localisation audit.}
 Table~\ref{tab:localisation} shows that the head's attention sits on the target far more often
