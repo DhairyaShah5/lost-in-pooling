@@ -106,7 +106,9 @@ targets is the scene. Tiling a 224 px head over 448 px tokens at test time recov
 quarters of a 448 px head's gain on COCO with no training, but distilling either teacher into
 a 224 px input recovers at most 0.01: the evidence is lost at the encoder's input, not in the
 head.
-% TODO(final): LUNA abstract sentence
+On LUNA16 CT slices, where every nodule is a sub-patch target, the global probes of DINOv2
+score 0.61 AUROC at every nodule diameter against 0.95 for the region read-out on the same
+tokens.
 We explain why natural images, with their strong context priors, show a graded loss where
 radiographs show a cliff, and ship a pre-deployment check that predicts the loss from target
 size and token grid.
@@ -1189,6 +1191,59 @@ Attention head   & 0.662 & 0.778 & 0.811 & 0.833 & 0.837 & 0.832 \\
 \end{tabular}
 \end{table}
 
+\subsection{LUNA16 nodule slices: the whole curve inside one bin}
+\label{sec:luna}
+The CT arm places the entire blindness curve inside its smallest bin. A LUNA16 nodule of
+median diameter 5 mm covers 0.05\% of a 2D lung-window slice (median box fraction 0.054\%,
+90th percentile 0.23\%, maximum 0.59\%), so every one of the 1,439 positive slices is a
+sub-patch target at 224 px, where one patch is 0.39\% of the frame, and nine in ten remain
+sub-patch at 448 px. Binning by nodule diameter instead of relative area then asks how the
+read-outs behave as the target grows from a quarter of a patch to about one patch.
+Table~\ref{tab:luna} and Figure~\ref{fig:luna} give the answer with DINOv2 at 224 px. The
+cross-validated global read-outs sit at 0.61 AUROC overall (CLS 0.613, mean 0.610, max
+0.569) and between 0.59 and 0.63 for every diameter up to 20 mm, with no trend in diameter;
+the oracle on the same tokens scores 0.953 overall, 0.935 on nodules under 5 mm and 0.96 to
+0.97 from 8 mm up. This is the closest the project comes to the motivating study's result:
+the global probes of a general-purpose encoder are a tenth above chance on nodule slices of
+every size, while the region read-out on the same tokens is near perfect. The context-only
+control scores exactly what the global probes score (0.610), so the little the global vector
+knows is the slice, not the nodule. The 80 slices with nodules above 20 mm are the one place
+the global probes fall below chance (0.42 to 0.50): these are the largest masses, often
+against the pleura or the mediastinum, and the nodule-free negatives drawn from the same
+scans share that anatomy. The attention head is the weak point of this arm. Trained from
+slice-level labels on the 1,330 slices of the 98 training scans, it reaches $0.59\pm0.06$
+overall on the 804 test slices over three seeds, no better than the global probes and far
+less stable, with early stopping at epoch 6 to 9. The head needs more training images than
+two LUNA16 subsets provide; the ChestX-Det10 transfer, where it had 20,721, shows what it
+does with them.
+% TODO(final): LUNA 448
+
+\begin{figure}[t]
+\centering
+\guardedfig{figures/luna_curve__dinov2_vitb14_reg__res224.pdf}{\columnwidth}
+\caption{LUNA16 slices (DINOv2, 224 px): AUROC of nodule slice against nodule-free slice by
+nodule diameter, for the cross-validated read-outs (all 2,507 slices) and the seed-0 attention
+head (804 test slices). Bands are 95\% bootstrap intervals.}
+\label{fig:luna}
+\end{figure}
+
+\begin{table}[t]
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\caption{LUNA16 nodule slices (DINOv2 ViT-B/14-reg), AUROC by nodule diameter. Cross-validated
+read-outs: scan-disjoint 5-fold cross-validation over all 2,507 slices (1,439 positive: 153,
+546, 288, 372 and 80 per bin). Attention head: trained from slice-level labels on the training
+scans (1,330 slices), scored on the 804 test slices (486 positive: 62, 152, 97, 166 and 9 per
+bin), mean $\pm$ sample standard deviation over three seeds.}
+\label{tab:luna}
+\begin{tabular}{lrrrrrr}
+\toprule
+Read-out & 3--5 mm & 5--8 mm & 8--12 mm & 12--20 mm & $>20$ mm & All \\
+\midrule
+\IfFileExists{../results_luna/luna_table__dinov2_vitb14_reg.tex}{\input{../results_luna/luna_table__dinov2_vitb14_reg.tex}}{\todo{LUNA table missing}}
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Tiled-teacher distillation}
 \label{sec:distill}
 The resolution ablations say that a head reading 448 px tokens recovers more of the
@@ -1370,7 +1425,8 @@ global read-out falls from 0.99 AUROC on large targets to 0.80--0.86 on sub-patc
 DINOv2, CLIP, SigLIP and DINO ViT-B/16, with the same ordering of read-outs on each; on
 radiographs the cross-validated global read-outs score 0.58 overall on the NIH boxes and 0.56
 to 0.69 on lesions under 0.3\% of the frame on ChestX-Det10, with a general-purpose and a
-radiograph-adapted encoder, at 224 and 448 px. The difference between the graded loss on
+radiograph-adapted encoder, at 224 and 448 px; on LUNA16 nodule slices, where every target
+is sub-patch, they score 0.61 at every diameter against 0.95 for the oracle. The difference between the graded loss on
 natural images and the cliff on radiographs is the scene prior, which the context-only
 control measures directly: the tokens outside the box score what the global vector scores.
 
@@ -1409,7 +1465,9 @@ pooled vector.
 The head is the weakest part of the recovery story and the most obvious next step: a head
 that reads two resolutions at once, or a region proposal from the attention map followed by a
 second pass at higher resolution on the proposed region, would use the mechanism result
-directly. % TODO(final): LUNA conclusion sentence
+directly. The LUNA16 arm shows the limit of the head rather than of the tokens: with 1,330
+training slices it does not beat the probes, so a head trained on all ten LUNA16 subsets, or
+with the nodule-level supervision LIDC provides, is the natural follow-up.
 The audio arm of the pre-proposal remains open, and the context-only control suggests a
 within-COCO intervention (masking the tokens inside the box when the global probe is trained)
 that would separate scene from object without a second domain. Everything reported here runs

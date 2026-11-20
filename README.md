@@ -50,7 +50,9 @@ the new annotators better than the probes do (0.77 vs 0.70 for DINOv2 and 0.83 v
 Tiled-teacher distillation does not move a 224 px head off its baseline on radiographs (students 0.72 to 0.74 vs
 teacher 0.77) and gains at most 0.01 on COCO, while tiling the unchanged 224 px head over 448 px tokens at test time
 recovers three quarters of the 448 px head's gain on COCO (0.91 vs 0.92, baseline 0.87): the evidence a 448 px head
-uses is not in the 224 px tokens. Full tables, intervals and per-class
+uses is not in the 224 px tokens. On LUNA16 CT slices (subsets 0 and 1, 2,507 slices), where every nodule is a
+sub-patch target, the cross-validated global probes score 0.61 AUROC at every nodule diameter against 0.95 for the
+oracle on the same tokens. Full tables, intervals and per-class
 breakdowns: `report/final.pdf`, `results/`, `results_cxr/`, `results_det10/`, `results_luna/`.
 
 ## Reproduce

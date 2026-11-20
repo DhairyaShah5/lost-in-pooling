@@ -101,6 +101,20 @@ attention head (3 seeds) & $0.73\pm0.02$ & -- \\ \bottomrule
 \end{columns}
 \end{frame}
 
+\begin{frame}{LUNA16 CT slices: the whole curve inside one bin}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{luna_curve__dinov2_vitb14_reg__res224.pdf}
+\column{0.5\textwidth}\small
+\begin{itemize}
+\item Subsets 0--1: 178 scans, 2,507 lung-window slices, 1,439 with a nodule; every nodule is a sub-patch target (median 0.05\% of the frame).
+\item Scan-disjoint CV, DINOv2 224 px: global probes 0.61 AUROC at every diameter from 3 to 20 mm; context-only control 0.61; oracle on the same tokens 0.95 (0.94 under 5 mm).
+\item The closest replication of the motivating study: a tenth above chance for the pooled vector, near perfect for the region.
+\item The head, with 1,330 training slices, does not beat the probes ($0.59\pm0.06$): recovery needs training images this arm does not have. % TODO(final): LUNA 448
+\end{itemize}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Tiled-teacher distillation: a negative result}
 DINOv2, three seeds, macro AUROC. COCO: sub-patch targets / all; radiographs: 0.1--0.3\% lesions / all
 \begin{center}\scriptsize\begin{tabular}{@{}lcccc@{}}\toprule
@@ -133,7 +147,7 @@ Student of the 448 px teacher (224 px) & $0.84\pm0.00$ & $0.96$ & $0.63\pm0.05$ 
 \begin{enumerate}
 \item \textbf{The causal argument.} Same tokens, swap the read-out: is the oracle-vs-global comparison plus the resolution mechanism test enough, or should we add an intervention (e.g. masking tokens outside the box for the global probe)?
 \item \textbf{Context priors.} The context-only control now shows the floor of the global read-outs is the scene. Is that control convincing, or should we also mask tokens inside the box for the global probe at training time?
-\item \textbf{Extensions.} ChestX-Det10, DINO ViT-B/16 and distillation (negative) are in; the scoped LUNA16 slice arm is running. Is the negative distillation result worth a section of its own?
+\item \textbf{Extensions.} ChestX-Det10, DINO ViT-B/16 and distillation (negative) are in; the scoped LUNA16 slice arm is in. Is the negative distillation result worth a section of its own?
 \item \textbf{Framing.} Is the blindness curve plus the deployment check the right headline for the final report?
 \end{enumerate}
 \end{frame}
