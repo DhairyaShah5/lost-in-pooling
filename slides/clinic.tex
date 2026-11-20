@@ -1,0 +1,131 @@
+\documentclass[10pt,aspectratio=169]{beamer}
+\usetheme{default}\usecolortheme{seagull}\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{\hfill\scriptsize\insertframenumber/\inserttotalframenumber\hspace{2mm}\vspace{1mm}}
+\usepackage{booktabs,graphicx,amsmath}
+\graphicspath{{../report/figures/}}
+\title{Lost in Pooling: Recovering Small-Signal Evidence Discarded by Frozen Foundation Models}
+\subtitle{CSCI 566 project clinic}
+\author{Dhairya Shah \and Raghav Sarmukaddam \and Yash Desai \and Prisha Thakur \and Ansh Parasher \and Advait Kale}
+\institute{University of Southern California}
+\date{November 23, 2026}
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}{The question}
+\begin{itemize}
+\item Frozen ViT backbones are deployed as \textbf{one pooled vector} per image (CLS or mean of patch tokens) plus a linear probe.
+\item A recent chest X-ray study found CLS probes at chance on small lesions while the same models' patch tokens, restricted to the lesion, kept the signal.
+\item \textbf{Hypothesis:} the evidence survives the encoder and is lost at \emph{aggregation}.
+\item \textbf{Test:} on identical cached tokens, swap only the read-out: CLS, mean, max, an oracle that pools the ground-truth region, a max-MIL head and a gated attention head trained from image-level labels only.
+\item \textbf{Measure:} per-class AUROC stratified by the relative size of the largest instance (the \emph{blindness curve}).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Pre-proposal feedback and what we did with it}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Feedback}
+\begin{itemize}
+\item Scope: one dataset and one backbone first.
+\item Causal claim: cross-modal similarity is not cause; use the controlled pooling swap.
+\item Keep negative findings specific.
+\item Audio and distillation wait.
+\end{itemize}
+\column{0.5\textwidth}
+\textbf{Done}
+\begin{itemize}
+\item MS-COCO 2017 + DINOv2 ViT-B/14 first; then CLIP, SigLIP, DINO ViT-B/16.
+\item Every read-out on the same tokens; oracle vs global on the same images.
+\item NIH ChestX-ray14 (+ RAD-DINO, 448 px, ChestX-Det10 in progress).
+\item Distillation and LUNA16 scheduled last.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Blindness curve, COCO val2017, DINOv2 ViT-B/14 at 224 px}
+\centering
+\includegraphics[width=0.62\textwidth]{blindness_curve__dinov2_vitb14_reg__res224.pdf}
+\begin{itemize}\small
+\item Global read-outs fall from 0.99 AUROC on large targets to 0.84--0.86 on sub-patch targets ($<0.1\%$ of the image).
+\item The oracle, pooling only the ground-truth region of the \emph{same} tokens, stays at 0.97: the loss is at pooling.
+\item The attention head (no boxes) reaches 0.89 ($0.90$ multi-scale); mAP 0.73 $\rightarrow$ 0.80 (0.82).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Same pattern on three backbones}
+\centering
+\includegraphics[width=0.95\textwidth]{cross_backbone__res224.pdf}
+\begin{itemize}\small
+\item DINOv2, CLIP ViT-B/16, SigLIP ViT-B/16: global read-outs $\approx 0.83$--$0.86$ on sub-patch targets, oracles 0.93--0.97, heads in between on each.
+\item Three seeds per head; paired bootstrap intervals exclude zero in the small bins.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Where does the head look?}
+\centering
+\includegraphics[width=0.9\textwidth]{attention_examples.png}
+\begin{itemize}\small
+\item Attention mass inside the ground-truth box is 12 to 24 times chance on small targets; the head learned the object, not only its context.
+\item Classes that global pooling loses are the ones with unpredictable scenes (banana, motorcycle); the per-class oracle gap tracks a context score (Spearman $-0.98$).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Mechanism: token fraction vs patches covered}
+\centering
+\includegraphics[width=0.8\textwidth]{patch_units__dinov2_vitb14_reg.pdf}
+\begin{itemize}\small
+\item 224, 336 and 448 px on the same images. The oracle's curves coincide in \emph{patch} units: more pixels per object help a region read-out.
+\item Global pooling orders itself by \emph{token fraction}: at 448 px a small object is the same share of four times as many tokens, and the probe does not improve.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Radiographs: the cliff reappears (NIH ChestX-ray14, 880 boxed images)}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{blindness_curve__dinov2_vitb14_reg__res224_cxr.pdf}
+\column{0.5\textwidth}\small
+\begin{tabular}{lcc}\toprule
+DINOv2, 224 px & global & oracle \\ \midrule
+5-fold CV on boxed images & 0.58 & 0.88--0.94 \\
+image-level training (20,721) & 0.70 & -- \\
+attention head (3 seeds) & $0.73\pm0.02$ & \\ \bottomrule
+\end{tabular}
+\begin{itemize}
+\item No scene prior: every radiograph is a chest, so the pooled vector has nothing to fall back on.
+\item RAD-DINO (radiograph-adapted) raises both sides (oracle 0.95--0.97, probes 0.77) without closing the gap.
+\item At 448 px on the full cache the head gains 0.04 ($0.77\pm0.01$), the global probes 0.01.
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{A pre-deployment check}
+\centering
+\includegraphics[width=0.98\textwidth]{deploy_check.pdf}
+\begin{itemize}\small
+\item Global AUROC as a logistic function of token fraction: within 0.02 across resolutions, leave-one-backbone-out error $\le 0.012$; the radiograph offset (0.17--0.28) is the missing scene prior.
+\item Oracle AUROC as a function of patches covered. Given a target size and a token grid, the two curves predict the loss.
+\item 200 boxed images detect the sub-patch gap on COCO with power 0.84; 50 suffice on radiographs.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{What we would like feedback on}
+\begin{enumerate}
+\item \textbf{The causal argument.} Same tokens, swap the read-out: is the oracle-vs-global comparison plus the resolution mechanism test enough, or should we add an intervention (e.g. masking tokens outside the box for the global probe)?
+\item \textbf{Context priors.} The per-class and cross-domain evidence says scene context explains the floor of the global read-outs. A within-COCO control is not available (too few single-object images). Alternatives?
+\item \textbf{Extensions in flight.} ChestX-Det10 as a second boxed set (3,543 images, 10 findings); DINO ViT-B/16 to separate patch size from objective; tiled-teacher distillation; a scoped LUNA16 slice arm.
+\item \textbf{Framing.} Is the blindness curve plus the deployment check the right headline for the final report?
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Plan to the final report (Dec 7)}
+\begin{tabular}{p{0.2\textwidth}p{0.75\textwidth}}\toprule
+Nov 23--29 & Finish ChestX-Det10, DINO ViT-B/16, seeds for every read-out, distillation; poster. \\
+Nov 30 & Poster and live demo: blindness curve and attention maps on a user-chosen image. \\
+Nov 30--Dec 6 & LUNA16 slice arm; consolidate; final report in the midterm format. \\
+Dec 7 & Final report, released code, cached curves and reproduction commands. \\ \bottomrule
+\end{tabular}
+\vspace{4mm}
+
+Code and results: \texttt{github.com/DhairyaShah5/lost-in-pooling}
+\end{frame}
+\end{document}
