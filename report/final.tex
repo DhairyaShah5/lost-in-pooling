@@ -97,9 +97,17 @@ but not the global read-outs: what governs global pooling is the fraction of all
 object occupies, not the patches it covers. On NIH ChestX-ray14 the cliff of the motivating
 study reappears, with global probes at 0.58 to 0.70 AUROC against 0.88 to 0.94 for the oracle
 on the same tokens, and a radiograph-adapted backbone (RAD-DINO) raises both sides without
-closing the gap; the head recovers part of it, and at 448 px it gains a further 0.04 AUROC where the global probes retrained on the same tokens gain 0.01 to 0.02. We explain why natural images, with
-their strong context priors, show a graded loss where radiographs show a cliff, and set out
-the plan to the final report.
+closing the gap; the head recovers part of it, and at 448 px it gains a further 0.04 AUROC
+where the global probes retrained on the same tokens gain 0.01 to 0.02. A second set of
+radiologist boxes (ChestX-Det10, 3,543 images) reproduces the cliff on 5.4 times the boxes,
+and the heads trained on NIH labels transfer to it better than the probes do (0.77 against
+0.70 at 448 px). A context-only control shows that the global read-outs' floor on small
+targets is the scene, and a tiled-teacher distillation shows that what a 448 px head sees
+cannot be taught to a 224 px head: the evidence is lost at the encoder's input.
+% TODO(final): LUNA abstract sentence
+We explain why natural images, with their strong context priors, show a graded loss where
+radiographs show a cliff, and ship a pre-deployment check that predicts the loss from target
+size and token grid.
 \end{list}
 \vspace{14pt}
 \end{@twocolumnfalse}
@@ -687,7 +695,7 @@ the tennis racket it attends to the player's body, a context cue, not the target
 \end{figure*}
 
 \begin{table}[t]
-\centering\small
+\centering\footnotesize
 \caption{Localisation audit of the attention head per size bin: mean attention mass inside the
 ground-truth boxes versus its chance level (box area as a fraction of the grid), and
 pointing-game accuracy (arg-max patch inside a box). $\lambda=0$; $n$ is the number of
@@ -814,7 +822,7 @@ this is the within-dataset evidence for the context-prior account: the sub-patch
 the global read-outs is the scene, and the oracle gap is the object.
 
 \begin{table}[t]
-\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
 \caption{Context-only control on COCO val2017 (224 px unless stated), macro AUROC. \emph{Context}
 pools only the tokens outside the ground-truth boxes (random matched box for negatives) with
 the oracle's probe recipe; \emph{oracle} pools only the tokens inside. Seed 0.}
@@ -1301,7 +1309,7 @@ same mechanism seen with and without a context prior: on COCO the global vector 
 on the scene, on a chest radiograph it cannot. What the controlled comparisons establish is
 that for these encoders and these tokens the loss occurs at aggregation and is recoverable
 by a read-out that can select patches; what they do not establish is how much of it a head
-trained without boxes can recover in general. On COCO the answer is a third to a half
+trained without boxes can recover in general. On COCO the answer is a quarter to three quarters
 of the gap depending on the backbone, on radiographs much less, and the per-class
 analysis says the recoverable share is largest exactly where context helps least. All
 statements are about the named backbones at 224 or 448 px on COCO val2017 and the NIH boxed
@@ -1311,49 +1319,60 @@ images, with one seed except where seeds are reported.
 \section{Conclusion and Future Work}
 \label{sec:plan}
 % ======================================================================
-Three weeks remain. The core comparison, the backbone and resolution extensions and the
-radiograph replication are in; the plan below deepens each rather than opening new fronts.
+This project set out to answer three questions about frozen foundation models and small
+targets: how general the loss of small-signal evidence is, where it happens, and whether it
+can be recovered without extra supervision. With one harness, five backbones (counting
+RAD-DINO), three sets of radiologist boxes and a CT arm, the answers are as follows.
 
-\begin{table}[h]
-\centering\small
-\caption{Week-by-week plan to the final report. Audio and distillation remain deferred, as
-recommended in the pre-proposal feedback; LUNA16 (3D CT) is dropped.}
-\label{tab:plan}
-\begin{tabular}{p{0.95in}p{2.1in}}
-\toprule
-Week & Deliverable \\
-\midrule
-Nov 16--22 &
-  RAD-DINO head on the full 448 px cache; three seeds for every head on both datasets;
-  formalise the token-fraction pre-deployment check of Section~\ref{sec:results} and
-  validate it on both datasets. \\
-Nov 23--29 &
-  \textbf{Clinic, Nov 23}: present the cross-backbone curves, the oracle gap, the mechanism
-  figure and the radiograph replication; get feedback on the causal argument. Add a fourth
-  backbone that is self-supervised with a 16-pixel patch, to separate patch size from
-  pretraining objective, and ChestX-Det10 boxes (3,500 images) to thicken the radiograph bins. \\
-Nov 30--Dec 6 &
-  \textbf{Poster and demo, Nov 30}: live demo of the curve and the attention maps on
-  user-chosen images. Then consolidate: repeat key runs over three seeds, finish the
-  radiograph curves, write the size-stratified evaluation recommendation. Tiled-teacher
-  distillation only if everything above is complete. \\
-Dec 7 &
-  \textbf{Final report}: cross-dataset (COCO, chest radiographs) and cross-backbone blindness
-  curves, the recovery method with its localisation audit, the evaluation recommendation, and
-  released code, cached curves and reproduction commands. \\
-\bottomrule
-\end{tabular}
-\end{table}
+\paragraph{How general.}
+Every backbone we tested loses small-target evidence, and at the same place. On COCO the best
+global read-out falls from 0.99 AUROC on large targets to 0.80--0.86 on sub-patch ones for
+DINOv2, CLIP, SigLIP and DINO ViT-B/16, with the same ordering of read-outs on each; on
+radiographs the cross-validated global read-outs score 0.58 overall on the NIH boxes and 0.56
+to 0.69 on lesions under 0.3\% of the frame on ChestX-Det10, with a general-purpose and a
+radiograph-adapted encoder, at 224 and 448 px. The difference between the graded loss on
+natural images and the cliff on radiographs is the scene prior, which the context-only
+control measures directly: the tokens outside the box score what the global vector scores.
 
-\paragraph{Risks and fallbacks.}
-The midterm results stand on their own; the remaining risks are to the extensions. The
-radiograph bins are thin (79 to 180 boxed images per finding), so chest-side head results
-need seeds before any claim under 0.05 AUROC, and ChestX-Det10 is the planned remedy. A
-fourth backbone depends on weights being available without a licence gate; if none is, the
-patch-size question is answered with FlexiViT-style resizing of DINOv2 instead. Every
-COCO-side number here is one seed except the head; the final report repeats the probes over
-three seeds. Audio, distillation and further modalities stay out of scope unless everything
-above is complete.
+\paragraph{Where.}
+The oracle on identical tokens stays at 0.90--0.97 on COCO and 0.88--0.99 on radiographs, so
+the evidence survives the encoder and is lost at aggregation. The resolution ablation says
+which aggregation: global pooling tracks the fraction of tokens a target occupies, the region
+read-out tracks the patches it covers, and doubling the resolution moves only the latter. The
+distillation experiment closes the loop from the other side: a 224 px head cannot be taught
+what a 448 px head sees, because the evidence is not in its input. Together they say that for
+small targets the choices that matter are made before the probe, at the encoder's input and
+at pooling, and that no amount of training on the pooled vector undoes them.
+
+\paragraph{Recovery.}
+A gated attention head trained from image-level labels alone recovers between a quarter and
+three quarters of the gap on COCO depending on the backbone (0.82 to 0.91 on sub-patch
+targets), with attention mass 5 to 24 times chance on the target. On radiographs it gains
+from resolution where the global probes do not (0.73 to 0.77 for DINOv2 and 0.76 to 0.80 for
+RAD-DINO over three seeds) and transfers to a second set of annotators better than the probes
+do (0.77 against 0.70 and 0.83 against 0.80 at 448 px). It does not recover everything: on
+RAD-DINO at 448 px it ties mean pooling overall and leads only inside the size bins, and on
+the thinnest radiograph bins its seeds spread by up to 0.08.
+
+\paragraph{What a practitioner should do.}
+Three things follow. Evaluate by target size: an overall AUROC of 0.80 on radiographs hides
+0.56 on small lesions. Before freezing a backbone, run the pre-deployment check: given the
+token grid and the typical target size it predicts the global and the region read-out's
+AUROC to within 0.02, and says how many boxed images (about 200 on natural images, 50 on
+radiographs) are needed to confirm the gap on a new dataset. If small targets matter, spend
+the budget on input resolution and a token-level read-out, not on a better probe of the
+pooled vector.
+
+\paragraph{Future work.}
+The head is the weakest part of the recovery story and the most obvious next step: a head
+that reads two resolutions at once, or a region proposal from the attention map followed by a
+second pass at higher resolution on the proposed region, would use the mechanism result
+directly. % TODO(final): LUNA conclusion sentence
+The audio arm of the pre-proposal remains open, and the context-only control suggests a
+within-COCO intervention (masking the tokens inside the box when the global probe is trained)
+that would separate scene from object without a second domain. Everything reported here runs
+on one laptop from cached tokens, and the repository ships the cache recipes, the curves and
+the check, so that the next backbone can be placed on the same axes in an afternoon.
 
 % ======================================================================
 \bibliographystyle{unsrtnat}
