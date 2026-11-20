@@ -806,7 +806,9 @@ probe does not (0.858): the extra tokens add context, not object. On radiographs
 sits with the global read-outs as well (cross-validated, DINOv2: 0.59 overall against 0.58
 for CLS and 0.66 for the oracle; RAD-DINO: 0.64 against 0.62 and 0.68), but there the
 shared level is near chance in the small bins, and what the context carries is the
-co-occurrence of findings rather than a scene. Together with Section~\ref{sec:perclass},
+co-occurrence of findings rather than a scene; at 448 px the same holds (0.60 against 0.58
+for DINOv2, 0.65 against 0.62 for RAD-DINO, with the oracles at 0.67 and 0.68 overall and
+0.92 to 0.98 per bin). Together with Section~\ref{sec:perclass},
 this is the within-dataset evidence for the context-prior account: the sub-patch floor of
 the global read-outs is the scene, and the oracle gap is the object.
 
@@ -1050,12 +1052,20 @@ of image set; on the 305 images whose NIH identity is known with certainty the f
 0.74 to 0.75 against 0.66 to 0.68. The transfer gain sits in the 1--10\% bins (0.75 to 0.79
 against 0.68 to 0.70); under 0.3\% of the frame, where Det10 has one to four shared findings,
 the head and the probes are within noise of each other (0.70 against 0.72 at 0.1--0.3\%).
-% TODO(final): 448 px Det10 block
+At 448 px (Table~\ref{tab:det10}, last block) the Det10 oracle rises in every bin, to 0.96 for
+lesions under 0.1\% of the frame (from 0.91) and 0.97 at 0.1--0.3\% (from 0.93). Unlike on
+the 880 NIH images, the cross-validated global probes also move here: CLS from 0.56 to 0.66 in
+the smallest bin and from 0.71 to 0.74 overall, mean pooling from 0.56 to 0.64 and 0.71 to
+0.73. With 3.3 times as many boxed pairs per bin the probes have more to fit, and some of the
+gain is that; the gap to the oracle on the same tokens is nonetheless 0.30 to 0.31 AUROC in
+the two smallest bins at 448 px against 0.24 to 0.35 at 224 px, so the resolution buys the
+region read-out more than it buys the global one on this set too.
+% TODO(final): RAD-DINO 448 Det10 + transfer at 448
 
 \begin{table}[t]
 \centering\footnotesize\setlength{\tabcolsep}{3.5pt}
 \caption{ChestX-Det10 (3,543 boxed NIH images, 10 findings), macro AUROC per lesion-size bin at
-224 px. Upper blocks: 5-fold patient-disjoint cross-validation on the Det10 images.
+224 px unless stated. Upper blocks: 5-fold patient-disjoint cross-validation on the Det10 images.
 Lower block: read-outs trained on the NIH image-level labels, scored on the 8 shared findings over
 the 2,491 Det10 images outside our NIH train/val patients. Parenthesised: findings per bin.}
 \label{tab:det10}
@@ -1082,6 +1092,12 @@ CLS probe        & 0.485 & 0.716 & 0.647 & 0.684 & 0.702 & 0.686 \\
 Mean probe       & 0.474 & 0.675 & 0.607 & 0.690 & 0.700 & 0.681 \\
 Attention head   & 0.510 & 0.697 & 0.660 & 0.756 & 0.785 & 0.740 \\
 Multi-scale head & 0.503 & 0.693 & 0.666 & 0.757 & 0.784 & 0.741 \\
+\midrule
+\multicolumn{7}{l}{\emph{DINOv2, cross-validated, 448 px}} \\
+CLS    & 0.655 & 0.668 & 0.684 & 0.708 & 0.751 & 0.741 \\
+Mean   & 0.641 & 0.645 & 0.671 & 0.707 & 0.762 & 0.730 \\
+Max    & 0.588 & 0.584 & 0.624 & 0.655 & 0.667 & 0.677 \\
+Oracle & \textbf{0.959} & \textbf{0.973} & \textbf{0.975} & \textbf{0.964} & \textbf{0.966} & 0.967 \\
 \bottomrule
 \end{tabular}
 \end{table}
