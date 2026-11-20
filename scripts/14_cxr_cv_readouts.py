@@ -63,6 +63,7 @@ if __name__ == "__main__":
     p.add_argument("--folds", type=int, default=5)
     p.add_argument("--min-pos", type=int, default=5)
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--region", choices=("inside", "outside"), default="inside", help="outside = context-only control")
     a = p.parse_args()
 
     store = FeatureStore(a.backbone, a.res, "test", root=a.features_root)
@@ -77,11 +78,15 @@ if __name__ == "__main__":
 
     stats = positive_box_stats(boxes, Y.shape[1])
     F_or, _ = cache_oracle_features(store, boxes, {**lab, "y": boxed}, stats, neg_mode="matched",
-                                    seed=a.seed, root=a.features_root)
-    feats = {kind: cache_pooled(store, kind) for kind in ("cls", "mean", "max")}
+                                    seed=a.seed, root=a.features_root, region=a.region)
+    if a.region == "outside":
+        readouts = [("context", lambda c: np.asarray(F_or[:, c, :]))]
+    else:
+        feats = {kind: cache_pooled(store, kind) for kind in ("cls", "mean", "max")}
+        readouts = [("cls", lambda c: feats["cls"]), ("mean", lambda c: feats["mean"]),
+                    ("max", lambda c: feats["max"]), ("oracle", lambda c: np.asarray(F_or[:, c, :]))]
 
-    for name, fn in [("cls", lambda c: feats["cls"]), ("mean", lambda c: feats["mean"]),
-                     ("max", lambda c: feats["max"]), ("oracle", lambda c: np.asarray(F_or[:, c, :]))]:
+    for name, fn in readouts:
         scores = cv_scores(fn, Y, boxed, folds, seed=a.seed)
         readout = f"{name}_cv{a.folds}"
         res = evaluate_readout(scores, lab, readout, a.backbone, a.res, split="test", train_split="test-cv",

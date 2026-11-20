@@ -198,7 +198,7 @@ def build_oracle_features(store: FeatureStore, boxes_df: pd.DataFrame, labels, c
 def build_oracle_features_all(store: FeatureStore, boxes_df: pd.DataFrame, labels,
                               stats: BoxStats, neg_mode: str = "matched", seed: int = 0,
                               batch_size: int = 256, out_path: Path | str | None = None,
-                              verbose: bool = False) -> tuple[np.ndarray, np.ndarray]:
+                              verbose: bool = False, region: str = "inside") -> tuple[np.ndarray, np.ndarray]:
     """One pass over the memmap -> features (n, C, d) float16 and neg boxes (n, C, 4).
 
     If ``out_path`` is given the feature array is an ``open_memmap`` written in
@@ -242,6 +242,8 @@ def build_oracle_features_all(store: FeatureStore, boxes_df: pd.DataFrame, label
             W = np.ones((b, C, P), dtype=np.float32)
         lo, hi = np.searchsorted(keys, [s * C, e * C])
         W[pair_rows[lo:hi] - s, pair_cats[lo:hi]] = U[lo:hi]
+        if region == "outside":          # context-only control: every token the box read-out does NOT see
+            W = (W <= 0).astype(np.float32)
         W = _normalise(W)
         x = block.astype(np.float32, copy=False)
         feats[s:e] = np.matmul(W, x).astype(np.float16)
@@ -254,23 +256,26 @@ def build_oracle_features_all(store: FeatureStore, boxes_df: pd.DataFrame, label
     return feats, neg_boxes
 
 
-def oracle_paths(store: FeatureStore, neg_mode: str, root: Path | str | None = None):
+def oracle_paths(store: FeatureStore, neg_mode: str, root: Path | str | None = None, region: str = "inside"):
     base = store.dir if root is None else Path(root).joinpath(*store.dir.parts[-3:])
-    return base / f"oracle_{neg_mode}.npy", base / f"oracle_{neg_mode}_boxes.npy"
+    tag = "" if region == "inside" else f"_{region}"
+    return base / f"oracle_{neg_mode}{tag}.npy", base / f"oracle_{neg_mode}{tag}_boxes.npy"
 
 
 def cache_oracle_features(store: FeatureStore, boxes_df: pd.DataFrame, labels, stats: BoxStats,
                           neg_mode: str = "matched", seed: int = 0, root=None,
-                          batch_size: int = 256, force: bool = False, verbose: bool = False):
-    """Build (once) and return the memmapped (n, C, d) float16 oracle features + neg boxes."""
-    fp, bp = oracle_paths(store, neg_mode, root)
+                          batch_size: int = 256, force: bool = False, verbose: bool = False,
+                          region: str = "inside"):
+    """Build (once) and return the memmapped (n, C, d) float16 oracle features + neg boxes.
+    ``region="outside"`` builds the context-only control (mean of the tokens outside the box)."""
+    fp, bp = oracle_paths(store, neg_mode, root, region)
     n, C = _as_y(labels).shape
     if fp.exists() and bp.exists() and not force:
         f = np.load(fp, mmap_mode="r")
         if f.shape[:2] == (n, C):
             return f, np.load(bp)
     _, neg_boxes = build_oracle_features_all(store, boxes_df, labels, stats, neg_mode, seed,
-                                             batch_size, out_path=fp, verbose=verbose)
+                                             batch_size, out_path=fp, verbose=verbose, region=region)
     np.save(bp, neg_boxes)
     return np.load(fp, mmap_mode="r"), neg_boxes
 

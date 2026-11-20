@@ -71,25 +71,29 @@ def main():
     boxes = pd.read_parquet(a.boxes)
     remap = {int(d): k for k, d in enumerate(det_idx)}
     boxes = boxes[boxes["cat_idx"].isin(list(remap))].copy(); boxes["cat_idx"] = boxes["cat_idx"].map(remap).astype(np.int16)
-    lab_e = reduced(eligible)
+    subsets = [("", eligible, reduced(eligible)), ("_m", eligible & matched, reduced(eligible & matched))]
+    print(f"[20] evaluation subsets: all eligible = {int(eligible.sum())}, matched-only = {int((eligible & matched).sum())}")
     summary = {}
 
     def evaluate(scores14, name, notes, alpha=None):
-        s = scores14[:, nih_idx][eligible]
-        r = R.evaluate_readout(s, lab_e, name, bb, res, min_pos=a.min_pos, split="det10", train_split="nih-train", notes=notes, seed=0)
-        R.save_results(r, R.results_path(name, bb, res, results_dir=out)); R.save_scores(s, R.scores_path(name, bb, res, results_dir=out))
-        pb = r["per_bin"]
-        print(f"[20] {name:16s} " + " ".join(f"{k}={v['auroc_macro']:.3f}({v['n_classes']})" for k, v in pb.items() if v.get("auroc_macro") is not None)
-              + f" | all auroc={r['overall']['auroc_macro']:.3f} mAP={r['overall']['map']:.3f}")
-        summary[name] = {"overall": r["overall"], "per_bin": {k: v.get("auroc_macro") for k, v in pb.items()}}
-        if alpha is not None:
-            ids = lab_e["image_ids"]
-            bx = boxes[boxes["image_id"].isin(set(int(i) for i in ids))]
-            df = localization_table(alpha[eligible][:, nih_idx], bx, lab_e, grid=store.grid, image_ids=ids)
-            summ = summarise_localization(df, name=name)
-            summ.update({"readout": name, "backbone": bb, "res": res, "split": "det10", "notes": notes})
-            save_localization(summ, localization_path(name, bb, res, root=out))
-            print(format_summary(summ))
+        for tag, mask, labm in subsets:
+            nm = name + tag
+            s = scores14[:, nih_idx][mask]
+            r = R.evaluate_readout(s, labm, nm, bb, res, min_pos=a.min_pos, split="det10", train_split="nih-train",
+                                   notes=notes + (" [matched-to-NIH images only]" if tag else ""), seed=0)
+            R.save_results(r, R.results_path(nm, bb, res, results_dir=out)); R.save_scores(s, R.scores_path(nm, bb, res, results_dir=out))
+            pb = r["per_bin"]
+            print(f"[20] {nm:18s} " + " ".join(f"{k}={v['auroc_macro']:.3f}({v['n_classes']})" for k, v in pb.items() if v.get("auroc_macro") is not None)
+                  + f" | all auroc={r['overall']['auroc_macro']:.3f} mAP={r['overall']['map']:.3f} n={int(mask.sum())}")
+            summary[nm] = {"overall": r["overall"], "per_bin": {k: v.get("auroc_macro") for k, v in pb.items()}, "n_images": int(mask.sum())}
+            if alpha is not None:
+                ids = labm["image_ids"]
+                bx = boxes[boxes["image_id"].isin(set(int(i) for i in ids))]
+                df = localization_table(alpha[mask][:, nih_idx], bx, labm, grid=store.grid, image_ids=ids)
+                summ = summarise_localization(df, name=nm)
+                summ.update({"readout": nm, "backbone": bb, "res": res, "split": "det10", "notes": notes})
+                save_localization(summ, localization_path(nm, bb, res, root=out))
+                print(format_summary(summ))
 
     for h in [x for x in a.heads.split(",") if x]:
         ck = Path(a.checkpoints) / f"{h}__{bb}__res{res}.pt"

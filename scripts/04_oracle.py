@@ -39,6 +39,7 @@ def main() -> None:
     p.add_argument("--manifest", default="data/coco/manifest.parquet")
     p.add_argument("--out", default="results")
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--region", choices=("inside", "outside"), default="inside", help="outside = context-only control (tokens the box read-out does not see)")
     p.add_argument("--readout-suffix", default="", help="appended to the read-out name, e.g. _s1 for seed repeats")
     p.add_argument("--force", action="store_true", help="rebuild cached oracle features")
     p.add_argument("--verbose", action="store_true")
@@ -54,7 +55,7 @@ def main() -> None:
     from lip.readouts.probe import macro_ap
     probes_script = import_module("03_probes")  # load_wh / print_bins helpers
 
-    readout = READOUT_NAME[a.neg_mode] + a.readout_suffix
+    readout = ("context" if a.region == "outside" else READOUT_NAME[a.neg_mode]) + a.readout_suffix
     stores = {s: FeatureStore(a.backbone, a.res, s, root=a.features_root) for s in SPLITS}
     labels = {s: align_labels(stores[s], load_labels(a.labels, split=s)) for s in SPLITS}
     n_classes = labels["train"]["y"].shape[1]
@@ -71,7 +72,7 @@ def main() -> None:
         seeds[s] = a.seed + 1000 * k
         feats[s], _ = cache_oracle_features(stores[s], boxes, labels[s], stats, a.neg_mode,
                                             seed=seeds[s], batch_size=a.batch_size,
-                                            force=a.force, verbose=a.verbose)
+                                            force=a.force, verbose=a.verbose, region=a.region)
         print(f"    {s:5s} oracle features {tuple(feats[s].shape)} float16 ({time.time() - t0:.0f}s)")
 
     t0 = time.time()
@@ -80,7 +81,8 @@ def main() -> None:
     fit_s = time.time() - t0
     val_map = macro_ap(labels["val"]["y"], probes.predict(feats["val"]))
     scores = probes.predict(feats["test"])
-    notes = (f"{readout}: neg_mode={a.neg_mode}; feature = mean of patch tokens in the union of "
+    notes = (f"{readout}: neg_mode={a.neg_mode}; region={a.region}; feature = mean of patch tokens "
+             f"{'OUTSIDE' if a.region == 'outside' else 'in'} the union of "
              f"GT boxes (positives) / "
              + ("class-matched random box (negatives)" if a.neg_mode == "matched"
                 else "global mean of all patches (negatives, inflated ablation)")
