@@ -238,14 +238,28 @@ companions, and recognition systems, human and artificial, exploit this
 \subsection{How our work differs}
 Each of the lines above answers part of our question. What is missing is a controlled comparison
 that holds the encoder, the tokens and the training images fixed, varies only the read-out, and
-reports performance as a function of target size. We provide that comparison on one dataset and
-one backbone, with a told-where-to-look oracle on the same tokens as the ceiling. We use an
+reports performance as a function of target size. We provide that comparison, first on one
+dataset and one backbone and then on four backbones, two radiograph box sets and CT slices,
+with a told-where-to-look oracle on the same tokens as the ceiling and its complement, a
+context-only read-out, as the floor. We use an
 attention head that contains mean pooling as a special case, so the baseline is nested in the
 model and any gain is attributable to where the head looks. Finally, we audit the head's
 attention against ground-truth boxes, which separates ``sees the object'' from ``guesses from
 context'' in a way that the AUROC curve alone cannot. Audio event detection is the natural second modality, where a ``small'' event is a brief one
 and attention pooling over frames is already standard \citep{kong2019attention,chen2023beats};
 per the feedback it is deferred until the vision result is settled.
+
+\paragraph{Tiling and distillation.}
+Slicing an image into tiles and running the detector on each is the standard remedy for small
+objects in detection \citep{akyon2022sahi}, at a cost of several forward passes per image, and
+resizing the patch embedding lets one ViT run at several patch sizes \citep{beyer2023flexivit}.
+Knowledge distillation trains a cheap student to match a stronger teacher's outputs
+\citep{hinton2015distilling}. The pre-proposal's tiled-teacher distillation combines the two:
+a teacher that sees the image at higher effective resolution, by tiling or by a larger input,
+provides soft targets for a read-out that sees the standard low-resolution tokens. In our
+setting both teacher and student act on cached tokens, so the question is whether the
+teacher's targets carry information about small targets that the image-level labels alone do
+not.
 
 % ======================================================================
 \section{Project Summary and Progress}
@@ -336,7 +350,7 @@ writes against, and committed JSON results under \fname{results/}. The steps are
 Every script is seeded, takes \texttt{--backbone}, \texttt{--res} and \texttt{--out} flags, and
 writes to the paths in the contract. Unit tests run on synthetic data without the real dataset. The code is public at
 \url{https://github.com/DhairyaShah5/lost-in-pooling}.
-Status at submission: every experiment in Section~\ref{sec:results} is complete and committed, and every figure and table is regenerated from the \texttt{results*/} JSON files by the numbered scripts; the repository has over 130 commits, 59 unit tests, and the midterm and final reports, the clinic slides and the poster are built from source in \fname{report/}, \fname{slides/} and \fname{poster/}.
+Status at submission: every experiment in Section~\ref{sec:results} is complete and committed, and every figure and table is regenerated from the \texttt{results*/} JSON files by the numbered scripts; the repository has over 110 commits, 59 unit tests, and the midterm and final reports, the clinic slides and the poster are built from source in \fname{report/}, \fname{slides/} and \fname{poster/}.
 
 % ======================================================================
 \section{Experimental Setup}
@@ -462,7 +476,7 @@ caches, bins, metrics and seeds.
 
 \paragraph{A fourth backbone: DINO ViT-B/16.}
 DINOv2 (14 px patch, self-supervised), CLIP and SigLIP (16 px, language-supervised) confound
-patch size with pretraining objective. DINO v1 ViT-B/16 \citep{caron2021emerging} is
+patch size with pretraining objective. DINO v1 ViT-B/16 \citep{caron2021dino} is
 self-supervised with a 16 px patch, so with the other three it separates the two factors.
 It runs through the full COCO suite: probes, oracle, max-MIL, the attention head and the
 multi-scale head with three seeds, and the 448 px ablation on the 5,000-image training subset.
