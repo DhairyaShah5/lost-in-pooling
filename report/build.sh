@@ -1,2 +1,2 @@
 #!/bin/sh
-cd "$(dirname "$0")" && tectonic midterm.tex
+cd "$(dirname "$0")" && tectonic final.tex

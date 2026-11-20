@@ -1,0 +1,964 @@
+% Lost in Pooling -- CSCI 566 final report (same format as the midterm report)
+% Build: ./build.sh   (tectonic final.tex, run from report/)
+% Figures are expected in report/figures/; every \includegraphics is guarded so the
+% document compiles with a grey placeholder when a figure is missing.
+% Table 1 is \input from ../results/ and is also guarded.
+\documentclass[10pt,letterpaper,twocolumn]{article}
+
+% ---------- page and fonts ----------
+\usepackage[margin=0.75in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{newtxtext,newtxmath}
+\usepackage{microtype}
+\setlength{\columnsep}{0.25in}
+
+% ---------- packages ----------
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf,skip=4pt}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.2ex plus 0.6ex minus 0.2ex}{1.0ex}
+\titlespacing*{\subsection}{0pt}{1.6ex plus 0.4ex minus 0.2ex}{0.6ex}
+\titlespacing*{\paragraph}{0pt}{1.1ex plus 0.3ex minus 0.1ex}{0.8em}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=*}
+\usepackage[numbers,sort&compress]{natbib}
+\renewcommand{\bibfont}{\footnotesize}
+\setlength{\bibsep}{1pt plus 0.3ex}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[colorlinks=true,allcolors=black,pdftitle={Lost in Pooling: Final Report},pdfauthor={Shah, Sarmukaddam, Desai, Thakur, Parasher, Kale}]{hyperref}
+
+% ---------- helper macros ----------
+% Red bold placeholder for every number / detail still to be filled.
+\newcommand{\todotext}[1]{{\color{red}\bfseries [TODO: #1]}}
+\newcommand{\todo}[1]{\ifmmode\text{\todotext{#1}}\else\todotext{#1}\fi}
+% File / identifier names with underscores, safe in captions and in \todo.
+\newcommand{\fname}[1]{\texttt{\detokenize{#1}}}
+% Grey placeholder box drawn when a figure file is absent.
+\newcommand{\figplaceholder}[2]{%
+  \colorbox{black!12}{\parbox[c][1.9in][c]{\dimexpr#2-2\fboxsep\relax}{%
+    \centering\small\color{black!60} figure not found\\[3pt]
+    {\footnotesize\ttfamily\expandafter\detokenize\expandafter{#1}}}}}
+% \guardedfig{path}{width}: includes the figure if it exists, otherwise the placeholder.
+\newcommand{\guardedfig}[2]{\IfFileExists{#1}{\includegraphics[width=#2]{#1}}{\figplaceholder{#1}{#2}}}
+
+% Paths to figure and table hooks (edit here if names change)
+\newcommand{\figBlindness}{figures/blindness_curve__dinov2_vitb14_reg__res224.pdf}
+\newcommand{\figAttention}{figures/attention_examples.png}
+\newcommand{\tabBlindness}{../results/blindness_table__dinov2_vitb14_reg__res224.tex}
+
+\raggedbottom
+\begin{document}
+
+% ======================================================================
+%  Title block and abstract, single column
+% ======================================================================
+\makeatletter
+\twocolumn[
+\begin{@twocolumnfalse}
+\begin{center}
+  {\LARGE\bfseries Lost in Pooling: Recovering Small-Signal Evidence\\[3pt]
+   Discarded by Frozen Foundation Models\par}
+  \vspace{5pt}
+  {\large\bfseries Final Report\par}
+  \vspace{12pt}
+  {\normalsize Dhairya Shah \quad Raghav Sarmukaddam \quad Yash Desai \quad
+  Prisha Thakur \quad Ansh Parasher \quad Advait Kale\par}
+  \vspace{4pt}
+  {\small\ttfamily \{dhairyad, sarmukad, ysdesai, prishath, aparashe, advaitka\}@usc.edu\par}
+  \vspace{4pt}
+  {\small University of Southern California \ \textbullet\ \ CSCI 566, Fall 2026\par}
+  \vspace{16pt}
+  {\normalsize\bfseries Abstract\par}
+  \vspace{4pt}
+\end{center}
+\begin{list}{}{\setlength{\leftmargin}{0.55in}\setlength{\rightmargin}{0.55in}}\item\relax
+\noindent
+The dominant transfer recipe freezes a large pretrained backbone, keeps its single global
+embedding, and trains a light classifier on top. Recent evidence from chest radiography shows
+that this recipe fails silently on small targets: global embeddings score at chance on small
+lesions while the same models' patch tokens, restricted to a supplied region, retain the
+signal. Following the pre-proposal feedback we built one controlled comparison and then
+expanded it. Every read-out is trained and evaluated on identical cached tokens, and
+per-class AUROC is stratified by the relative size of the largest instance. On MS-COCO 2017
+with DINOv2 ViT-B/14 the best global read-out falls from 0.99 AUROC on large targets to 0.86
+on sub-patch ones, while an oracle that pools only the ground-truth region stays at 0.97 on
+the same tokens, so the evidence survives the encoder and is lost at pooling; the same holds
+on CLIP and SigLIP ViT-B/16, with the same ordering of read-outs on each. A gated attention head trained from image-level labels only
+recovers a third of the gap (0.90; 0.91 with a multi-scale variant), lifts mAP from 0.73 to
+0.80 (0.82 multi-scale), and places 12 to 24 times chance attention mass on the target; three
+seeds and paired bootstrap tests confirm it. Doubling the input resolution helps the oracle
+but not the global read-outs: what governs global pooling is the fraction of all tokens the
+object occupies, not the patches it covers. On NIH ChestX-ray14 the cliff of the motivating
+study reappears, with global probes at 0.58 to 0.70 AUROC against 0.88 to 0.94 for the oracle
+on the same tokens, and a radiograph-adapted backbone (RAD-DINO) raises both sides without
+closing the gap; the head recovers part of it, and at 448 px it gains a further 0.04 AUROC where the global probes retrained on the same tokens gain 0.01. We explain why natural images, with
+their strong context priors, show a graded loss where radiographs show a cliff, and set out
+the plan to the final report.
+\end{list}
+\vspace{14pt}
+\end{@twocolumnfalse}
+]
+\makeatother
+
+% ======================================================================
+\section{Introduction}
+% ======================================================================
+Transfer learning with a frozen foundation model is cheap, reproducible and usually good
+enough: compute an embedding once, fit a linear probe, ship. The hidden assumption is that the
+embedding keeps whatever the downstream task needs. A recent evaluation of five chest-radiograph
+foundation models shows that this assumption can fail completely for small targets. Linear
+probes on the global (CLS) embeddings score at chance on small lesions, AUC 0.500 to 0.524,
+while probes on the same models' patch tokens restricted to a supplied region of interest are
+near perfect \citep{smalllesion2026}. The signal survives the encoder and is destroyed when the
+tokens are collapsed into one vector.
+
+Our pre-proposal asked three questions: how general is this effect, what causes it, and can it
+be recovered without extra supervision? The feedback we received (Section~\ref{sec:feedback})
+was that the plan, with seven backbones, several modalities, mechanism ablations and
+distillation, was too large for one semester, and that the causal claim needed a controlled
+experiment rather than similar curves across modalities. This report describes the project
+as rebuilt around that advice. We first ran one controlled comparison: MS-COCO 2017
+\citep{lin2014coco}, one frozen backbone, DINOv2 ViT-B/14 with registers
+\citep{oquab2024dinov2,darcet2024registers}, the CLS and patch tokens cached once, every
+read-out trained on the same cached tokens, per-class AUROC stratified by the relative area of
+the largest instance of the class, and an oracle that is told where to look as the ceiling.
+With that result in hand we expanded along the axes the feedback allowed: two further
+backbones with a different pretraining objective and patch size (CLIP and SigLIP ViT-B/16), a
+resolution ablation that tests the pre-proposal's mechanism hypothesis, a gated attention
+head trained from image-level labels alone with a localisation audit and a multi-scale
+variant, seeds and paired tests, a per-class analysis of where scene context does the work,
+and a replication on the chest radiographs that motivated the project.
+
+Section~\ref{sec:lit} reviews the related literature, Section~\ref{sec:progress} describes
+progress since the pre-proposal and our response to feedback, Section~\ref{sec:setup} fixes
+the experimental protocol, Section~\ref{sec:results} reports initial results, and
+Section~\ref{sec:plan} gives the plan to the final report. Code and results are at
+\url{https://github.com/DhairyaShah5/lost-in-pooling}.
+
+% ======================================================================
+\section{Literature Review}
+\label{sec:lit}
+% ======================================================================
+
+\subsection{Frozen features and linear probing}
+Freezing a pretrained encoder and training a linear classifier on its output is the oldest and
+still the most common way to use a foundation model. It is the standard evaluation for
+self-supervised vision models \citep{caron2021dino,oquab2024dinov2}, it is how CLIP reports
+transfer on its suite of downstream datasets \citep{radford2021clip}, and
+\citet{kornblith2019transfer} showed that ImageNet accuracy predicts linear-probe transfer
+across a wide range of target tasks. The recipe is attractive because features can be cached
+once and probes are cheap, so a hospital or a lab can evaluate a backbone on a laptop. The
+implicit assumption is that the single vector handed to the probe retains whatever the task
+needs. For whole-image categories this holds well: a frozen DINOv2 ViT-g/14 with a linear
+layer exceeds 86\% top-1 on ImageNet \citep{oquab2024dinov2}. Whether it holds when the label
+depends on a few percent of the pixels is the question this project asks.
+
+\subsection{How a ViT produces one vector}
+A vision transformer emits one token per patch plus, in the original design, a learned class
+token whose final state is read out by the classification head \citep{dosovitskiy2021vit}.
+Three global read-outs are in common use. The CLS token aggregates through self-attention
+inside the network, so what it keeps is shaped entirely by the pretraining objective. Global
+average pooling (GAP) of the patch tokens is the alternative; \citet{beyer2022betterplain}
+found that a plain ViT trained with GAP matches or slightly exceeds the CLS variant on
+ImageNet, and \citet{raghu2021vitcnn} showed that the two organise spatial information differently. The third option is a learned multihead
+attention pooling (MAP) head, a single cross-attention layer with a learned query, introduced
+for scaling ViTs \citep{zhai2022scaling} and used by SigLIP \citep{zhai2023siglip}. All three produce one fixed-size vector before any downstream task is specified. \citet{darcet2024registers} add a complication:
+large supervised and self-supervised ViTs recycle low-information background patches as
+high-norm tokens that carry global rather than local content, which corrupts the patch map;
+adding dedicated register tokens removes the artefacts and improves dense downstream tasks. We
+therefore use the register variant of DINOv2, since the patch tokens are our object of study.
+
+\subsection{Patch tokens localise objects without supervision}
+\label{sec:lit-patch}
+Self-supervised ViT features are unusually good at separating foreground from background with
+no labels. \citet{caron2021dino} observed that the CLS attention maps of DINO segment the main
+object. LOST \citep{simeoni2021lost} localises an object in a single forward pass by picking
+the patch with the fewest positive correlations to the others as a seed and growing a region of
+correlated patches, with no training at all. TokenCut \citep{wang2022tokencut} builds a graph
+over patch tokens and applies a normalised cut to separate the object from the background.
+Intermediate DINO-ViT features act as dense descriptors \citep{amir2022deepvit}. DINOv2 extended this with large-scale curated
+pretraining and reports strong linear segmentation and depth results from frozen patch tokens
+\citep{oquab2024dinov2}. The information needed to find and classify an object survives in the tokens; at issue is whether global pooling keeps it.
+
+\subsection{Small objects, scale and resolution}
+Small objects are the hardest case for detectors: scale variation dominates detection error
+\citep{singh2018snip}, slicing inference recovers small objects by running the detector on
+overlapping tiles at the cost of several forward passes \citep{akyon2022sahi}, and benchmarks
+are stratified by absolute object size \citep{cheng2023smallobject}. For ViTs the relevant knob
+is the patch size \citep{beyer2023flexivit}, and DINOv2 raises its input resolution to 518 px
+for the final epochs to sharpen patch features \citep{oquab2024dinov2}. All of these act before
+or inside the encoder. Our question is complementary: given a fixed encoder at a fixed
+resolution, how much of the small-object signal is lost \emph{after} the encoder, at the
+aggregation step, and does resolution change that?
+
+\subsection{Multiple-instance learning pooling}
+Multiple-instance learning (MIL) treats an image as a bag of instances with a single bag label
+\citep{dietterich1997mil}. The pooling function is the main design choice. Max pooling selects
+one instance and encodes the classic MIL assumption that a positive bag contains at least one
+positive instance; mean pooling spreads responsibility over the bag
+\citep{wang2018revisiting}. \citet{ilse2018attention} proposed attention-based MIL,
+where a two-layer network with a gated $\tanh$/sigmoid nonlinearity produces instance weights
+that sum to one and the bag embedding is the weighted sum, so the weights double as an
+interpretable map. This is now the standard aggregator over frozen tile features in
+computational pathology: \citet{campanella2019clinical} train a clinical-grade classifier with
+max-MIL over tile features, and CLAM \citep{lu2021clam} uses class-specific gated attention
+over frozen tile embeddings with instance-level clustering as a regulariser. A whole-slide image
+is the extreme case of our problem, a tumour of a few tiles in a bag of tens of thousands, and
+the pathology literature already contains the pattern we want to test on natural images: frozen
+encoder, learned pooling, image-level labels only.
+
+\subsection{Size-stratified evaluation and the motivating paper}
+COCO reports average precision separately for small (area below $32^2$ pixels), medium and
+large objects \citep{lin2014coco}, and most detection papers follow;
+\citet{cheng2023smallobject} argue for finer stratification. Classification benchmarks almost never stratify by target size, although in medical imaging the clinically important finding is often small. ChestX-ray8 \citep{wang2017chestxray8} introduced weakly supervised
+classification and localisation of thorax diseases from image-level labels, and foundation
+models for the domain now include BiomedCLIP \citep{zhang2023biomedclip} and RAD-DINO
+\citep{perezgarcia2025raddino}. The paper that motivates us evaluated frozen global embeddings
+of five such models on small lesions and found AUC at chance (0.500 to 0.524), while patch
+tokens inside a supplied region of interest retained near-perfect signal
+\citep{smalllesion2026}; it concludes that pre-deployment evaluation must stratify by lesion
+size. Whether the effect is specific to radiographs, where the lesion is subtle and the rest of
+the image is uninformative about it, or a general property of global pooling, is open. Context
+is the obvious confound on natural images: objects co-occur with predictable scenes and
+companions, and recognition systems, human and artificial, exploit this
+\citep{oliva2007context}.
+
+\subsection{How our work differs}
+Each of the lines above answers part of our question. What is missing is a controlled comparison
+that holds the encoder, the tokens and the training images fixed, varies only the read-out, and
+reports performance as a function of target size. We provide that comparison on one dataset and
+one backbone, with a told-where-to-look oracle on the same tokens as the ceiling. We use an
+attention head that contains mean pooling as a special case, so the baseline is nested in the
+model and any gain is attributable to where the head looks. Finally, we audit the head's
+attention against ground-truth boxes, which separates ``sees the object'' from ``guesses from
+context'' in a way that the AUROC curve alone cannot. Audio event detection is the natural second modality, where a ``small'' event is a brief one
+and attention pooling over frames is already standard \citep{kong2019attention,chen2023beats};
+per the feedback it is deferred until the vision result is settled.
+
+% ======================================================================
+\section{Project Summary and Progress}
+\label{sec:progress}
+% ======================================================================
+
+\subsection{Response to pre-proposal feedback}
+\label{sec:feedback}
+The pre-proposal was graded 5/5 with four pieces of feedback. We list each and what we changed.
+
+\begin{itemize}
+\item \textbf{Scope.} Seven backbones, several modalities, mechanism ablations and distillation
+  were judged too much for one semester, with the advice to do the pooling comparison first on
+  one image dataset and one backbone using the same frozen tokens, then expand. We did exactly
+  this, in that order. The core study is MS-COCO 2017 with DINOv2 ViT-B/14 (registers) at
+  224 px; once its result was in we added CLIP and SigLIP, the resolution ablation and the NIH
+  ChestX-ray14 replication, all on the same harness. Audio and distillation remain deferred.
+  LUNA16 was dropped outright: it is 3D CT, the notion of relative box area does not carry
+  over cleanly to volumes, and it would not answer the question any better than COCO.
+\item \textbf{The causal claim.} Similar curves across modalities do not show that pooling
+  caused the failure. Our design is now a within-subjects comparison: identical cached tokens,
+  identical train/validation/test images, identical optimiser and early-stopping rule; only the
+  read-out changes. Any difference in the size curve is therefore attributable to the read-out,
+  and the oracle read-out on the same tokens bounds how much signal the tokens carry at each
+  size. We will not use cross-modality similarity as evidence of mechanism.
+\item \textbf{The size-based evaluation is useful on its own.} We agree and built the
+  evaluation harness as a standalone module with a file contract, so that the blindness curve
+  for the fixed read-outs is a deliverable independent of whether the learned head helps.
+\item \textbf{Keep negative findings specific.} Every result in this report is stated for a
+  named backbone, input resolution, dataset and training set (Section~\ref{sec:setup}), and
+  where a result holds on one dataset and not the other we say so
+  (Section~\ref{sec:cxr-results}).
+\end{itemize}
+
+\subsection{Design decisions and their reasons}
+\paragraph{Dataset: MS-COCO 2017.}
+Every non-crowd instance has a bounding box, so relative size is defined for every positive;
+80 classes give enough per-bin positives for a macro average; roughly 40\% of instances are
+``small'' under the official definition \citep{lin2014coco}; and the data are public, which
+keeps the pipeline reproducible by anyone with a laptop. The known cost is context priors
+(Section~\ref{sec:discussion}), which we address with the oracle gap and the localisation
+audit rather than by pretending they do not exist.
+
+\paragraph{Backbone: DINOv2 ViT-B/14 with registers, frozen.}
+Self-supervised, so no COCO label leaks into the encoder; patch tokens that are known to
+localise objects; register tokens that remove the high-norm artefacts
+\citep{darcet2024registers}; and a ViT-B that fits the compute we have, a single
+Apple-silicon laptop with 16 GB of unified memory (measured throughput: 38 images per second at 224 px).
+
+\paragraph{Input handling: squash-resize to $224\times224$, no crop.}
+A centre crop would discard boxes near the border; squashing keeps every box inside the token
+grid at the price of a distortion that affects every read-out equally. The backbone runs once
+per image and every read-out, including the attention head, reads the same fp16 cache, which
+is what makes the comparison same-token by construction.
+
+\subsection{Pipeline and repository}
+The repository is organised as a small library \fname{src/lip/} with numbered scripts under \fname{scripts/} that run in order, a
+written data and feature contract (\fname{docs/CONTRACTS.md}) that every module reads and
+writes against, and committed JSON results under \fname{results/}. The steps are:
+\begin{enumerate}
+\item \textbf{Data.} COCO 2017 annotations, all 5,000 val2017 images and a seeded
+  10,000-image subset of train2017; one manifest row per image with split and size; an
+  $N\times80$ presence matrix and an $N\times80$ matrix of largest-instance box-area fractions;
+  a boxes table in normalised coordinates (crowd annotations ignored).
+\item \textbf{Feature cache.} Each backbone on the MPS backend, squash-resize and the model's
+  own normalisation, fp16 memmap writer, one directory per backbone, resolution and split.
+\item \textbf{Fixed read-outs.} CLS, mean, CLS+mean, per-dimension max, max-MIL and oracle
+  region pooling, each with a linear probe trained by joint binary cross-entropy with early
+  stopping on the 1,000-image validation split.
+\item \textbf{Learned head.} Gated attention MIL head over the memmapped tokens with an
+  entropy regulariser, plus the localisation metrics.
+\item \textbf{Evaluation and figures.} Per-class per-bin AUROC, macro average, bootstrap
+  confidence intervals, overall AUROC and mAP, results JSON, the blindness-curve figure and
+  the per-bin table; paired bootstrap, per-class, seed and cross-backbone analyses as further
+  scripts.
+\item \textbf{Chest radiograph arm.} A manifest builder that writes NIH ChestX-ray14 into the
+  same contract (14 findings, box area over the frame as size, patient-disjoint splits) and a
+  cross-validated read-out script for the boxed images, so every script above runs unchanged
+  with different paths.
+\end{enumerate}
+Every script is seeded, takes \texttt{--backbone}, \texttt{--res} and \texttt{--out} flags, and
+writes to the paths in the contract. Unit tests run on synthetic data without the real dataset. The code is public at
+\url{https://github.com/DhairyaShah5/lost-in-pooling}.
+Status at submission: every experiment in Section~\ref{sec:results} is complete and committed, and every figure and table is regenerated from the \texttt{results*/} JSON files by the numbered scripts.
+
+% ======================================================================
+\section{Experimental Setup}
+\label{sec:setup}
+% ======================================================================
+
+\subsection{Data and splits}
+Test set: all 5,000 COCO val2017 images. Training data: a seeded 10,000-image subset of
+train2017, split 9,000/1,000 into \emph{train} (probe fitting) and \emph{val} (model selection
+and early stopping only). No test image is seen during training or selection. Labels are
+80-way multi-label presence; category index follows ascending COCO category id.
+
+\paragraph{Chest radiographs (NIH ChestX-ray14).}
+To test the motivating domain we add NIH ChestX-ray14 \citep{wang2017chestxray8}: 14 findings as
+image-level labels, and 984 radiologist boxes for 8 findings on 880 images. We fetched 40,880
+of the 112,120 images (all 880 boxed ones plus a seeded random subset) and use 23,839 of them
+here. Test = the 880 boxed images; train/val = 20,721/2,238 images, patient-disjoint from test
+(images sharing a patient with a test image are dropped). Size = box area over the $1024^2$
+frame. A pair that carries a finding label but no box counts as a positive overall and enters
+no size bin. Because the training images have no boxes, the oracle cannot be fitted on them;
+Section~\ref{sec:cxr-protocol} gives the cross-validated protocol.
+\subsection{Backbones and feature cache}
+\label{sec:backbones}
+Primary: DINOv2 ViT-B/14 with four register tokens, frozen, input squash-resized to
+$224\times224$ with ImageNet normalisation; we keep the final-layer-norm CLS token
+$z_0\in\mathbb{R}^{768}$ and the $P=256$ patch tokens in row-major grid order, and discard the
+register tokens. To test whether the pattern depends on the pretraining objective or the
+patch size we add two backbones with a 16-pixel patch ($14\times14=196$ tokens at 224 px, one
+patch $=0.51\%$ of the image): CLIP ViT-B/16 \citep{radford2021clip}, language-supervised,
+whose global vector is the post-layer-norm CLS token and whose patch tokens we take after the
+same layer norm; and SigLIP ViT-B/16 \citep{zhai2023siglip}, which has no CLS token and whose
+global vector is a learned multihead attention-pooling (MAP) head, so its ``CLS'' read-out is
+already a trained attention pool over the patches. For the radiographs we use DINOv2 and
+RAD-DINO \citep{perezgarcia2025raddino}, a DINOv2-B/14 continued-pretrained on chest X-rays
+(no registers). Every backbone is cached once per image as fp16 (global token plus patch
+tokens), and all read-outs of a backbone read the same cache.
+\subsection{Size variable, bins and box-to-patch mapping}
+\label{sec:bins}
+For class $c$ in image $n$ the size variable is $s_{n,c}=\max_{k}\,\mathrm{area}(b_k)/(W H)$
+over the non-crowd instances $b_k$ of class $c$, binned at 0.1\%, 0.3\%, 1\%, 3\% and 10\%
+of the image area ($<0.1\%$, 0.1--0.3\%, 0.3--1\%, 1--3\%, 3--10\%, $>10\%$). A patch is \emph{inside} a box if its centre lies in the
+box; a sub-patch box that contains no patch centre is assigned the single patch containing the
+box centre, so every positive has at least one inside patch.
+
+\subsection{Read-outs compared on identical tokens}
+Each read-out maps the cached tokens of an image to 80 class scores. With $\bar z =
+\frac{1}{P}\sum_i z_i$:
+\begin{align*}
+\text{CLS:}&\quad s_c = w_c^{\top} z_0 + b_c,\\
+\text{mean:}&\quad s_c = w_c^{\top} \bar z + b_c,\\
+\text{CLS+mean:}&\quad s_c = w_c^{\top} [z_0;\bar z] + b_c,\\
+\text{max:}&\quad s_c = w_c^{\top} \big(\max_i z_{i,\cdot}\big) + b_c \ \text{(per dimension)},\\
+\text{max-MIL:}&\quad s_c = \max_i \big(w_c^{\top} z_i + b_c\big),\\
+\text{oracle:}&\quad s_c = w_c^{\top}\Big(\tfrac{1}{|B_{n,c}|}\textstyle\sum_{i\in B_{n,c}} z_i\Big) + b_c .
+\end{align*}
+The first four are linear probes on a fixed global vector. Max-MIL scores every patch with the
+same linear scorer and keeps the maximum, the classic instance-level MIL read-out. The oracle
+pools only the patches $B_{n,c}$ inside the ground-truth boxes of class $c$; for negative
+images, which have no box, we draw a random box whose area is sampled from that class's
+positive box-area distribution, so the probe cannot learn box statistics and the oracle
+measures only whether the tokens inside a region of the right size carry the class. It is the
+told-where-to-look upper bound on the same tokens.
+
+\subsection{Gated attention MIL head}
+Following \citet{ilse2018attention} with class-specific attention as in CLAM
+\citep{lu2021clam}, the head computes for each patch a gated hidden state
+$h_i = \tanh(Vz_i)\odot\sigma(Uz_i)$, $h_i\in\mathbb{R}^{L}$, class-specific attention
+$a_{i,c} = \mathrm{softmax}_i\big(u_c^{\top} h_i\big)$, a class-specific bag embedding
+$g_c=\sum_i a_{i,c}\, z_i$ and a score $s_c = \theta_c^{\top} g_c + b_c$. With $L=256$ the
+head has 475,728 parameters and sees image-level labels only. The loss is joint binary
+cross-entropy plus an entropy term on the attention of the classes present in the image,
+\begin{equation*}
+\mathcal{L} = \mathrm{BCE}(s, y) + \lambda\,\frac{1}{|C_n|}\sum_{c\in C_n}\frac{H(a_{\cdot,c})}{\log P},
+\end{equation*}
+where $H$ is the Shannon entropy, so the term lies in $[0,1]$ and $\lambda>0$ discourages the
+degenerate uniform solution. That uniform solution, $a_{i,c}=1/P$ for all $i$, gives
+$g_c=\bar z$, so the head reduces exactly to the mean-pooling probe: mean pooling is a nested
+special case that the head can always fall back to (it is the $\lambda\to-\infty$ limit). We
+sweep $\lambda\in\{0, 0.01, 0.1\}$.
+
+\subsection{Evaluation protocol}
+For class $c$ and bin $b$, AUROC is computed with positives the test images whose largest
+instance of $c$ falls in $b$ and negatives \emph{all} test images without class $c$; the
+negatives are shared across bins so that bins differ only in the positives. The per-bin score
+is the macro average over classes with at least 10 positives in that bin. A 95\% confidence
+interval comes from a bootstrap over images (500 draws). We also report overall macro AUROC
+and mAP with all sizes pooled. For the attention head we add two localisation metrics per bin:
+attention mass inside the ground-truth boxes, $m_{n,c}=\sum_{i\in B_{n,c}} a_{i,c}$, compared
+with its chance level $|B_{n,c}|/P$, and pointing-game accuracy, the fraction of positives
+whose arg-max patch lies inside a box.
+
+\subsection{Training details}
+Linear probes are trained with AdamW (learning rate $10^{-3}$, weight decay $10^{-4}$, batch
+512, 40 epochs, cosine schedule) on standardised features, keeping the epoch with the best
+validation mAP; seed 0 throughout. Max-MIL uses the same optimiser with batch 128 for up to 15
+epochs with patience 3. The oracle probes are per-class logistic regressions (L-BFGS, $C=1$)
+with train negatives subsampled to 3,000 per class. The attention head is trained with AdamW
+(learning rate $10^{-3}$, weight decay $10^{-4}$, batch 128, up to 20 epochs, patience 5) with
+the same selection rule. All experiments run on one Apple-silicon laptop (M4, 16 GB). Feature
+extraction runs at 38 images/s at 224 px and 10 images/s at 448 px, so the 224 px cache of all
+15,000 images takes about seven minutes and occupies 5.5 GB in fp16; every probe then trains
+in well under a minute. Caches at 336 and 448 px cover the test split and a 5,000-image
+training subset.
+
+\subsection{Chest radiograph protocol}
+\label{sec:cxr-protocol}
+The NIH training images carry labels but no boxes, so two protocols are run. (i) Image-level
+training as on COCO: CLS, mean, max, max-MIL and the attention head are trained on the 20,721
+training images and evaluated per size bin on the 880 boxed images. (ii) Cross-validation on
+the boxed images, following the motivating study: CLS, mean, max and the oracle are each
+fitted as per-class logistic regressions with 5-fold patient-disjoint cross-validation over
+the 880 boxed images, so all four see identical training images and the oracle gap is a
+same-data comparison; positives are boxed pairs, negatives are images without the finding
+label, and unboxed positives are excluded from fitting. With 79 to 180 boxed images per
+finding the bins are thin, so for this arm we lower the per-bin threshold to 5 positives per
+class and report the number of contributing findings.
+
+% ======================================================================
+\section{Results}
+\label{sec:results}
+% ======================================================================
+
+\begin{table*}[t]
+\centering\small
+\caption{Macro AUROC per size bin (95\% bootstrap CI) and overall AUROC/mAP for each read-out
+on identical DINOv2 ViT-B/14-reg tokens at 224 px, COCO val2017. Generated by the evaluation
+script into \fname{results/blindness_table__dinov2_vitb14_reg__res224.tex}; the best
+non-oracle read-out per column is in bold.}
+\label{tab:blindness}
+\IfFileExists{\tabBlindness}{\input{\tabBlindness}}{%
+  \colorbox{black!12}{\parbox[c][0.9in][c]{0.9\textwidth}{\centering\small\color{black!60}
+  table not found\\[3pt]{\footnotesize\ttfamily\detokenize{../results/blindness_table__dinov2_vitb14_reg__res224.tex}}}}}
+\end{table*}
+
+\subsection{Dataset statistics}
+The 5,000 test images contain 14,631 positive (image, class) pairs: 637 whose largest instance
+is under 0.1\% of the image, 1,149 at 0.1--0.3\%, 2,037 at 0.3--1\%, 2,324 at 1--3\%, 3,045 at
+3--10\% and 5,439 above 10\%; in these bins 19, 30, 50, 62, 68 and 71 classes clear the
+10-positive threshold for the macro average. The 9,000 training images contribute 26,202
+pairs with the same shape (counts in \texttt{results/dataset\_stats.json}).
+\subsection{The blindness curve}
+Figure~\ref{fig:blindness} plots macro AUROC against size bin for every read-out on the same
+tokens, and Table~\ref{tab:blindness} gives the numbers with confidence intervals.
+
+\begin{figure}[t]
+\centering
+\guardedfig{\figBlindness}{\columnwidth}
+\caption{Blindness curve for DINOv2 ViT-B/14-reg at 224 px on COCO val2017: macro AUROC per
+size bin for each read-out trained on identical cached tokens. Shaded bands are 95\%
+bootstrap intervals over images. The dotted vertical line marks the area of one patch
+(0.39\%). The oracle is drawn in black; the learned head shares the axes with the fixed
+read-outs. Per-bin class counts ($n$) are printed under the axis.}
+\label{fig:blindness}
+\end{figure}
+
+\paragraph{Global read-outs.}
+All four global read-outs fall monotonically with target size. Mean pooling, the best of them,
+scores 0.992 in the $>10\%$ bin and 0.862 in the $<0.1\%$ bin, a drop of 0.13 AUROC; CLS is
+lower throughout (0.978 down to 0.832, a drop of 0.15), and CLS+mean (0.990 to 0.843) and
+per-dimension max pooling (0.991 to 0.846) sit between the two. The decline begins before the
+one-patch boundary: in the 0.3--1\% bin, where the object spans one to two patches, every
+global read-out is already about 0.06 below its large-object value. No read-out approaches
+chance in any bin, unlike the chest-radiograph cliff. Contrary to what the MIL literature
+would predict, max pooling does not hold up better than mean pooling on sub-patch targets
+(0.846 vs.\ 0.862), and max-MIL, whose per-patch scorer should in principle detect a single
+firing patch, is marginally below mean pooling there (0.851) and clearly worse on large
+targets (0.945); its validation mAP peaked after the first epoch, so with a linear scorer and
+9,000 training images the top-1 instance rule is a harder estimation problem than averaging,
+not a better aggregator.
+
+\paragraph{Oracle gap.}
+The oracle, which pools only the patches under the ground-truth boxes, stays above 0.97 in
+every bin: 0.973 in the $<0.1\%$ bin and 0.989 in the 0.1--0.3\% bin, against 0.862 and 0.918
+for mean pooling. The gap between the oracle and the best global read-out is therefore
+0.11 AUROC for sub-patch targets, 0.06 for targets of one to two patches, and under 0.01 for
+targets above 10\% of the image. Because the oracle reads the same cached tokens as the global
+probes, the evidence for sub-patch objects survives the encoder at 224 px and is lost at
+aggregation, which is the controlled comparison the pre-proposal feedback asked for. The
+matched-negative design matters: if negatives are instead given the global mean of all
+patches (\texttt{oracle\_globalneg} in \texttt{results/}), the oracle rises to 0.988 on
+sub-patch targets and 0.992 mAP overall (vs.\ 0.944), because the probe can then separate
+box-pooled from globally pooled statistics without reading content. We report the matched
+version as the upper bound.
+
+\paragraph{Resolution ablation.}
+If the loss were in the encoder, giving it more pixels per object should help every read-out.
+We re-extracted the test split and a 5,000-image training subset at 448 px ($32\times32$ grid,
+one patch $=0.098\%$, so the $<0.1\%$ bin is now about one patch and the 0.1--0.3\% bin spans
+one to three patches) and trained the same probes; the 224 px probes in
+Table~\ref{tab:resolution} are retrained on the same 5,000 images so that only the resolution
+differs. The oracle improves in every small bin (0.973 to 0.994 for sub-patch targets), so the
+tokens at 448 px carry more evidence about small objects. The global read-outs do not move:
+CLS, mean and max change by at most 0.008 in the three smallest bins. Four times as many tokens
+now describe the same object, and four times as many describe everything else, so the pooled
+vector dilutes the object by the same factor. For DINOv2 ViT-B/14 on COCO, resolution fixes the
+encoder's view of small objects but not the aggregation's.
+
+\begin{table}[t]
+\centering\small
+\caption{Resolution ablation, macro AUROC on COCO val2017. Both columns per bin use probes
+trained on the same 5,000 training images; the oracle uses all available training positives
+(9,000 images at 224 px, 5,000 at 448 px), which if anything disadvantages 448 px.}
+\label{tab:resolution}
+\begin{tabular}{l cc cc cc}
+\toprule
+ & \multicolumn{2}{c}{$<0.1\%$} & \multicolumn{2}{c}{0.1--0.3\%} & \multicolumn{2}{c}{0.3--1\%} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Read-out & 224 & 448 & 224 & 448 & 224 & 448 \\
+\midrule
+CLS    & 0.824 & 0.828 & 0.888 & 0.890 & 0.909 & 0.914 \\
+Mean   & 0.853 & 0.858 & 0.917 & 0.921 & 0.928 & 0.936 \\
+Max    & 0.843 & 0.837 & 0.905 & 0.906 & 0.918 & 0.927 \\
+\midrule
+Oracle & 0.973 & \textbf{0.994} & 0.989 & \textbf{0.996} & 0.992 & \textbf{0.999} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Which size variable governs the loss?}
+The pre-proposal predicted that the cliff tracks the ratio of target extent to patch area, so
+that curves for different resolutions should coincide when plotted against the number of
+patches an object covers. Figure~\ref{fig:patchunits} tests this with 224, 336 and 448 px
+results on the same images (probes trained on the same 5,000 images at every resolution).
+For the oracle the prediction holds: at equal patch coverage the three curves coincide (an
+object covering one to two patches scores 0.991, 0.995 and 0.995). For the global read-outs
+it fails in a specific direction: at equal patch coverage the curves order themselves by
+token count, with 448 px below 336 px below 224 px (mean pooling 0.936, 0.915 and 0.910 for
+one to two patches; 0.969, 0.959 and 0.947 for 8 to 16 patches), because an object covering
+the same number of patches is a smaller fraction of 576 or 1,024 tokens than of 256. What governs the region read-out is how many patches see the object;
+what governs the global read-out is what fraction of all tokens the object occupies, and
+raising the resolution improves the first while leaving the second unchanged. The second
+quantity can be computed from the box statistics of a dataset and the token count of a
+backbone without running the model, which is the pre-deployment check we will formalise in
+the final report.
+
+\begin{figure}[t]
+\centering
+\guardedfig{figures/patch_units__dinov2_vitb14_reg.pdf}{\columnwidth}
+\caption{Macro AUROC against the largest instance's size in patches covered, DINOv2 ViT-B/14-reg
+on COCO val2017 at 224 px (solid), 336 px (dotted) and 448 px (dashed), probes trained on the
+same 5,000 images at every resolution. Mean pooling and the oracle are drawn; CLS and max
+follow mean pooling and are in \texttt{results/}. The oracle curves coincide; the global
+read-out orders itself by token count, because the same patch coverage is a smaller fraction
+of more tokens. Bands: 95\% bootstrap over images (200 draws).}
+\label{fig:patchunits}
+\end{figure}
+
+\subsection{Learned head and localisation}
+\begin{figure*}[t]
+\centering
+\guardedfig{\figAttention}{\textwidth}
+\caption{Class-specific attention of the gated head ($\lambda=0$) for six test images whose
+largest instance of the named class covers 0.15--0.30\% of the image (sub-patch to one patch).
+Top: the squash-resized input with the ground-truth boxes of that class in white. Bottom: the
+class's attention map on the $16\times16$ grid, normalised by its maximum. The head finds the
+surfer, the traffic light, the glove and the clock; it lands one patch beside the bird; and for
+the tennis racket it attends to the player's body, a context cue, not the target.}
+\label{fig:attention}
+\end{figure*}
+
+\begin{table}[t]
+\centering\small
+\caption{Localisation audit of the attention head per size bin: mean attention mass inside the
+ground-truth boxes versus its chance level (box area as a fraction of the grid), and
+pointing-game accuracy (arg-max patch inside a box). $\lambda=0$; $n$ is the number of
+positive (image, class) pairs. \emph{Uniform} attention would score exactly the chance column.}
+\label{tab:localisation}
+\begin{tabular}{lrrrrr}
+\toprule
+Bin & $n$ & Mass in box & Chance & Ratio & Pointing \\
+\midrule
+$<0.1\%$     & 637   & 0.088 & 0.007 & 12.1 & 0.129 \\
+0.1--0.3\%   & 1,149 & 0.195 & 0.008 & 23.5 & 0.260 \\
+0.3--1\%     & 2,037 & 0.304 & 0.013 & 23.7 & 0.382 \\
+1--3\%       & 2,324 & 0.447 & 0.030 & 15.0 & 0.515 \\
+3--10\%      & 3,045 & 0.636 & 0.086 & 7.4  & 0.715 \\
+$>10\%$      & 5,439 & 0.813 & 0.410 & 2.0  & 0.842 \\
+\midrule
+All          & 14,631 & 0.567 & 0.178 & 3.2 & 0.623 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Learned head.}
+Figure~\ref{fig:blindness} and Table~\ref{tab:blindness} include the gated attention head at
+$\lambda=0$. It beats every fixed read-out in every bin below 10\%: 0.899 on sub-patch targets
+against 0.862 for mean pooling and 0.973 for the oracle, closing a third of the oracle gap
+there, a fifth in the 0.1--0.3\% bin and a third in the 0.3--1\% bin; it raises overall mAP from
+0.734 (mean) and 0.758 (CLS+mean) to 0.800. On targets above 10\% it sits 0.006 below mean
+pooling, the price of a class-specific attention that no longer averages over the whole object.
+An entropy sweep over $\lambda\in\{-0.1, 0, 0.01, 0.1\}$ (normalised entropies 0.90, 0.44, 0.29, 0.06; full results in \texttt{results/}) shows that a strong sharpening term ($\lambda=0.1$) collapses the attention onto a few patches and both AUROC and mAP fall, while pushing towards uniform ($\lambda=-0.1$) gives the best per-bin AUROC of the sweep (0.908 on sub-patch targets) at lower mAP (0.790) with attention mass on small targets only 3.6 times chance: mean pooling with a mild class-specific tilt that ranks images well without looking at the object much. The
+$\lambda=0$ head is the one that both improves on mean pooling and localises, so we report it
+as the main result; the trade-off between ranking and localisation is itself a finding we will
+pursue with the multi-scale variant.
+
+\paragraph{Localisation audit.}
+Table~\ref{tab:localisation} shows that the head's attention sits on the target far more often
+than chance in every bin. For sub-patch targets ($<0.1\%$) the mean attention mass inside the
+boxes is 0.088 against a chance level of 0.007, a 12-fold ratio, and the arg-max patch lies
+inside a box for 13\% of positives; for targets of 0.1--1\% the ratio rises to 24 and pointing
+accuracy to 26--38\%; for large targets the mass inside the box reaches 0.81 and pointing
+accuracy 84\%. The absolute mass on sub-patch targets is still small, which is consistent with
+Figure~\ref{fig:attention}: on the smallest objects the head often lands one patch beside the
+box or on a correlated object (the player rather than the racket), and the box itself covers at
+most one of 256 patches. The attention is nevertheless far from uniform: its normalised entropy
+settles at 0.43 during training (uniform $=1$), so the head is not re-deriving mean pooling.
+
+\paragraph{Robustness and variants.}
+Three seeds of the $\lambda=0$ head give sub-patch AUROC 0.899, 0.891 and 0.889 (mean 0.893, s.d.\ 0.005) and mAP 0.800, 0.802 and 0.798; three seeds of the CLS and mean probes give $0.836\pm0.004$ and $0.864\pm0.003$, so the gain over mean pooling is not a seed effect. Max-MIL with top-8 instead of top-1 pooling improves (0.958 on large targets, mAP 0.654) but stays below mean pooling in every bin. The multi-scale head
+(\texttt{attn\_ms}), which attends jointly over the $16\times16$ grid and its $2\times$ and
+$4\times$ average-pooled versions (336 tokens with learned scale embeddings, 478k parameters),
+is the best read-out we trained: $0.904\pm0.004$ on sub-patch targets over three seeds (0.908 for seed 0), 0.948 and 0.963 in the next two bins, 0.990 on large targets (level with mean pooling), overall AUROC 0.973 and mAP $0.815\pm0.002$, with
+attention mass on sub-patch targets 16 times chance and pointing accuracy 0.195 (vs.\ 0.129
+for the single-scale head). It closes 41\% of the oracle gap on sub-patch targets, 42\% in the
+0.1--0.3\% bin and 55\% in the 0.3--1\% bin, so letting the head choose its scale helps exactly
+where the single-scale head was weakest, and it does so while looking at the object more, not
+less.
+
+\paragraph{Paired tests.}
+Because every read-out scores the same test images, differences can be tested with a paired
+bootstrap over images (500 draws, same resample for both read-outs). The $\lambda=0$ head beats
+mean pooling by $+0.037$ AUROC on sub-patch targets (95\% CI $+0.018$ to $+0.055$) and by
+$+0.014$ to $+0.023$ in the next three bins (every interval excludes zero), and is $0.005$
+worse on targets above 10\% (CI $-0.009$ to $-0.002$); overall mAP gains $+0.066$ ($+0.058$ to
+$+0.074$). The oracle's margin over mean pooling is $+0.111$ ($+0.094$ to $+0.129$) on
+sub-patch targets and shrinks monotonically to $+0.005$ on large ones.
+
+\subsection{Which classes does pooling lose?}
+\label{sec:perclass}
+Figure~\ref{fig:perclass} and Table~\ref{tab:perclass} break the small-target result down by
+class (positives whose largest instance is under 0.3\% of the image; 41 classes have at least
+10 such test positives). The oracle is above 0.92 for every class, so the tokens carry every
+class's small instances. The mean probe spreads from 0.46 (banana) to 1.00 (tennis racket):
+the classes it loses are objects that appear in unpredictable scenes (banana, motorcycle,
+suitcase, orange, apple, boat), and the classes it keeps are the sports equipment whose scene
+predicts it (tennis racket, kite, baseball glove and bat, skis, surfboard). The Spearman
+correlation between a class's mean-probe small-target AUROC and its oracle gap is $-0.98$; the
+gap averages 0.11 (median 0.08). The head's gain is largest exactly where the gap is largest
+(rank correlation $+0.85$; banana 0.46 to 0.90, apple 0.76 to 0.90, motorcycle 0.61 to 0.73)
+and is positive for 76\% of classes. This makes the context-prior story concrete: averaging
+over patches keeps the scene and drops the object, and whether that matters for a class
+depends on how much the scene already says about it.
+
+\begin{figure}[t]
+\centering
+\guardedfig{figures/perclass__dinov2_vitb14_reg__res224.pdf}{0.92\columnwidth}
+\caption{Per-class AUROC on small targets ($<0.3\%$ of the image), DINOv2 ViT-B/14-reg at
+224 px: mean-pooling probe (x) against the oracle on the same tokens (y). Point size is the
+number of small positives. Every class sits above the diagonal; the farther left, the more the
+global vector depends on scene context for that class.}
+\label{fig:perclass}
+\end{figure}
+
+\begin{table}[t]
+\centering\footnotesize\setlength{\tabcolsep}{4pt}
+\caption{Classes with the largest and smallest oracle gap on small targets. $n$: small test
+positives; columns are AUROC of the mean probe, the $\lambda=0$ head and the oracle; gap =
+oracle $-$ mean.}
+\label{tab:perclass}
+\IfFileExists{../results/perclass_table__dinov2_vitb14_reg__res224.tex}{\input{../results/perclass_table__dinov2_vitb14_reg__res224.tex}}{\todo{per-class table missing}}
+\end{table}
+
+\subsection{Does the pattern depend on the backbone?}
+\label{sec:backbones-results}
+Figure~\ref{fig:backbones} and Table~\ref{tab:backbones} repeat the comparison on CLIP
+ViT-B/16 and SigLIP ViT-B/16, two backbones with a different pretraining objective (language
+supervision) and a different patch size (16 px, one patch $=0.51\%$ of the image), on the same
+images and with the same harness. Three things hold across all three backbones. First, the
+global read-outs lose the same amount: the best global read-out scores 0.862 (DINOv2), 0.838
+(CLIP) and 0.847 (SigLIP) on sub-patch targets, from about 0.99 on large ones, and the CLS
+probes are within 0.01 of each other (0.832, 0.832, 0.824). SigLIP's global vector is already a
+learned attention pool (its MAP head) and it is no better on small targets than DINOv2's CLS
+token, so a pooling head trained inside the backbone does not by itself solve the problem.
+Second, the oracle stays far above the global read-outs on every backbone, so the loss is at
+aggregation for all three, but the amount of evidence in the tokens differs: the oracle
+reaches 0.973 on DINOv2 against 0.935 on CLIP and 0.934 on SigLIP, and its gap to mean
+pooling is 0.11, 0.10 and 0.09. Self-supervised patch tokens carry the most small-object
+evidence, which matches the object-discovery literature on DINO features
+(Section~\ref{sec:lit-patch}). Third, the attention head recovers part of the gap on every
+backbone. Over three seeds its sub-patch AUROC is $0.893\pm0.005$ on DINOv2, $0.892\pm0.016$
+on CLIP and $0.875\pm0.007$ on SigLIP, against 0.862, 0.838 and 0.847 for mean pooling, so it
+closes about 30\%, 55\% and 30\% of the respective oracle gaps (mAP 0.741 vs.\ 0.691 on CLIP,
+0.743 vs.\ 0.729 on SigLIP), with weaker localisation than on DINOv2 (attention mass 7 and
+6.5 times chance vs.\ 12). The three heads land within 0.02 of each other on sub-patch
+targets although their oracles differ by 0.04 in the other direction, so the head is limited
+more by what it can learn from image-level labels than by what the tokens contain. The multi-scale head is the best read-out on all three backbones
+(0.908, 0.913 and 0.878 on sub-patch targets; mAP 0.816, 0.747 and 0.775), so choosing the
+scale helps regardless of how the tokens were pretrained. Max-MIL is the one read-out whose behaviour changes qualitatively: it
+collapses on CLIP (0.770) and SigLIP (0.750), consistent with their patch tokens not being
+linearly class-separable one patch at a time, whereas region means over several patches (the
+oracle) remain informative.
+
+\begin{figure*}[t]
+\centering
+\guardedfig{figures/cross_backbone__res224.pdf}{\textwidth}
+\caption{Blindness curves for three frozen backbones on the same 5,000 COCO test images, 224 px
+input: CLS (or SigLIP's MAP-pooled vector), mean pooling, the attention head and the oracle,
+each trained on identical cached tokens. Bands are 95\% bootstrap intervals; the dotted line
+marks one patch for each backbone's patch size.}
+\label{fig:backbones}
+\end{figure*}
+
+\begin{table*}[t]
+\centering\small
+\caption{Macro AUROC per size bin for the five main read-outs on each backbone (COCO val2017,
+224 px). Best non-oracle read-out per backbone and column in bold.}
+\label{tab:backbones}
+\IfFileExists{../results/cross_backbone_table__res224.tex}{\input{../results/cross_backbone_table__res224.tex}}{\todo{cross-backbone table missing}}
+\end{table*}
+
+\subsection{Chest radiographs: the cliff reappears}
+\label{sec:cxr-results}
+Table~\ref{tab:cxr} and Figure~\ref{fig:cxr} give the chest radiograph results for DINOv2
+ViT-B/14-reg and RAD-DINO at 224 px. We describe DINOv2 first. With image-level training on 20,721
+radiographs, the global probes reach 0.70 (CLS) and 0.69 (mean) overall AUROC on the boxed
+test images and between 0.52 and 0.79 per lesion-size bin; fitted by 5-fold cross-validation on
+the 880 boxed images alone they fall to 0.58, essentially the chance-level result of the
+motivating study. The oracle on the same tokens, fitted under the same cross-validation on the
+same 880 images, scores 0.88 to 0.94 in every populated bin (0.91 for lesions covering 0.3--1\%
+of the frame, 0.94 for 1--3\%). The gap is therefore 0.27 to 0.31 AUROC on radiographs,
+against 0.11 on COCO sub-patch targets, and it is present at every lesion size, not only the
+smallest: enlarged hearts and large effusions in the $>10\%$ bin are also missed by the global
+vector (0.67 to 0.69). This is the cliff the pre-proposal set out to explain, reproduced with a
+different encoder than the five of the motivating paper and with our own pipeline, and the
+controlled comparison gives the same answer as on COCO: the tokens carry the finding and the
+pooled vector does not. What differs from COCO is the absence of scene context. Every
+radiograph is a chest, so a global vector has nothing to predict a finding from except the
+finding itself, and without a context prior to fall back on the loss at pooling is close to
+total. The attention head, trained from the image-level labels of the 20,721 training
+radiographs, is the best read-out that sees no boxes: $0.73\pm0.02$ overall AUROC over three seeds against 0.70 for CLS, 0.61 (seed spread 0.04) against 0.52 for lesions covering 0.1--0.3\% of the frame and 0.83 against 0.76 for the largest findings, and its attention mass on small lesions is 13 to 15 times chance. The
+multi-scale variant is level with it. The head therefore recovers part of what pooling loses
+on radiographs, as on COCO, but on radiographs the remaining distance to the oracle (0.15 to
+0.28 AUROC) is much larger: with no scene prior to lean on and only a few hundred positives
+per finding, learning where to look from image-level labels alone is far harder than reading
+a region that is pointed out. Max-MIL fails outright (0.56), as it did on CLIP and SigLIP.
+The one finding with enough small lesions for a per-finding estimate, nodules under 0.3\% of
+the frame ($n=23$), shows the pattern in miniature: mean pooling 0.54, head 0.64, oracle 0.89.
+Figure~\ref{fig:cxr-attn} shows the head's attention on six small findings: it lands on the
+nodules and the mass, is close on the effusion, and misses the pneumothorax and the
+atelectasis.
+
+\paragraph{RAD-DINO.}
+The radiograph-adapted backbone moves every read-out up and leaves the structure intact
+(Table~\ref{tab:cxr}, lower half). Its tokens carry more: the cross-validated oracle rises to
+0.95 to 0.97 per bin (from 0.88 to 0.94). Its global vector also carries more: image-level
+probes reach 0.77 overall (from 0.70) and 0.79 to 0.87 in the bins above 0.3\%, while the
+cross-validated probes stay at 0.61 to 0.62 overall. The gap between the oracle and the best
+global read-out on the same training data is therefore still 0.19 to 0.31 AUROC per bin, so
+domain adaptation of the encoder does not remove the loss at aggregation; it raises both
+sides of it. The attention head does not improve AUROC on RAD-DINO ($0.76\pm0.02$ over three seeds vs.\ 0.77 for CLS; the seed-0 run reported in Table~\ref{tab:cxr} is the best of the three) but localises better than on any other backbone, with attention mass on small lesions 21 to 24
+times chance and pointing accuracy 0.19 to 0.27, which suggests the adapted tokens make the
+lesion easy to find and the remaining difficulty is in scoring it from a few hundred positives.
+
+\paragraph{Resolution on radiographs.}
+Repeating the cross-validated comparison at 448 px (DINOv2, $32\times32$ grid, same 880
+images and folds) reproduces the COCO mechanism result where it matters most. The oracle
+improves in every bin, and most for the smallest lesions: 0.981 for 0.1--0.3\% of the frame
+(from 0.902 at 224 px), 0.964 for 0.3--1\% (from 0.911) and 0.951 for 1--3\% (from 0.936). The
+cross-validated global probes do not move: CLS 0.582 overall (0.584 at 224 px) and 0.64 to
+0.77 per bin against 0.64 to 0.73 before. A radiologist's nodule that covers one 14-pixel
+patch at 224 px covers four at 448 px, and the region read-out sees that; the global vector,
+averaging over four times as many tokens, does not. For a frozen-backbone pipeline on
+radiographs, raising the input resolution without changing the aggregation buys almost nothing for
+small findings. RAD-DINO behaves the same way at 448 px: its cross-validated oracle rises to
+0.96 to 0.98 in every bin (0.960 for 0.1--0.3\% lesions, from 0.904) while its cross-validated
+CLS probe stays at 0.62 overall. Trained on the full 20,721-image cache at 448 px, the attention head reaches $0.77\pm0.01$ overall over three seeds ($0.73\pm0.02$ at 224 px on the same images) and $0.72\pm0.01$ for lesions covering 0.1--0.3\% of the frame ($0.61\pm0.04$ at 224 px), while the global probes retrained on the same 448 px cache move from 0.69 to 0.71 overall (CLS and mean; max pooling from 0.67 to 0.66) and, in that bin, CLS from 0.52 to 0.57 and mean from 0.53 to 0.58. The head's lead over the best global read-out on the same cache therefore widens from 0.03 AUROC at 224 px to 0.06 at 448 px (paired bootstrap over the 880 images: $+0.055$, 95\% CI $[0.038, 0.072]$ against CLS and $[0.029, 0.082]$ against mean, against $+0.028$ $[0.012, 0.048]$ over CLS at 224 px). The head's attention mass on lesions rises to 3.5 times chance overall and 44 times chance for 0.1--0.3\% lesions (13 times at 224 px), with pointing accuracy 0.47 (0.40 at 224 px); all three seeds agree to within 0.4 and 3 times chance respectively. The learned read-out therefore gains from the extra patches much as the oracle does while the global probe gains little, which is the COCO mechanism result again, this time with a read-out that sees no boxes. RAD-DINO's head on a 5,000-image 448 px cache scores 0.71 overall but
+localises small lesions far better than at 224 px (attention mass 67 times chance and
+pointing accuracy 0.38 for 0.1--0.3\% lesions, vs.\ 24 times and 0.19), so the extra pixels
+help the head find lesions even where the training set limits how well it scores them.
+
+\begin{figure*}[t]
+\centering
+\guardedfig{figures/attention_examples_cxr.png}{\textwidth}
+\caption{Attention of the gated head on NIH radiographs for findings covering 0.4--1\% of the
+frame (top: radiograph with the radiologist's box; bottom: the finding's attention map on the
+$16\times16$ grid). The head was trained from image-level labels only.}
+\label{fig:cxr-attn}
+\end{figure*}
+
+\begin{figure}[t]
+\centering
+\guardedfig{figures/blindness_curve__dinov2_vitb14_reg__res224_cxr.pdf}{\columnwidth}
+\caption{Blindness curve on NIH ChestX-ray14 boxed images (DINOv2 ViT-B/14-reg, 224 px), size
+= box area over the frame, macro AUROC over findings with at least 5 positives in the bin
+(the $<0.1\%$ bin has 2 pairs and is empty). Read-outs fitted by 5-fold patient-disjoint
+cross-validation on the 880 boxed images (suffix \texttt{\_cv5}) or trained on the 20,721
+unboxed training radiographs (no suffix).}
+\label{fig:cxr}
+\end{figure}
+
+\begin{table}[t]
+\centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+\caption{Chest radiographs, macro AUROC per lesion-size bin on the 880 boxed NIH images at
+224 px (and, for DINOv2, at 448 px on the full cache), for DINOv2 ViT-B/14-reg (upper half) and RAD-DINO (lower half). Parenthesised:
+findings contributing to the bin. \emph{All} pools every labelled positive, including those
+without a box, which for the oracle receive a random region and so understate it.}
+\label{tab:cxr}
+\begin{tabular}{lrrrrrr}
+\toprule
+Read-out & 0.1--0.3\% & 0.3--1\% & 1--3\% & 3--10\% & $>10\%$ & All \\
+ & (1) & (5) & (7) & (6) & (7) & (14) \\
+\midrule
+\multicolumn{7}{l}{\emph{5-fold cross-validation on the 880 boxed images}} \\
+CLS    & 0.733 & 0.639 & 0.650 & 0.685 & 0.673 & 0.584 \\
+Mean   & 0.735 & 0.612 & 0.630 & 0.680 & 0.689 & 0.579 \\
+Max    & 0.644 & 0.608 & 0.616 & 0.626 & 0.675 & 0.565 \\
+Oracle & \textbf{0.902} & \textbf{0.911} & \textbf{0.936} & \textbf{0.927} & \textbf{0.884} & 0.663 \\
+\midrule
+\multicolumn{7}{l}{\emph{image-level training on 20,721 radiographs}} \\
+CLS    & 0.517 & 0.709 & 0.683 & 0.687 & 0.759 & 0.699 \\
+Mean   & 0.532 & 0.717 & 0.655 & 0.722 & 0.791 & 0.691 \\
+Max    & 0.554 & 0.682 & 0.682 & 0.701 & 0.734 & 0.668 \\
+Max-MIL          & 0.394 & 0.541 & 0.541 & 0.609 & 0.618 & 0.564 \\
+Attention head   & 0.634 & 0.755 & 0.719 & 0.749 & 0.821 & 0.727 \\
+Multi-scale head & 0.632 & 0.753 & 0.728 & 0.750 & 0.821 & 0.724 \\
+\multicolumn{7}{l}{\emph{the same, at 448 px (full 20,721-image cache)}} \\
+CLS            & 0.568 & 0.712 & 0.685 & 0.706 & 0.792 & 0.711 \\
+Mean           & 0.575 & 0.718 & 0.672 & 0.716 & 0.784 & 0.710 \\
+Max            & 0.612 & 0.661 & 0.649 & 0.691 & 0.720 & 0.663 \\
+Attention head & 0.732 & 0.775 & 0.723 & 0.773 & 0.840 & 0.766 \\
+\midrule
+\multicolumn{7}{l}{\emph{RAD-DINO, 5-fold cross-validation on the boxed images}} \\
+CLS    & 0.849 & 0.707 & 0.695 & 0.712 & 0.786 & 0.620 \\
+Mean   & 0.746 & 0.749 & 0.644 & 0.694 & 0.725 & 0.613 \\
+Oracle & \textbf{0.904} & \textbf{0.964} & \textbf{0.954} & \textbf{0.966} & \textbf{0.952} & 0.675 \\
+\multicolumn{7}{l}{\emph{RAD-DINO, image-level training on 20,721 radiographs}} \\
+CLS            & 0.637 & 0.789 & 0.759 & 0.771 & 0.853 & 0.773 \\
+Mean           & 0.657 & 0.782 & 0.764 & 0.790 & 0.871 & 0.767 \\
+Max-MIL        & 0.475 & 0.715 & 0.669 & 0.756 & 0.788 & 0.687 \\
+Attention head & 0.715 & 0.795 & 0.762 & 0.803 & 0.871 & 0.779 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Discussion and caveats}
+\label{sec:discussion}
+\paragraph{Context priors.}
+COCO scenes are strongly predictive of their objects: a tiny sports ball co-occurs with a
+person swinging a bat, a toothbrush with a sink. A global embedding can therefore score a small
+object well above chance without encoding the object at all, simply by encoding the scene
+\citep{oliva2007context}. This is why the AUROC curve alone cannot separate ``sees the object''
+from ``guesses from context''. Two of our measurements can. The oracle gap tells us how much
+more is available when the read-out is pointed at the object; if the global read-outs are
+already close to the oracle in a bin, context is doing the work. The localisation audit tells
+us whether the attention head is looking at the object or at its companions; a head that beats
+mean pooling while placing no more attention mass in the box than chance has learned context,
+not the target. On the first count the data say that context does much but not all of the
+work: the global read-outs sit 0.11 AUROC below the oracle on sub-patch targets and 0.06 below
+on one-to-two-patch targets, so a large share of the available evidence is discarded, while the
+0.83--0.86 they retain is far above what a context-free domain would show. On the second count
+the head passes the audit: its attention mass inside the box is 12 to 24 times chance on small
+targets, so its gain over mean pooling comes with localisation rather than instead of it. The
+tennis-racket panel of Figure~\ref{fig:attention} shows that context routes still exist, and
+the audit is what makes them visible.
+
+\paragraph{Limitations.}
+The oracle and the CLIP, SigLIP and chest probes rest on one seed; the DINOv2 CLS and mean probes and every head are seeded (three seeds), with spreads of 0.003 to 0.016 on COCO and 0.015 to 0.084 on radiographs, where the thinnest bin moves most. The
+chest bins are thin, with one to seven findings per bin and one finding in the 0.1--0.3\% bin,
+so chest-side per-bin numbers carry wide intervals and we lean on the overall and paired
+figures. The COCO resolution ablations train probes on 5,000 images rather than 9,000 so that the
+resolutions are comparable with each other, which makes their absolute numbers lower than the
+main tables; on radiographs the 448 px DINOv2 head and probes use the full 20,721-image cache and
+the RAD-DINO 448 px head a 5,000-image one. The oracle's ``all'' column on radiographs
+includes label-positive pairs without a box, which it cannot see. A control that removes
+scene context on COCO is not available, because images with one small object and nothing
+else annotated are too rare (one class qualifies), so the context argument rests on the
+per-class analysis and the radiograph comparison rather than on a within-COCO control.
+Finally, squash-resizing distorts aspect ratios equally for every read-out, and the macro
+average over classes with at least 10 (COCO) or 5 (radiographs) positives per bin drops rare
+classes from the small bins.
+
+\paragraph{What this does and does not establish.}
+Measured with one harness, the loss at pooling is graded on natural images (0.13 to 0.15 AUROC
+between the largest and the sub-patch bin, never near chance) and a cliff on radiographs
+(0.27 to 0.31 per bin, with cross-validated global probes at 0.58 overall). The two are the
+same mechanism seen with and without a context prior: on COCO the global vector can fall back
+on the scene, on a chest radiograph it cannot. What the controlled comparisons establish is
+that for these encoders and these tokens the loss occurs at aggregation and is recoverable
+by a read-out that can select patches; what they do not establish is how much of it a head
+trained without boxes can recover in general. On COCO the answer is a third to a half
+of the gap depending on the backbone, on radiographs much less, and the per-class
+analysis says the recoverable share is largest exactly where context helps least. All
+statements are about the named backbones at 224 or 448 px on COCO val2017 and the NIH boxed
+images, with one seed except where seeds are reported.
+
+% ======================================================================
+\section{Conclusion and Future Work}
+\label{sec:plan}
+% ======================================================================
+Three weeks remain. The core comparison, the backbone and resolution extensions and the
+radiograph replication are in; the plan below deepens each rather than opening new fronts.
+
+\begin{table}[h]
+\centering\small
+\caption{Week-by-week plan to the final report. Audio and distillation remain deferred, as
+recommended in the pre-proposal feedback; LUNA16 (3D CT) is dropped.}
+\label{tab:plan}
+\begin{tabular}{p{0.95in}p{2.1in}}
+\toprule
+Week & Deliverable \\
+\midrule
+Nov 16--22 &
+  RAD-DINO head on the full 448 px cache; three seeds for every head on both datasets;
+  formalise the token-fraction pre-deployment check of Section~\ref{sec:results} and
+  validate it on both datasets. \\
+Nov 23--29 &
+  \textbf{Clinic, Nov 23}: present the cross-backbone curves, the oracle gap, the mechanism
+  figure and the radiograph replication; get feedback on the causal argument. Add a fourth
+  backbone that is self-supervised with a 16-pixel patch, to separate patch size from
+  pretraining objective, and ChestX-Det10 boxes (3,500 images) to thicken the radiograph bins. \\
+Nov 30--Dec 6 &
+  \textbf{Poster and demo, Nov 30}: live demo of the curve and the attention maps on
+  user-chosen images. Then consolidate: repeat key runs over three seeds, finish the
+  radiograph curves, write the size-stratified evaluation recommendation. Tiled-teacher
+  distillation only if everything above is complete. \\
+Dec 7 &
+  \textbf{Final report}: cross-dataset (COCO, chest radiographs) and cross-backbone blindness
+  curves, the recovery method with its localisation audit, the evaluation recommendation, and
+  released code, cached curves and reproduction commands. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Risks and fallbacks.}
+The midterm results stand on their own; the remaining risks are to the extensions. The
+radiograph bins are thin (79 to 180 boxed images per finding), so chest-side head results
+need seeds before any claim under 0.05 AUROC, and ChestX-Det10 is the planned remedy. A
+fourth backbone depends on weights being available without a licence gate; if none is, the
+patch-size question is answered with FlexiViT-style resizing of DINOv2 instead. Every
+COCO-side number here is one seed except the head; the final report repeats the probes over
+three seeds. Audio, distillation and further modalities stay out of scope unless everything
+above is complete.
+
+% ======================================================================
+\bibliographystyle{unsrtnat}
+\bibliography{refs}
+
+\end{document}
