@@ -44,8 +44,9 @@ def main():
             hp = R[heads[0]]["by_diameter"]
             print("% head test positives per bin: " + " ".join(f"{b}={hp[b]['n_pos']}" for b in bins))
     print("\n".join(rows))
+    header = ("\\begin{tabular}{lrrrrrr}\n\\toprule\nRead-out & 3--5 mm & 5--8 mm & 8--12 mm & 12--20 mm & $>20$ mm & All \\\\\n\\midrule\n")
     out = f"{a.results}/luna_table__{a.backbone}.tex"
-    open(out, "w").write("\n".join(rows) + "\n"); print("wrote", out)
+    open(out, "w").write(header + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n"); print("wrote", out)
 
 if __name__ == "__main__":
     main()
