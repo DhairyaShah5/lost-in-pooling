@@ -71,7 +71,10 @@ def main():
     cls, patches = cls.float().cpu().numpy(), patches.float().cpu().numpy()
     grid = int(np.sqrt(patches.shape[1]))
 
-    names = [str(c) for c in np.load(a.labels, allow_pickle=False)["cat_names"]]
+    if Path(a.labels).exists():
+        names = [str(c) for c in np.load(a.labels, allow_pickle=False)["cat_names"]]
+    else:  # raw data cleared: the 80 class names are committed in the same order
+        names = json.loads((Path(__file__).resolve().parents[1] / "docs/data/coco_cat_names.json").read_text())["names"]
     head = load_head(a.head or Path(a.checkpoints) / f"attn__{a.backbone}__res{a.res}.pt", device=resolve_device(a.device))
     with torch.no_grad():
         logits, alpha = head(torch.from_numpy(patches).to(resolve_device(a.device)))
