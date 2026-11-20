@@ -31,8 +31,9 @@ data/ features/ local only, gitignored
 | DINOv2 ViT-B/14-reg | 0.832 | 0.862 | 0.899 (multi-scale 0.908) | 0.973 |
 | CLIP ViT-B/16 | 0.832 | 0.838 | 0.910 (multi-scale 0.913) | 0.935 |
 | SigLIP ViT-B/16 | 0.824 | 0.847 | 0.872 (multi-scale 0.878) | 0.934 |
+| DINO ViT-B/16 | 0.804 | 0.798 | 0.824 (multi-scale 0.822) | 0.900 |
 
-Every read-out in a row is trained and evaluated on the same cached tokens. The oracle pools only the
+Every read-out in a row is trained and evaluated on the same cached tokens (heads: mean of three seeds). The oracle pools only the
 patches under the ground-truth boxes (negatives get a matched random box). Large targets score ~0.99 for
 every read-out. Doubling the input to 448 px lifts the oracle to 0.994 and leaves the global read-outs
 unchanged: global pooling tracks the fraction of tokens an object occupies, not the patches it covers.
