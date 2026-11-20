@@ -38,3 +38,6 @@ report/*.synctex.gz
 /checkpoints_cxr/
 !results_det10/scores/*.npy
 !results_luna/scores/*.npy
+
+# local-only demo inputs (a few COCO val2017 images for scripts/demo.py)
+/demo_inputs/

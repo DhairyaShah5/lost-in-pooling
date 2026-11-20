@@ -136,3 +136,9 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 18.2 Clinic slides (Nov 23): cross-backbone curves, oracle gap, mechanism figure, radiograph replication
 - [x] 18.3 Poster (Nov 30) and live demo script (curve + attention maps on a user-chosen image)
 - [x] 18.4 Final push: README reproduce commands for every arm, release tag (v1.0-final)
+
+# Phase 9 (Nov 20): housekeeping after the close-out
+- [x] 19.1 Stop the orphaned LUNA16 wait loop; confirm no experiment process, cron or launchd job remains
+- [x] 19.2 Move the NIH ChestX-ray14 fetch tooling into the repo (`scripts/00c_fetch_nih_cxr.py`, `scripts/00c_download_nih_cxr.sh`, `docs/NIH_CXR_SOURCES.md`) and commit the exact image lists (`docs/data/`)
+- [x] 19.3 README reproduce block covers every arm from download to PDF with the disk and time budget; `docs/DATA.md` lists the expected data layout
+- [ ] 19.4 Delete the rebuildable caches and raw data (~255 GB: `features*/` arrays, `results*/attention/`, `data/`); keep `.venv`, `checkpoints*/`, the feature `meta.json` files and ten local demo images
