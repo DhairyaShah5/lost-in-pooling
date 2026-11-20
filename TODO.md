@@ -119,3 +119,19 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 16.3 Seeds 1 and 2 of the full-cache 448 px head: 0.771 +- 0.005 overall (0.732 +- 0.016 at 224 px), mAP 0.381 +- 0.008
 - [x] 16.4 Like-for-like CLS / mean / max probes on the full 448 px cache (0.711 / 0.710 / 0.663 vs head 0.766)
 - [x] 16.5 Report (chest resolution paragraph, Table tab:cxr block, paired test, abstract, limitations, plan), README, push
+
+# Phase 7 (Nov 19 onward): finish the plan from the midterm report
+- [ ] 17.1 RAD-DINO chest head on the full 448 px cache, three seeds, like-for-like probes (running)
+- [ ] 17.2 Fourth backbone: DINO ViT-B/16 (self-supervised, 16 px patch) on COCO at 224 and 448 px: probes, oracle, heads x3 seeds, multi-scale head
+- [ ] 17.3 Seed repeats for every one-seed read-out (COCO oracles at 224/336/448, CLIP/SigLIP probes and oracles, chest probes, max-MIL)
+- [ ] 17.4 ChestX-Det10 boxes: fetch annotations, map to our NIH images, patient-disjoint manifest, CV read-outs and NIH-trained heads at 224/448 px
+- [ ] 17.5 Token-fraction pre-deployment check: fit AUROC loss vs token fraction on COCO, validate on radiographs, ship as a CLI
+- [ ] 17.6 Tiled-teacher distillation: 448 px head as teacher, 224 px student on the same images (COCO and chest)
+- [ ] 17.7 LUNA16 arm (scoped): one or two subsets, 2D nodule slices, blindness curve of CLS / mean / oracle / head by nodule size
+- [ ] 17.8 Update the memory notes and README as results land
+
+# Phase 8: deliverables
+- [ ] 18.1 Final report (same format as the midterm), every number seeded, new sections for 17.2-17.7
+- [ ] 18.2 Clinic slides (Nov 23): cross-backbone curves, oracle gap, mechanism figure, radiograph replication
+- [ ] 18.3 Poster (Nov 30) and live demo script (curve + attention maps on a user-chosen image)
+- [ ] 18.4 Final push: README reproduce commands for every arm, release tag
