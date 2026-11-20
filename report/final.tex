@@ -122,23 +122,29 @@ Our pre-proposal asked three questions: how general is this effect, what causes 
 be recovered without extra supervision? The feedback we received (Section~\ref{sec:feedback})
 was that the plan, with seven backbones, several modalities, mechanism ablations and
 distillation, was too large for one semester, and that the causal claim needed a controlled
-experiment rather than similar curves across modalities. This report describes the project
-as rebuilt around that advice. We first ran one controlled comparison: MS-COCO 2017
+experiment rather than similar curves across modalities. This final report describes the
+project as rebuilt around that advice and then carried through. We first ran one controlled
+comparison: MS-COCO 2017
 \citep{lin2014coco}, one frozen backbone, DINOv2 ViT-B/14 with registers
 \citep{oquab2024dinov2,darcet2024registers}, the CLS and patch tokens cached once, every
 read-out trained on the same cached tokens, per-class AUROC stratified by the relative area of
 the largest instance of the class, and an oracle that is told where to look as the ceiling.
-With that result in hand we expanded along the axes the feedback allowed: two further
-backbones with a different pretraining objective and patch size (CLIP and SigLIP ViT-B/16), a
-resolution ablation that tests the pre-proposal's mechanism hypothesis, a gated attention
-head trained from image-level labels alone with a localisation audit and a multi-scale
-variant, seeds and paired tests, a per-class analysis of where scene context does the work,
-and a replication on the chest radiographs that motivated the project.
+With that result in hand we expanded along the axes the feedback allowed: three further
+backbones that separate pretraining objective from patch size (CLIP and SigLIP ViT-B/16, DINO
+ViT-B/16), a resolution ablation that tests the pre-proposal's mechanism hypothesis, a gated
+attention head trained from image-level labels alone with a localisation audit and a
+multi-scale variant, three seeds for every read-out and paired tests, a per-class analysis
+and a context-only control that isolate what scene context does, a replication on the chest
+radiographs that motivated the project on two sets of radiologist boxes (NIH ChestX-ray14 and
+ChestX-Det10) and with a radiograph-adapted encoder, a tiled-teacher distillation, a scoped
+CT arm on LUNA16 nodule slices, and a pre-deployment check that turns the mechanism result
+into a prediction a practitioner can use. Only the audio arm of the pre-proposal was not
+pursued.
 
-Section~\ref{sec:lit} reviews the related literature, Section~\ref{sec:progress} describes
-progress since the pre-proposal and our response to feedback, Section~\ref{sec:setup} fixes
-the experimental protocol, Section~\ref{sec:results} reports initial results, and
-Section~\ref{sec:plan} gives the plan to the final report. Code and results are at
+Section~\ref{sec:lit} reviews the related literature, Section~\ref{sec:progress} summarises
+the project and our response to feedback, Section~\ref{sec:setup} fixes the experimental
+protocol, Section~\ref{sec:results} reports the results, and Section~\ref{sec:plan}
+concludes. Code and results are at
 \url{https://github.com/DhairyaShah5/lost-in-pooling}.
 
 % ======================================================================
@@ -255,10 +261,12 @@ The pre-proposal was graded 5/5 with four pieces of feedback. We list each and w
   were judged too much for one semester, with the advice to do the pooling comparison first on
   one image dataset and one backbone using the same frozen tokens, then expand. We did exactly
   this, in that order. The core study is MS-COCO 2017 with DINOv2 ViT-B/14 (registers) at
-  224 px; once its result was in we added CLIP and SigLIP, the resolution ablation and the NIH
-  ChestX-ray14 replication, all on the same harness. Audio and distillation remain deferred.
-  LUNA16 was dropped outright: it is 3D CT, the notion of relative box area does not carry
-  over cleanly to volumes, and it would not answer the question any better than COCO.
+  224 px; once its result was in we added CLIP, SigLIP and DINO ViT-B/16, the resolution
+  ablation and the NIH ChestX-ray14 replication, all on the same harness, and after the
+  midterm the remaining items in the order the feedback implied: seeds for everything, a
+  context-only control, a second set of radiograph boxes, distillation last among the
+  modelling items, and LUNA16 last of all and only as 2D slices, where relative box area is
+  defined. Audio was not pursued.
 \item \textbf{The causal claim.} Similar curves across modalities do not show that pooling
   caused the failure. Our design is now a within-subjects comparison: identical cached tokens,
   identical train/validation/test images, identical optimiser and early-stopping rule; only the
@@ -319,11 +327,16 @@ writes against, and committed JSON results under \fname{results/}. The steps are
   same contract (14 findings, box area over the frame as size, patient-disjoint splits) and a
   cross-validated read-out script for the boxed images, so every script above runs unchanged
   with different paths.
+\item \textbf{Post-midterm arms.} A context-only variant of the oracle (tokens outside the
+  box), the ChestX-Det10 builder with NIH identity recovery and a transfer script for the
+  NIH-trained read-outs, the tiled-teacher distillation module, the LUNA16 slice builder with
+  a diameter-binned curve, the pre-deployment check with its command-line tool, and a
+  one-image demo script for the poster session.
 \end{enumerate}
 Every script is seeded, takes \texttt{--backbone}, \texttt{--res} and \texttt{--out} flags, and
 writes to the paths in the contract. Unit tests run on synthetic data without the real dataset. The code is public at
 \url{https://github.com/DhairyaShah5/lost-in-pooling}.
-Status at submission: every experiment in Section~\ref{sec:results} is complete and committed, and every figure and table is regenerated from the \texttt{results*/} JSON files by the numbered scripts.
+Status at submission: every experiment in Section~\ref{sec:results} is complete and committed, and every figure and table is regenerated from the \texttt{results*/} JSON files by the numbered scripts; the repository has over 130 commits, 59 unit tests, and the midterm and final reports, the clinic slides and the poster are built from source in \fname{report/}, \fname{slides/} and \fname{poster/}.
 
 % ======================================================================
 \section{Experimental Setup}
