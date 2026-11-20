@@ -1,0 +1,136 @@
+{
+  "readout": "attn_s1",
+  "backbone": "dinov2_vitb14_reg",
+  "res": 448,
+  "split": "test",
+  "n_images": 804,
+  "train_split": "train",
+  "notes": "gated attention MIL head (attn); epochs=30 lr=0.001 wd=0.0001 lam=0 hidden=256 batch=128 dropout=0.1 seed=1 best_epoch=18 val_map=0.6872 params=394753 train_secs=78 device=mps",
+  "seed": 1,
+  "min_pos": 5,
+  "n_boot": 500,
+  "bins": {
+    "edges": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      1.0
+    ],
+    "names": [
+      "<0.1%",
+      "0.1-0.3%",
+      "0.3-1%",
+      "1-3%",
+      "3-10%",
+      ">10%"
+    ]
+  },
+  "per_bin": {
+    "<0.1%": {
+      "auroc_macro": 0.6219494819971099,
+      "ci_lo": 0.576368195382204,
+      "ci_hi": 0.6624888605066463,
+      "n_classes": 1,
+      "n_pos": 309
+    },
+    "0.1-0.3%": {
+      "auroc_macro": 0.643175351901767,
+      "ci_lo": 0.5983557429686548,
+      "ci_hi": 0.6894979853314038,
+      "n_classes": 1,
+      "n_pos": 168
+    },
+    "0.3-1%": {
+      "auroc_macro": 0.5335429769392034,
+      "ci_lo": 0.35905593108151473,
+      "ci_hi": 0.7261652921251393,
+      "n_classes": 1,
+      "n_pos": 9
+    },
+    "1-3%": {
+      "auroc_macro": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_classes": 0,
+      "n_pos": 0
+    },
+    "3-10%": {
+      "auroc_macro": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_classes": 0,
+      "n_pos": 0
+    },
+    ">10%": {
+      "auroc_macro": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_classes": 0,
+      "n_pos": 0
+    }
+  },
+  "overall": {
+    "auroc_macro": 0.6276496622408572,
+    "map": 0.6861778905201963
+  },
+  "per_class_bin": {
+    "Nodule": {
+      "<0.1%": {
+        "auroc": 0.6219494819971099,
+        "n_pos": 309
+      },
+      "0.1-0.3%": {
+        "auroc": 0.643175351901767,
+        "n_pos": 168
+      },
+      "0.3-1%": {
+        "auroc": 0.5335429769392034,
+        "n_pos": 9
+      },
+      "1-3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      ">10%": {
+        "auroc": null,
+        "n_pos": 0
+      }
+    }
+  },
+  "per_class_all": {
+    "Nodule": {
+      "auroc": 0.6276496622408572,
+      "n_pos": 486
+    }
+  },
+  "coco_sml": {
+    "small": {
+      "auroc_macro": 0.6294252600767375,
+      "ci_lo": 0.5904034127688019,
+      "ci_hi": 0.6667998400685045,
+      "n_classes": 1,
+      "n_pos": 477
+    },
+    "medium": {
+      "auroc_macro": 0.5335429769392034,
+      "ci_lo": 0.35905593108151473,
+      "ci_hi": 0.7261652921251393,
+      "n_classes": 1,
+      "n_pos": 9
+    },
+    "large": {
+      "auroc_macro": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_classes": 0,
+      "n_pos": 0
+    }
+  }
+}

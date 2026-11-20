@@ -362,7 +362,7 @@ writes against, and committed JSON results under \fname{results/}. The steps are
 Every script is seeded, takes \texttt{--backbone}, \texttt{--res} and \texttt{--out} flags, and
 writes to the paths in the contract. Unit tests run on synthetic data without the real dataset. The code is public at
 \url{https://github.com/DhairyaShah5/lost-in-pooling}.
-Status at submission: every experiment in Section~\ref{sec:results} is complete and committed, and every figure and table is regenerated from the \texttt{results*/} JSON files by the numbered scripts; the repository has over 110 commits, 59 unit tests, and the midterm and final reports, the clinic slides and the poster are built from source in \fname{report/}, \fname{slides/} and \fname{poster/}.
+Status at submission: every experiment in Section~\ref{sec:results} is complete and committed, and every figure and table is regenerated from the \texttt{results*/} JSON files by the numbered scripts; the repository has over 125 commits, 59 unit tests, and the midterm and final reports, the clinic slides and the poster are built from source in \fname{report/}, \fname{slides/} and \fname{poster/}.
 
 % ======================================================================
 \section{Experimental Setup}
@@ -1222,7 +1222,8 @@ even for nodules under 5 mm, while the cross-validated global probes move from 0
 (CLS 0.638, mean 0.647) and the context-only control moves with them (0.648): the resolution
 gain again goes almost entirely to the read-out that can select patches, and what the global
 vector gains, it gains from the slice.
-% TODO(final): LUNA 448 head
+The head at 448 px is no different ($0.61\pm0.02$ overall, against 0.64 for the probes),
+which confirms that its problem on this arm is the training set, not the tokens.
 
 \begin{figure}[t]
 \centering
