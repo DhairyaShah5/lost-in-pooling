@@ -1,0 +1,113 @@
+{
+  "readout": "mean_full",
+  "backbone": "dinov2_vitb14_reg",
+  "res": 448,
+  "n_seeds": 3,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "readouts": [
+    "mean_full",
+    "mean_full_s1",
+    "mean_full_s2"
+  ],
+  "files": [
+    "results_cxr/mean_full__dinov2_vitb14_reg__res448.json",
+    "results_cxr/mean_full_s1__dinov2_vitb14_reg__res448.json",
+    "results_cxr/mean_full_s2__dinov2_vitb14_reg__res448.json"
+  ],
+  "std_ddof": 1,
+  "note": "sample std (ddof=1) over 3 seed repeats",
+  "per_bin": {
+    "<0.1%": {
+      "auroc_macro_mean": null,
+      "auroc_macro_std": null,
+      "n": 0,
+      "values": [
+        null,
+        null,
+        null
+      ],
+      "n_classes": 0
+    },
+    "0.1-0.3%": {
+      "auroc_macro_mean": 0.5776628200026529,
+      "auroc_macro_std": 0.008013967216775076,
+      "n": 3,
+      "values": [
+        0.5749436264756599,
+        0.5713622496352302,
+        0.5866825838970686
+      ],
+      "n_classes": 1
+    },
+    "0.3-1%": {
+      "auroc_macro_mean": 0.7114754813704299,
+      "auroc_macro_std": 0.0052983144248472435,
+      "n": 3,
+      "values": [
+        0.7175774295065386,
+        0.7088076619091929,
+        0.7080413526955586
+      ],
+      "n_classes": 5
+    },
+    "1-3%": {
+      "auroc_macro_mean": 0.6770464845729022,
+      "auroc_macro_std": 0.007952190311591924,
+      "n": 3,
+      "values": [
+        0.671874736465093,
+        0.6730614304668127,
+        0.6862032867868011
+      ],
+      "n_classes": 7
+    },
+    "3-10%": {
+      "auroc_macro_mean": 0.7222664748940394,
+      "auroc_macro_std": 0.0068359603909076095,
+      "n": 3,
+      "values": [
+        0.7163541875375486,
+        0.729751856712057,
+        0.7206933804325125
+      ],
+      "n_classes": 6
+    },
+    ">10%": {
+      "auroc_macro_mean": 0.7921456949734109,
+      "auroc_macro_std": 0.009151148265496714,
+      "n": 3,
+      "values": [
+        0.7835557566609009,
+        0.8017701326226357,
+        0.7911111956366959
+      ],
+      "n_classes": 7
+    }
+  },
+  "overall": {
+    "auroc_macro": {
+      "mean": 0.7252411141130296,
+      "std": 0.01290187061459763,
+      "n": 3,
+      "values": [
+        0.7104555073041728,
+        0.7342143095024525,
+        0.7310535255324634
+      ]
+    },
+    "map": {
+      "mean": 0.32198278497496985,
+      "std": 0.0034835515702949836,
+      "n": 3,
+      "values": [
+        0.3259017586754859,
+        0.3192382087069367,
+        0.32080838754248703
+      ]
+    }
+  }
+}

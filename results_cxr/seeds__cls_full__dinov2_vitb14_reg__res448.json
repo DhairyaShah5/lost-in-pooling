@@ -1,0 +1,113 @@
+{
+  "readout": "cls_full",
+  "backbone": "dinov2_vitb14_reg",
+  "res": 448,
+  "n_seeds": 3,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "readouts": [
+    "cls_full",
+    "cls_full_s1",
+    "cls_full_s2"
+  ],
+  "files": [
+    "results_cxr/cls_full__dinov2_vitb14_reg__res448.json",
+    "results_cxr/cls_full_s1__dinov2_vitb14_reg__res448.json",
+    "results_cxr/cls_full_s2__dinov2_vitb14_reg__res448.json"
+  ],
+  "std_ddof": 1,
+  "note": "sample std (ddof=1) over 3 seed repeats",
+  "per_bin": {
+    "<0.1%": {
+      "auroc_macro_mean": null,
+      "auroc_macro_std": null,
+      "n": 0,
+      "values": [
+        null,
+        null,
+        null
+      ],
+      "n_classes": 0
+    },
+    "0.1-0.3%": {
+      "auroc_macro_mean": 0.5744351593933766,
+      "auroc_macro_std": 0.024179941131211996,
+      "n": 3,
+      "values": [
+        0.567913516381483,
+        0.6012070566388115,
+        0.5541849051598354
+      ],
+      "n_classes": 1
+    },
+    "0.3-1%": {
+      "auroc_macro_mean": 0.705972707116825,
+      "auroc_macro_std": 0.011355723484151798,
+      "n": 3,
+      "values": [
+        0.7115816602134065,
+        0.7134325956106972,
+        0.6929038655263712
+      ],
+      "n_classes": 5
+    },
+    "1-3%": {
+      "auroc_macro_mean": 0.6890863250976786,
+      "auroc_macro_std": 0.003760294727344687,
+      "n": 3,
+      "values": [
+        0.6851035316806777,
+        0.6925753311960458,
+        0.6895801124163127
+      ],
+      "n_classes": 7
+    },
+    "3-10%": {
+      "auroc_macro_mean": 0.7017112169143966,
+      "auroc_macro_std": 0.004216145660745793,
+      "n": 3,
+      "values": [
+        0.7064132294626341,
+        0.7004530018965519,
+        0.6982674193840039
+      ],
+      "n_classes": 6
+    },
+    ">10%": {
+      "auroc_macro_mean": 0.7904762713009122,
+      "auroc_macro_std": 0.0014417909267644899,
+      "n": 3,
+      "values": [
+        0.7917045393463901,
+        0.790835420013479,
+        0.7888888545428677
+      ],
+      "n_classes": 7
+    }
+  },
+  "overall": {
+    "auroc_macro": {
+      "mean": 0.7175873137243749,
+      "std": 0.006355378005696357,
+      "n": 3,
+      "values": [
+        0.7110248810628411,
+        0.7180239408462373,
+        0.7237131192640461
+      ]
+    },
+    "map": {
+      "mean": 0.31361337052710275,
+      "std": 0.002103245720135905,
+      "n": 3,
+      "values": [
+        0.3153863340811881,
+        0.3112894978024805,
+        0.31416427969763977
+      ]
+    }
+  }
+}
