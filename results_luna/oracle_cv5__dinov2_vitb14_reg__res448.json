@@ -1,0 +1,114 @@
+{
+  "readout": "oracle_cv5",
+  "backbone": "dinov2_vitb14_reg",
+  "res": 448,
+  "split": "test",
+  "n_images": 2507,
+  "train_split": "test-cv",
+  "notes": "5-fold patient-disjoint CV on the boxed NIH images; per-class logistic regression (C=1); positives = boxed pairs, negatives = label-absent; min_pos=5; seed=0",
+  "seed": 0,
+  "min_pos": 5,
+  "n_boot": 500,
+  "bins": {
+    "edges": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      1.0
+    ],
+    "names": [
+      "<0.1%",
+      "0.1-0.3%",
+      "0.3-1%",
+      "1-3%",
+      "3-10%",
+      ">10%"
+    ]
+  },
+  "per_bin": {
+    "<0.1%": {
+      "auroc_macro": 0.9894652874893507,
+      "ci_lo": 0.9864279377093556,
+      "ci_hi": 0.9922594078498465,
+      "n_classes": 1,
+      "n_pos": 932
+    },
+    "0.1-0.3%": {
+      "auroc_macro": 0.9919681819743669,
+      "ci_lo": 0.9893477300891452,
+      "ci_hi": 0.9946719187571769,
+      "n_classes": 1,
+      "n_pos": 436
+    },
+    "0.3-1%": {
+      "auroc_macro": 0.9934456928838952,
+      "ci_lo": 0.9893804256436793,
+      "ci_hi": 0.9968747468471929,
+      "n_classes": 1,
+      "n_pos": 71
+    },
+    "1-3%": {
+      "auroc_macro": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_classes": 0,
+      "n_pos": 0
+    },
+    "3-10%": {
+      "auroc_macro": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_classes": 0,
+      "n_pos": 0
+    },
+    ">10%": {
+      "auroc_macro": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_classes": 0,
+      "n_pos": 0
+    }
+  },
+  "overall": {
+    "auroc_macro": 0.9904200274327002,
+    "map": 0.9929797871476738
+  },
+  "per_class_bin": {
+    "Nodule": {
+      "<0.1%": {
+        "auroc": 0.9894652874893507,
+        "n_pos": 932
+      },
+      "0.1-0.3%": {
+        "auroc": 0.9919681819743669,
+        "n_pos": 436
+      },
+      "0.3-1%": {
+        "auroc": 0.9934456928838952,
+        "n_pos": 71
+      },
+      "1-3%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      "3-10%": {
+        "auroc": null,
+        "n_pos": 0
+      },
+      ">10%": {
+        "auroc": null,
+        "n_pos": 0
+      }
+    }
+  },
+  "per_class_all": {
+    "Nodule": {
+      "auroc": 0.9904200274327002,
+      "n_pos": 1439
+    }
+  },
+  "coco_sml": null
+}
