@@ -1,0 +1,132 @@
+{
+  "map": "attn_s1_nih_m",
+  "n_pairs": 451,
+  "bins": {
+    "edges": [
+      0,
+      0.001,
+      0.003,
+      0.01,
+      0.03,
+      0.1,
+      1.0
+    ],
+    "names": [
+      "<0.1%",
+      "0.1-0.3%",
+      "0.3-1%",
+      "1-3%",
+      "3-10%",
+      ">10%"
+    ]
+  },
+  "overall": {
+    "mass_in_box": 0.23687521687103746,
+    "chance_mass": 0.10372782705099778,
+    "mass_ratio": 2.2836226652523797,
+    "pointing_acc": 0.4057649667405765,
+    "n": 451
+  },
+  "per_bin": {
+    "<0.1%": {
+      "mass_in_box": 0.07571783065795898,
+      "chance_mass": 0.00390625,
+      "mass_ratio": 19.3837646484375,
+      "pointing_acc": 0.2,
+      "n": 5
+    },
+    "0.1-0.3%": {
+      "mass_in_box": 0.014566348357634111,
+      "chance_mass": 0.005504261363636364,
+      "mass_ratio": 2.6463765790385585,
+      "pointing_acc": 0.09090909090909091,
+      "n": 22
+    },
+    "0.3-1%": {
+      "mass_in_box": 0.09043386702736218,
+      "chance_mass": 0.009684244791666666,
+      "mass_ratio": 9.338246706153164,
+      "pointing_acc": 0.22916666666666666,
+      "n": 48
+    },
+    "1-3%": {
+      "mass_in_box": 0.07565374407049728,
+      "chance_mass": 0.02183219178082192,
+      "mass_ratio": 3.4652381597780715,
+      "pointing_acc": 0.1506849315068493,
+      "n": 73
+    },
+    "3-10%": {
+      "mass_in_box": 0.24751600961793552,
+      "chance_mass": 0.07288707386363637,
+      "mass_ratio": 3.3958834742221993,
+      "pointing_acc": 0.4375,
+      "n": 176
+    },
+    ">10%": {
+      "mass_in_box": 0.4150024201926284,
+      "chance_mass": 0.25003075787401574,
+      "mass_ratio": 1.6598054724200682,
+      "pointing_acc": 0.6377952755905512,
+      "n": 127
+    }
+  },
+  "uniform": {
+    "overall": {
+      "mass_in_box": 0.10372782705099778,
+      "chance_mass": 0.10372782705099778,
+      "mass_ratio": 1.0,
+      "pointing_acc": 0.10372782705099778,
+      "n": 451
+    },
+    "per_bin": {
+      "<0.1%": {
+        "mass_in_box": 0.00390625,
+        "chance_mass": 0.00390625,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.00390625,
+        "n": 5
+      },
+      "0.1-0.3%": {
+        "mass_in_box": 0.005504261363636364,
+        "chance_mass": 0.005504261363636364,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.005504261363636364,
+        "n": 22
+      },
+      "0.3-1%": {
+        "mass_in_box": 0.009684244791666666,
+        "chance_mass": 0.009684244791666666,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.009684244791666666,
+        "n": 48
+      },
+      "1-3%": {
+        "mass_in_box": 0.02183219178082192,
+        "chance_mass": 0.02183219178082192,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.02183219178082192,
+        "n": 73
+      },
+      "3-10%": {
+        "mass_in_box": 0.07288707386363637,
+        "chance_mass": 0.07288707386363637,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.07288707386363637,
+        "n": 176
+      },
+      ">10%": {
+        "mass_in_box": 0.25003075787401574,
+        "chance_mass": 0.25003075787401574,
+        "mass_ratio": 1.0,
+        "pointing_acc": 0.25003075787401574,
+        "n": 127
+      }
+    }
+  },
+  "readout": "attn_s1_nih_m",
+  "backbone": "dinov2_vitb14_reg",
+  "res": 224,
+  "split": "det10",
+  "notes": "NIH-trained head attn_s1__dinov2_vitb14_reg__res224.pt applied to ChestX-Det10 tokens; evaluated on the 8 shared findings over 2491 images whose patient is not in our NIH train/val"
+}

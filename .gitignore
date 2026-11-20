@@ -36,3 +36,5 @@ report/*.synctex.gz
 !results_cxr/scores/*.npy
 /features_cxr/
 /checkpoints_cxr/
+!results_det10/scores/*.npy
+!results_luna/scores/*.npy
