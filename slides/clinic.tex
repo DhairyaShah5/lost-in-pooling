@@ -84,12 +84,12 @@
 \column{0.5\textwidth}
 \includegraphics[width=\textwidth]{blindness_curve__dinov2_vitb14_reg__res224_cxr.pdf}
 \column{0.5\textwidth}\small
-\begin{tabular}{lcc}\toprule
+{\scriptsize\begin{tabular}{@{}lcc@{}}\toprule
 DINOv2, 224 px & global & oracle \\ \midrule
-5-fold CV on boxed images & 0.58 & 0.88--0.94 \\
+5-fold CV, boxed images & 0.58 & 0.88--0.94 \\
 image-level training (20,721) & 0.70 & -- \\
-attention head (3 seeds) & $0.73\pm0.02$ & \\ \bottomrule
-\end{tabular}
+attention head (3 seeds) & $0.73\pm0.02$ & -- \\ \bottomrule
+\end{tabular}}
 \begin{itemize}
 \item No scene prior: every radiograph is a chest, so the pooled vector has nothing to fall back on.
 \item RAD-DINO (radiograph-adapted) raises both sides (oracle 0.95--0.97, probes 0.77) without closing the gap.

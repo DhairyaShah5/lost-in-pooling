@@ -47,17 +47,37 @@ def build(root: Path = Path("data/chestx_det10"), nih_root: Path = Path("data/ni
 
     # ---- recover NIH identities by pixel hash -------------------------------------------------------------
     nih_paths = sorted((nih_root / "images").glob("**/*.png"))
-    print(f"[det10] hashing {len(nih_paths)} NIH images and {len(ann)} Det10 images ({workers} workers)")
-    nih_hash = dict(zip(hash_many([str(p) for p in nih_paths], workers), [p.name for p in nih_paths]))
-    det_hash = hash_many([str(on_disk[e["file_name"]]) for e in ann], workers)
+    cache = root / "_hashes.json"
+    if cache.exists():
+        hc = json.loads(cache.read_text())
+        nih_hash, det_hash = hc["nih"], [hc["det"][e["file_name"]] for e in ann]
+        print(f"[det10] loaded cached hashes for {len(nih_hash)} NIH and {len(det_hash)} Det10 images")
+    else:
+        print(f"[det10] hashing {len(nih_paths)} NIH images and {len(ann)} Det10 images ({workers} workers)")
+        nih_hashes = hash_many([str(p) for p in nih_paths], workers)
+        det_hash = hash_many([str(on_disk[e["file_name"]]) for e in ann], workers)
+        nih_hash = {}
+        for h, p in zip(nih_hashes, nih_paths):
+            nih_hash.setdefault(h, []).append(p.name)
+        cache.write_text(json.dumps({"nih": nih_hash, "det": {e["file_name"]: h for e, h in zip(ann, det_hash)}}))
+    # a hash bucket may hold several NIH files (near-identical follow-ups); confirm with an exact pixel comparison
+    def same_pixels(a: Path, b: Path) -> bool:
+        return np.array_equal(np.asarray(Image.open(a).convert("L")), np.asarray(Image.open(b).convert("L")))
+    nih_by_name = {p.name: p for p in nih_paths}
     entry = pd.read_csv(nih_root / "Data_Entry_2017.csv").set_index("Image Index")
     nih_man = pd.read_parquet(nih_root / "manifest.parquet").set_index("file_name")
     from .nih_cxr import image_id_of
     n_match = 0
     synthetic = SYNTHETIC_PATIENT0
+    used_nih = set()
     for e, h in zip(ann, det_hash):
-        nih_name = nih_hash.get(h)
+        nih_name = None
+        for cand in nih_hash.get(h, []):
+            if cand not in used_nih and same_pixels(on_disk[e["file_name"]], nih_by_name[cand]):
+                nih_name = cand
+                break
         if nih_name is not None:
+            used_nih.add(nih_name)
             n_match += 1
             e["nih_file_name"] = nih_name
             e["patient_id"] = int(entry.loc[nih_name, "Patient ID"])
