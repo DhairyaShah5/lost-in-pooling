@@ -817,8 +817,9 @@ DINOv2, 448 px & Mean & 0.858 & 0.921 & 0.958 & 0.991 & 0.960 \\
 \label{sec:backbones-results}
 Figure~\ref{fig:backbones} and Table~\ref{tab:backbones} repeat the comparison on CLIP
 ViT-B/16 and SigLIP ViT-B/16, two backbones with a different pretraining objective (language
-supervision) and a different patch size (16 px, one patch $=0.51\%$ of the image), on the same
-images and with the same harness. Three things hold across all three backbones. First, the
+supervision) and a different patch size (16 px, one patch $=0.51\%$ of the image), and on DINO
+ViT-B/16, which is self-supervised with the 16 px patch, on the same images and with the same
+harness. Three things hold across the first three backbones, and the fourth is discussed after them. First, the
 global read-outs lose the same amount: the best global read-out scores 0.862 (DINOv2), 0.838
 (CLIP) and 0.847 (SigLIP) on sub-patch targets, from about 0.99 on large ones, and the CLS
 probes are within 0.01 of each other (0.832, 0.832, 0.824). SigLIP's global vector is already a
@@ -843,10 +844,28 @@ collapses on CLIP (0.770) and SigLIP (0.750), consistent with their patch tokens
 linearly class-separable one patch at a time, whereas region means over several patches (the
 oracle) remain informative.
 
+\paragraph{Patch size or pretraining objective? DINO ViT-B/16.}
+The fourth panel separates the two factors that the first three confound. DINO v1 ViT-B/16 is
+self-supervised like DINOv2 but has the 16 px patch of CLIP and SigLIP. Its global read-outs
+lose the most of the four (CLS 0.804, mean 0.798 on sub-patch targets, from 0.95 to 0.97 on
+large ones), its oracle is the lowest (0.900, against 0.935 and 0.934 for the two
+language-supervised 16 px models and 0.973 for DINOv2), and its oracle gap to mean pooling is
+0.10, the same as the others. So the loss at aggregation does not depend on patch size or
+objective, but the amount of small-object evidence the tokens carry does, and not in the way
+patch size alone would predict: the two 16 px models with language supervision keep more than
+the 16 px self-supervised one, and the 14 px self-supervised one keeps the most. The
+pretraining recipe (DINOv2's data, its patch-level iBOT objective and registers) matters more
+than the patch size. The attention head recovers less on this backbone (0.830 on sub-patch
+targets for seed 0, a third of its gap) and localises less sharply (attention mass 5 to 7 times
+chance against 12 to 24 on DINOv2), consistent with weaker tokens giving the head less to find.
+The context-only control scores 0.824 on sub-patch targets, above both global read-outs, so
+here too the global vector's sub-patch score is the scene.
+% TODO(final): DINO16 seeds and 448 px
+
 \begin{figure*}[t]
 \centering
 \guardedfig{figures/cross_backbone__res224.pdf}{\textwidth}
-\caption{Blindness curves for three frozen backbones on the same 5,000 COCO test images, 224 px
+\caption{Blindness curves for four frozen backbones on the same 5,000 COCO test images, 224 px
 input: CLS (or SigLIP's MAP-pooled vector), mean pooling, the attention head and the oracle,
 each trained on identical cached tokens. Bands are 95\% bootstrap intervals; the dotted line
 marks one patch for each backbone's patch size.}
@@ -855,7 +874,7 @@ marks one patch for each backbone's patch size.}
 
 \begin{table*}[t]
 \centering\small
-\caption{Macro AUROC per size bin for the five main read-outs on each backbone (COCO val2017,
+\caption{Macro AUROC per size bin for the four main read-outs on each of four backbones (COCO val2017,
 224 px). Best non-oracle read-out per backbone and column in bold.}
 \label{tab:backbones}
 \IfFileExists{../results/cross_backbone_table__res224.tex}{\input{../results/cross_backbone_table__res224.tex}}{\todo{cross-backbone table missing}}
