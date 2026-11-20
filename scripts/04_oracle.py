@@ -39,6 +39,7 @@ def main() -> None:
     p.add_argument("--manifest", default="data/coco/manifest.parquet")
     p.add_argument("--out", default="results")
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--readout-suffix", default="", help="appended to the read-out name, e.g. _s1 for seed repeats")
     p.add_argument("--force", action="store_true", help="rebuild cached oracle features")
     p.add_argument("--verbose", action="store_true")
     a = p.parse_args()
@@ -53,7 +54,7 @@ def main() -> None:
     from lip.readouts.probe import macro_ap
     probes_script = import_module("03_probes")  # load_wh / print_bins helpers
 
-    readout = READOUT_NAME[a.neg_mode]
+    readout = READOUT_NAME[a.neg_mode] + a.readout_suffix
     stores = {s: FeatureStore(a.backbone, a.res, s, root=a.features_root) for s in SPLITS}
     labels = {s: align_labels(stores[s], load_labels(a.labels, split=s)) for s in SPLITS}
     n_classes = labels["train"]["y"].shape[1]
