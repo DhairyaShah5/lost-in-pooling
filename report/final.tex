@@ -898,7 +898,13 @@ targets over three seeds, a third of its gap; the multi-scale head $0.822\pm0.01
 chance against 12 to 24 on DINOv2), consistent with weaker tokens giving the head less to find.
 The context-only control scores 0.824 on sub-patch targets, above both global read-outs, so
 here too the global vector's sub-patch score is the scene.
-% TODO(final): DINO16 448 px
+At 448 px (a $28\times28$ grid; every read-out retrained on the 5,000-image subset present in
+both caches) DINO ViT-B/16 repeats the mechanism result of Section~\ref{sec:results}: its oracle
+rises from 0.900 to 0.941 on sub-patch targets and from 0.942 to 0.967 on one-to-two-patch
+ones, while the global read-outs retrained on the same subset do not move (CLS 0.799 to
+0.798, mean 0.788 to 0.776, max 0.740 to 0.743 on sub-patch targets; 0.925 to 0.927 overall
+for CLS). The fourth backbone, with the largest patch and the weakest tokens, therefore orders
+itself by token fraction like the other three.
 
 \begin{figure*}[t]
 \centering
