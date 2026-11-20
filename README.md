@@ -39,9 +39,16 @@ unchanged: global pooling tracks the fraction of tokens an object occupies, not 
 
 Chest radiographs (NIH ChestX-ray14, 880 boxed images): with DINOv2, global probes score 0.58 (5-fold CV) to
 0.70 (trained on 20k radiographs) overall AUROC while the oracle on the same tokens reaches 0.88 to 0.94 per
-lesion-size bin and the attention head 0.73; RAD-DINO lifts every read-out (oracle 0.95 to 0.97, probes 0.77)
-without closing the gap. At 448 px the chest oracle rises to 0.96 to 0.98 and the global probes do not move, while the attention head trained on the full 448 px cache reaches 0.77 +- 0.01 over three seeds (0.73 +- 0.02 at 224 px): the learned read-out gains from resolution where the global probes do not. Full tables, intervals and per-class breakdowns: `report/midterm.pdf`, `results/`,
-`results_cxr/`.
+lesion-size bin and the attention head 0.73 +- 0.02; RAD-DINO lifts every read-out (oracle 0.95 to 0.97, probes 0.77)
+without closing the gap. At 448 px the chest oracle rises to 0.96 to 0.98 and the cross-validated global probes do not
+move, while the attention head trained on the full 448 px cache reaches 0.77 +- 0.01 (DINOv2) and 0.80 +- 0.01
+(RAD-DINO) over three seeds. A context-only control (the oracle protocol on the tokens *outside* the box) scores the
+same as the global probes on sub-patch targets, so the global vector's floor is the scene. ChestX-Det10 (3,543 NIH
+images re-annotated with 8,339 boxes) shows the same cliff on 5.4x the boxes, and the NIH-trained head transfers to
+the new annotators better than the probes do (0.77 vs 0.70 for DINOv2 and 0.83 vs 0.80 for RAD-DINO at 448 px).
+Tiled-teacher distillation does not move a 224 px head off its baseline on radiographs (students 0.72 to 0.74 vs
+teacher 0.77): the evidence a 448 px head uses is not in the 224 px tokens. Full tables, intervals and per-class
+breakdowns: `report/final.pdf`, `results/`, `results_cxr/`, `results_det10/`, `results_luna/`.
 
 ## Reproduce
 
@@ -71,11 +78,26 @@ scripts/run_cxr_backbone.sh dinov2_vitb14_reg
 .venv/bin/python scripts/09_perclass.py && .venv/bin/python scripts/10_compare.py --pairs attn:mean,oracle:mean
 .venv/bin/python scripts/11_seeds.py --readouts attn --suffixes ",_s1,_s2"
 .venv/bin/python scripts/15_patch_units.py
-# report
+# context-only control (the oracle protocol with the tokens outside the box)
+scripts/run_context.sh
+# fourth backbone (DINO ViT-B/16) and seed repeats for every read-out
+scripts/run_dino16.sh && scripts/run_seed_repeats.sh
+# ChestX-Det10 (place the ChestX-Det10 release under data/chestx_det10/)
+.venv/bin/python scripts/18_build_det10_manifest.py && scripts/run_det10.sh
+# tiled-teacher distillation (COCO and radiographs)
+scripts/run_distill.sh coco && scripts/run_distill.sh chest && .venv/bin/python scripts/23_distill_table.py --dataset chest
+# LUNA16 slices (annotations.csv, seg-lungs-LUNA16.zip and the subset zips under data/luna16/raw/)
+.venv/bin/python scripts/21_build_luna16.py --subsets subset0,subset1 && scripts/run_luna.sh
+# pre-deployment check (fits and figure), then the CLI for a token grid and a target size
+.venv/bin/python scripts/17_deploy_check.py
+.venv/bin/python -m lip.eval.deploy_check --grid 16 --target-frac 0.002
+# live demo on one image: curve position, attention map, probe scores
+.venv/bin/python scripts/demo.py --image path/to/image.jpg --out demo.png
+# report, slides, poster
 report/build.sh
 ```
 
-Tests: `.venv/bin/python -m pytest -q` (synthetic data, no download needed).
+Tests: `.venv/bin/python -m pytest -q` (59 tests on synthetic data, no download needed).
 
 File formats, bins, metric and result schema: `docs/CONTRACTS.md`. Plan and decisions: `docs/PLAN.md`.
 Progress checklist: `TODO.md`. Committed results live in `results/` (JSON + per-image test scores).

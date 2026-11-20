@@ -121,10 +121,10 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 16.5 Report (chest resolution paragraph, Table tab:cxr block, paired test, abstract, limitations, plan), README, push
 
 # Phase 7 (Nov 19 onward): finish the plan from the midterm report
-- [ ] 17.1 RAD-DINO chest head on the full 448 px cache, three seeds, like-for-like probes (running)
+- [x] 17.1 RAD-DINO chest head on the full 448 px cache, three seeds, like-for-like probes (attn 0.800+-0.006 vs mean 0.808 overall; head leads in every size bin, +0.12 at 0.1-0.3%)
 - [ ] 17.2 Fourth backbone: DINO ViT-B/16 (self-supervised, 16 px patch) on COCO at 224 and 448 px: probes, oracle, heads x3 seeds, multi-scale head
 - [x] 17.3 Seed repeats for every one-seed read-out (COCO oracles at 224/336/448, CLIP/SigLIP probes and oracles, chest probes, max-MIL); seeds__*.json summaries
-- [ ] 17.4 ChestX-Det10 boxes: fetch annotations, map to our NIH images, patient-disjoint manifest, CV read-outs and NIH-trained heads at 224/448 px
+- [x] 17.4 ChestX-Det10 boxes: fetch annotations, map to our NIH images, patient-disjoint manifest, CV read-outs and NIH-trained heads at 224/448 px (both backbones; transfer head 0.77 vs 0.70 DINOv2, 0.83 vs 0.80 RAD-DINO at 448)
 - [x] 17.5 Token-fraction pre-deployment check: fits within 0.02 across resolutions, leave-one-backbone-out MAE <= 0.012, radiograph offset 0.17-0.28, 200 boxed images detect the gap; CLI `python -m lip.eval.deploy_check`
 - [ ] 17.6 Tiled-teacher distillation: 448 px head as teacher, 224 px student on the same images (COCO and chest)
 - [ ] 17.7 LUNA16 arm (scoped): one or two subsets, 2D nodule slices, blindness curve of CLS / mean / oracle / head by nodule size

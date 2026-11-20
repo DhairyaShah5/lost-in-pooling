@@ -95,10 +95,27 @@ attention head (3 seeds) & $0.73\pm0.02$ & -- \\ \bottomrule
 \begin{itemize}
 \item No scene prior: every radiograph is a chest, so the pooled vector has nothing to fall back on.
 \item RAD-DINO (radiograph-adapted) raises both sides (oracle 0.95--0.97, probes 0.77) without closing the gap.
-\item At 448 px on the full cache the head gains 0.04 ($0.77\pm0.01$), the global probes 0.01--0.02.
-\item ChestX-Det10 (3,543 images, 10 findings, 5.4$\times$ the boxes): same cliff (global 0.56--0.69 vs oracle 0.91--0.93 under 0.3\%); NIH-trained head transfers (0.74 vs 0.69 for CLS).
+\item At 448 px on the full cache the head gains 0.04 ($0.77\pm0.01$), the global probes 0.01--0.02. RAD-DINO at 448 px: head $0.80\pm0.01$ vs.\ mean probe 0.81 overall, but the head leads in every size bin ($+0.12$ at 0.1--0.3\%).
+\item ChestX-Det10 (3,543 images, 10 findings, 5.4$\times$ the boxes): same cliff (global 0.56--0.69 vs oracle 0.91--0.93 under 0.3\%); NIH-trained head transfers: 0.74 vs 0.69 (CLS) at 224 px, 0.77 vs 0.70 at 448 px; RAD-DINO 0.83 vs 0.80.
 \end{itemize}
 \end{columns}
+\end{frame}
+
+\begin{frame}{Tiled-teacher distillation: a negative result}
+NIH radiographs, DINOv2, three seeds, macro AUROC (0.1--0.3\% lesions / all)
+\begin{center}\small\begin{tabular}{@{}lcc@{}}\toprule
+Read-out (tokens at test time) & 0.1--0.3\% & All \\ \midrule
+224 px head, baseline (224 px) & $0.61\pm0.04$ & $0.73\pm0.02$ \\
+Inference-time tiling, $4\times$ compute (448 px) & 0.58 & 0.73 \\
+448 px head, teacher (448 px) & $\mathbf{0.72\pm0.01}$ & $\mathbf{0.77\pm0.01}$ \\
+Student of the tiled teacher (224 px) & $0.58\pm0.03$ & $0.74\pm0.02$ \\
+Student of the 448 px teacher (224 px) & $0.63\pm0.05$ & $0.72\pm0.01$ \\ \bottomrule
+\end{tabular}\end{center}
+\begin{itemize}\small
+\item Neither student moves off the baseline in any bin; tiling at test time does not either.
+\item The 448 px head's extra evidence is not in the 224 px tokens: it was lost at patch embedding, and a teacher cannot supply what the student's input does not contain.
+\item Resolution gains on small findings must be bought at the encoder's input. % TODO(final): COCO
+\end{itemize}
 \end{frame}
 
 \begin{frame}{A pre-deployment check}
@@ -115,7 +132,7 @@ attention head (3 seeds) & $0.73\pm0.02$ & -- \\ \bottomrule
 \begin{enumerate}
 \item \textbf{The causal argument.} Same tokens, swap the read-out: is the oracle-vs-global comparison plus the resolution mechanism test enough, or should we add an intervention (e.g. masking tokens outside the box for the global probe)?
 \item \textbf{Context priors.} The context-only control now shows the floor of the global read-outs is the scene. Is that control convincing, or should we also mask tokens inside the box for the global probe at training time?
-\item \textbf{Extensions in flight.} Tiled-teacher distillation and a scoped LUNA16 slice arm are running; ChestX-Det10 and DINO ViT-B/16 are in.
+\item \textbf{Extensions.} ChestX-Det10, DINO ViT-B/16 and distillation (negative) are in; the scoped LUNA16 slice arm is running. Is the negative distillation result worth a section of its own?
 \item \textbf{Framing.} Is the blindness curve plus the deployment check the right headline for the final report?
 \end{enumerate}
 \end{frame}
