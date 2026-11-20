@@ -135,4 +135,4 @@ Legend: `[ ]` pending, `[~]` in progress, `[x]` done, `[-]` cut for today
 - [x] 18.1 Final report (same format as the midterm), every number seeded, new sections for 17.2-17.7
 - [x] 18.2 Clinic slides (Nov 23): cross-backbone curves, oracle gap, mechanism figure, radiograph replication
 - [x] 18.3 Poster (Nov 30) and live demo script (curve + attention maps on a user-chosen image)
-- [ ] 18.4 Final push: README reproduce commands for every arm, release tag
+- [x] 18.4 Final push: README reproduce commands for every arm, release tag (v1.0-final)
