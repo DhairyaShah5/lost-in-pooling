@@ -1,0 +1,22 @@
+{
+  "backbone": "dinov2_vitb14_reg",
+  "res": 224,
+  "patch_size": 14,
+  "grid": 16,
+  "dim": 768,
+  "n": 804,
+  "resize": "squash",
+  "mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "img_per_s": 47.52,
+  "tokens": "global=x_norm_clstoken; patches=final tokens",
+  "autocast": "float16"
+}

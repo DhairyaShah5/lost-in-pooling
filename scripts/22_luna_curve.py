@@ -26,9 +26,11 @@ def main():
     p.add_argument("--labels-head", default="data/luna16/labels_head.npz")
     p.add_argument("--readouts", default="cls_cv5,mean_cv5,max_cv5,oracle_cv5,context_cv5,attn,attn_s1,attn_s2")
     p.add_argument("--n-boot", type=int, default=300)
-    p.add_argument("--fig", default="results_luna/figures/luna_curve.pdf")
+    p.add_argument("--fig", default="", help="default results_luna/figures/luna_curve__{backbone}__res{res}.pdf")
     p.add_argument("--report-fig-dir", default="report/figures")
     a = p.parse_args()
+    if not a.fig:
+        a.fig = f"{a.results}/figures/luna_curve__{a.backbone}__res{a.res}.pdf"
     man = pd.read_parquet(a.manifest).set_index("image_id")
     rng = np.random.default_rng(0)
     out = {"backbone": a.backbone, "res": a.res, "bins": [f"{lo}-{hi} mm" if hi < 100 else f">{lo} mm" for lo, hi in DIAMETER_BINS], "readouts": {}}
