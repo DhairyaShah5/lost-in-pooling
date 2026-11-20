@@ -523,11 +523,12 @@ seeds each. The tiled teacher is also evaluated on its own at test time (inferen
 tiling of the 224 px head, four times the compute, no training).
 
 \paragraph{LUNA16 nodule slices.}
-A scoped CT arm \citep{setio2017luna16}: LUNA16 subsets 0 and 1 (178 scans) as 2D axial
-lung-window slices. Every slice through an annotated nodule, and its neighbours within the
-nodule radius, is a positive with a square box of the nodule's diameter; six nodule-free
-lung slices per scan (at least 20 mm from any nodule, inside the provided lung masks) are
-negatives. One class, scan-disjoint 5-fold cross-validation for CLS, mean, max, oracle and
+A scoped CT arm \citep{setio2017luna16}: LUNA16 subsets 0 and 1 (178 scans, 246 annotated
+nodules) as 2D axial lung-window slices. Every slice through an annotated nodule, and its
+neighbours within the nodule radius, is a positive with a square box of the nodule's
+diameter (1,439 slices, 1,492 boxes: 158 under 5 mm, 558 at 5--8 mm, 319 at 8--12 mm, 377 at
+12--20 mm and 80 above); six nodule-free lung slices per scan (at least 20 mm from any nodule,
+inside the provided lung masks) are negatives (1,068 slices). One class, scan-disjoint 5-fold cross-validation for CLS, mean, max, oracle and
 the context-only control, and an image-level head on a scan-level split, at 224 and 448 px
 with DINOv2. The size variable is the nodule diameter (3--5, 5--8, 8--12, 12--20, over 20 mm);
 a 5 mm nodule covers 0.02\% of a 350 mm field of view, well inside our smallest bin.
