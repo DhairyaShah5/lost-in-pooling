@@ -999,9 +999,9 @@ the failure is the scene prior: the COCO fit overpredicts the radiograph probes 
 only 0.05 below the COCO patch-units curve. The check therefore reports a band: given a
 target's expected share of the image and the token grid, the predicted global AUROC with a
 scene prior, the predicted region AUROC, and the gap. For a target covering 0.2\% of the
-image on a $16\times16$ grid (half a patch) the fitted curves give 0.87 for global pooling
-and 0.97 for a region read-out; on a $32\times32$ grid the region figure rises to 0.99 and the
-global one does not move. The last panel answers how many boxed images are needed to
+image on a $16\times16$ grid (half a patch) the fitted curves give 0.90 for global pooling
+with a scene prior and 0.98 for a region read-out; on a $32\times32$ grid the region figure
+rises to 0.99 and the global one does not move. The last panel answers how many boxed images are needed to
 confirm the gap on a new dataset: with the saved test scores, random subsets of 200 COCO
 images detect a sub-patch gap above 0.05 AUROC in 84\% of draws (400 images: 99\%), and 50
 radiographs do so in 90\% of draws, because there the gap is four times larger. The fits
