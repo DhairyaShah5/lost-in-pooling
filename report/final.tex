@@ -97,7 +97,7 @@ but not the global read-outs: what governs global pooling is the fraction of all
 object occupies, not the patches it covers. On NIH ChestX-ray14 the cliff of the motivating
 study reappears, with global probes at 0.58 to 0.70 AUROC against 0.88 to 0.94 for the oracle
 on the same tokens, and a radiograph-adapted backbone (RAD-DINO) raises both sides without
-closing the gap; the head recovers part of it, and at 448 px it gains a further 0.04 AUROC where the global probes retrained on the same tokens gain 0.01. We explain why natural images, with
+closing the gap; the head recovers part of it, and at 448 px it gains a further 0.04 AUROC where the global probes retrained on the same tokens gain 0.01 to 0.02. We explain why natural images, with
 their strong context priors, show a graded loss where radiographs show a cliff, and set out
 the plan to the final report.
 \end{list}
@@ -716,6 +716,8 @@ for the single-scale head). It closes 41\% of the oracle gap on sub-patch target
 where the single-scale head was weakest, and it does so while looking at the object more, not
 less.
 
+The read-outs that rested on one seed at the midterm are now seeded too. The oracle is as stable as the probes: $0.973\pm0.002$ on sub-patch targets at 224 px, $0.980\pm0.004$ at 336 px and $0.990\pm0.003$ at 448 px, with the seed changing the matched negative boxes; the CLIP and SigLIP probes and oracles vary by at most 0.003, max pooling by at most 0.002. Max-MIL is the one unstable read-out ($0.80\pm0.05$ on DINOv2, $0.75\pm0.03$ on CLIP, $0.71\pm0.03$ on SigLIP on sub-patch targets), which is consistent with a head that commits to a single patch per image.
+
 \paragraph{Paired tests.}
 Because every read-out scores the same test images, differences can be tested with a paired
 bootstrap over images (500 draws, same resample for both read-outs). The $\lambda=0$ head beats
@@ -878,7 +880,7 @@ pooled vector does not. What differs from COCO is the absence of scene context. 
 radiograph is a chest, so a global vector has nothing to predict a finding from except the
 finding itself, and without a context prior to fall back on the loss at pooling is close to
 total. The attention head, trained from the image-level labels of the 20,721 training
-radiographs, is the best read-out that sees no boxes: $0.73\pm0.02$ overall AUROC over three seeds against 0.70 for CLS, 0.61 (seed spread 0.04) against 0.52 for lesions covering 0.1--0.3\% of the frame and 0.83 against 0.76 for the largest findings, and its attention mass on small lesions is 13 to 15 times chance. The
+radiographs, is the best read-out that sees no boxes: $0.73\pm0.02$ overall AUROC over three seeds against $0.71\pm0.01$ for CLS, $0.61\pm0.04$ against $0.50\pm0.02$ for lesions covering 0.1--0.3\% of the frame and 0.83 against 0.76 for the largest findings, and its attention mass on small lesions is 13 to 15 times chance. The
 multi-scale variant is level with it. The head therefore recovers part of what pooling loses
 on radiographs, as on COCO, but on radiographs the remaining distance to the oracle (0.15 to
 0.28 AUROC) is much larger: with no scene prior to lean on and only a few hundred positives
@@ -914,7 +916,7 @@ averaging over four times as many tokens, does not. For a frozen-backbone pipeli
 radiographs, raising the input resolution without changing the aggregation buys almost nothing for
 small findings. RAD-DINO behaves the same way at 448 px: its cross-validated oracle rises to
 0.96 to 0.98 in every bin (0.960 for 0.1--0.3\% lesions, from 0.904) while its cross-validated
-CLS probe stays at 0.62 overall. Trained on the full 20,721-image cache at 448 px, the attention head reaches $0.77\pm0.01$ overall over three seeds ($0.73\pm0.02$ at 224 px on the same images) and $0.72\pm0.01$ for lesions covering 0.1--0.3\% of the frame ($0.61\pm0.04$ at 224 px), while the global probes retrained on the same 448 px cache move from 0.69 to 0.71 overall (CLS and mean; max pooling from 0.67 to 0.66) and, in that bin, CLS from 0.52 to 0.57 and mean from 0.53 to 0.58. The head's lead over the best global read-out on the same cache therefore widens from 0.03 AUROC at 224 px to 0.06 at 448 px (paired bootstrap over the 880 images: $+0.055$, 95\% CI $[0.038, 0.072]$ against CLS and $[0.029, 0.082]$ against mean, against $+0.028$ $[0.012, 0.048]$ over CLS at 224 px). The head's attention mass on lesions rises to 3.5 times chance overall and 44 times chance for 0.1--0.3\% lesions (13 times at 224 px), with pointing accuracy 0.47 (0.40 at 224 px); all three seeds agree to within 0.4 and 3 times chance respectively. The learned read-out therefore gains from the extra patches much as the oracle does while the global probe gains little, which is the COCO mechanism result again, this time with a read-out that sees no boxes. RAD-DINO's head on a 5,000-image 448 px cache scores 0.71 overall but
+CLS probe stays at 0.62 overall. Trained on the full 20,721-image cache at 448 px, the attention head reaches $0.77\pm0.01$ overall over three seeds ($0.73\pm0.02$ at 224 px on the same images) and $0.72\pm0.01$ for lesions covering 0.1--0.3\% of the frame ($0.61\pm0.04$ at 224 px), while the global probes retrained on the same 448 px cache move from $0.71\pm0.01$ to $0.72\pm0.01$ (CLS) and from $0.71\pm0.02$ to $0.73\pm0.01$ (mean) overall, max pooling from 0.67 to 0.66, and, in that bin, CLS from $0.50\pm0.02$ to $0.57\pm0.02$ and mean from $0.54\pm0.01$ to $0.58\pm0.01$ (three seeds each). The head's lead over the best global read-out on the same cache therefore widens from 0.02 AUROC at 224 px to 0.05 at 448 px (paired bootstrap over the 880 images: $+0.055$, 95\% CI $[0.038, 0.072]$ against CLS and $[0.029, 0.082]$ against mean, against $+0.028$ $[0.012, 0.048]$ over CLS at 224 px). The head's attention mass on lesions rises to 3.5 times chance overall and 44 times chance for 0.1--0.3\% lesions (13 times at 224 px), with pointing accuracy 0.47 (0.40 at 224 px); all three seeds agree to within 0.4 and 3 times chance respectively. The learned read-out therefore gains from the extra patches much as the oracle does while the global probe gains little, which is the COCO mechanism result again, this time with a read-out that sees no boxes. RAD-DINO's head on a 5,000-image 448 px cache scores 0.71 overall but
 localises small lesions far better than at 224 px (attention mass 67 times chance and
 pointing accuracy 0.38 for 0.1--0.3\% lesions, vs.\ 24 times and 0.19), so the extra pixels
 help the head find lesions even where the training set limits how well it scores them.
@@ -1041,7 +1043,7 @@ tennis-racket panel of Figure~\ref{fig:attention} shows that context routes stil
 the audit is what makes them visible.
 
 \paragraph{Limitations.}
-The oracle and the CLIP, SigLIP and chest probes rest on one seed; the DINOv2 CLS and mean probes and every head are seeded (three seeds), with spreads of 0.003 to 0.016 on COCO and 0.015 to 0.084 on radiographs, where the thinnest bin moves most. The
+Every read-out in the main tables now has three seeds except the cross-validated chest read-outs, whose folds are fixed by patient. On COCO the spreads are 0.000 to 0.004 for the probes, 0.001 to 0.004 for the oracles, 0.004 to 0.016 for the heads and 0.03 to 0.05 for max-MIL; on radiographs 0.003 to 0.024 for the probes and 0.005 to 0.084 for the heads, where the thinnest bin moves most. The
 chest bins are thin, with one to seven findings per bin and one finding in the 0.1--0.3\% bin,
 so chest-side per-bin numbers carry wide intervals and we lean on the overall and paired
 figures. The COCO resolution ablations train probes on 5,000 images rather than 9,000 so that the
